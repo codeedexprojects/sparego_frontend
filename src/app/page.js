@@ -9,10 +9,10 @@ export default function LandingHomePage() {
   return (
     <div>
       <Header />
-      <HeroSection></HeroSection>
-      <FourStoresSection></FourStoresSection>
-      <SpecialOffersCarousel></SpecialOffersCarousel>
-      <WhyChooseUs></WhyChooseUs>
+      <HeroSection id="home"></HeroSection>
+      <FourStoresSection id="shop"></FourStoresSection>
+      <SpecialOffersCarousel id="offer"></SpecialOffersCarousel>
+      <WhyChooseUs id="whychoose"></WhyChooseUs>
       <Footer></Footer>
     </div>
   );

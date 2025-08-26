@@ -9,6 +9,7 @@ import SearchByVehicleSection from './components/SearchParts'
 import PopularBrandsSection from './components/PopularBrands'
 import TestimonialsSection from './components/Testimonilels'
 import Footer from '@/components/landing/Footer'
+import SparePartsCarousel from './components/SpareCarousal'
 
 function page() {
     return (
@@ -21,6 +22,7 @@ function page() {
             <NewArrivalsSection></NewArrivalsSection>
             <SearchByVehicleSection></SearchByVehicleSection>
             <PopularBrandsSection></PopularBrandsSection>
+            <SparePartsCarousel></SparePartsCarousel>
             <TestimonialsSection></TestimonialsSection>
             <Footer></Footer>
         </div>
