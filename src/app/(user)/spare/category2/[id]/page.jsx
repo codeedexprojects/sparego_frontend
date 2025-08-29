@@ -1,14 +1,14 @@
 import Header from '@/components/user/spare/Header'
 import React from 'react'
 import Footer from '@/components/landing/Footer'
-import AutomotivePartsCatalog from './components/CategoryCard'
 import PromotionalBannerSection from './components/OfferSection'
+import SubCategoryPage from './components/CategoryCard'
 
 function page() {
     return (
         <div>
             <Header></Header>
-            <AutomotivePartsCatalog></AutomotivePartsCatalog>
+            <SubCategoryPage></SubCategoryPage>
             <PromotionalBannerSection></PromotionalBannerSection>
             <Footer></Footer>
         </div>
