@@ -12,6 +12,7 @@ import SimilarProducts from './components/SimilarProducts';
 import PromotionalBannerSection from './components/OfferSection';
 import { getProductById } from '@/redux/slices/productSlice';
 import { useParams } from 'next/navigation';
+import { Toaster } from 'sonner';
 
 const page = () => {
   const { id } = useParams();
@@ -89,6 +90,7 @@ const page = () => {
         <PromotionalBannerSection />
       </div>
       <Footer />
+      <Toaster position="top-center" richColors closeButton />
     </div>
   );
 };
