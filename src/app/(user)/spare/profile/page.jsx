@@ -7,17 +7,20 @@ import { useSelector, useDispatch } from "react-redux";
 import { createAddress, getAddress, updateAddress, deleteAddress } from "@/redux/slices/addressSlice";
 import { AddressForm } from "./components/AddressForm";
 import { AddressList } from "./components/AddressList";
+import { getUserProfile } from "@/redux/slices/authSlice";
 
 // Main Address Page Component
 const AddressPage = () => {
   const dispatch = useDispatch();
   const { address: addresses, loading, error } = useSelector((state) => state.address);
+  const { user, loading: userLoading } = useSelector((state) => state.auth); // Get user data from auth slice
   const [showForm, setShowForm] = useState(false);
   const [editingAddress, setEditingAddress] = useState(null);
   const [formLoading, setFormLoading] = useState(false);
 
   useEffect(() => {
     dispatch(getAddress());
+    dispatch(getUserProfile()); // Fetch user profile when component mounts
   }, [dispatch]);
 
   const handleAddAddress = () => {
@@ -85,13 +88,17 @@ const AddressPage = () => {
         {/* Name & Email */}
         <div className="bg-gray-50 p-6 rounded-lg border border-gray-200">
           <div className="flex items-center justify-between mb-2">
-            <h2 className="font-semibold text-gray-800">Name</h2>
-            <button className="text-gray-600 hover:text-gray-800">
+            <h2 className="font-semibold text-gray-800">
+              {userLoading ? "Loading..." : user?.name || "User Name"}
+            </h2>
+            {/* <button className="text-gray-600 hover:text-gray-800">
               <Pencil size={16} />
-            </button>
+            </button> */}
           </div>
-          <p className="text-sm text-gray-500">E-mail</p>
-          <p className="text-gray-700">bill.sanders@example.com</p>
+          <p className="text-sm text-gray-500">Number</p>
+          <p className="text-gray-700">
+            {userLoading ? "Loading..." : user?.number || "No Number available"}
+          </p>
         </div>
 
         {/* Address Section */}

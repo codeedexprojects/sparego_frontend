@@ -1,73 +1,108 @@
 "use client";
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ChevronDown } from 'lucide-react';
+import { useSelector, useDispatch } from 'react-redux';
+import { useRouter } from 'next/navigation';
+import { getAllBrands } from '@/redux/slices/brandSlice';
+import { getVehicleHierarchy, setFilters } from '@/redux/slices/vehicleSlice';
 
 export default function SearchByVehicleSection() {
+  const dispatch = useDispatch();
+  const router = useRouter(); // Initialize the router
+
+  const { brands, loading: brandsLoading, error: brandsError } = useSelector((state) => state.brand);
+
+  const { hierarchy, loading: hierarchyLoading, error: hierarchyError, filters } = useSelector((state) => state.vehicles);
+
   const [activeTab, setActiveTab] = useState('TWO WHEELER');
-  const [selectedBrand, setSelectedBrand] = useState('');
-  const [selectedModel, setSelectedModel] = useState('');
-  const [selectedYear, setSelectedYear] = useState('');
-  const [selectedModification, setSelectedModification] = useState('');
+  const [isDropdownOpen, setIsDropdownOpen] = useState({
+    brand: false,
+    modelLine: false,
+    year: false,
+    modification: false
+  });
 
   const tabs = ['FOUR WHEELER', 'TWO WHEELER'];
 
-  const vehicleData = {
-    'FOUR WHEELER': {
-      brands: ['Honda', 'Toyota', 'Hyundai', 'Maruti Suzuki', 'Tata', 'Mahindra'],
-      models: ['City', 'Civic', 'Accord', 'CR-V', 'Jazz'],
-      years: ['2024', '2023', '2022', '2021', '2020', '2019'],
-      modifications: ['Petrol', 'Diesel', 'CNG', 'Electric', 'Hybrid']
-    },
-    'TWO WHEELER': {
-      brands: ['Honda', 'Yamaha', 'Bajaj', 'TVS', 'Hero', 'Royal Enfield'],
-      models: ['Activa', 'CB Shine', 'Splendor', 'Apache', 'FZ'],
-      years: ['2024', '2023', '2022', '2021', '2020', '2019'],
-      modifications: ['Standard', 'Disc Brake', 'Electric Start', 'Alloy Wheel']
+  useEffect(() => {
+    dispatch(getAllBrands());
+  }, [dispatch]);
+
+  useEffect(() => {
+    if (filters.brand || filters.modelLine || filters.year || filters.modification) {
+      dispatch(getVehicleHierarchy(filters));
+    }
+  }, [dispatch, filters]);
+
+  const filteredBrands = brands && Array.isArray(brands)
+    ? brands.filter(brand => {
+      if (!brand.vehicleType) return false;
+      const brandVehicleType = brand.vehicleType.toLowerCase().replace('-', '');
+      const activeTabNormalized = activeTab.toLowerCase().replace(' ', '');
+      return brandVehicleType === activeTabNormalized;
+    })
+    : [];
+
+  const handleFilterChange = (filterType, value) => {
+    dispatch(setFilters({ [filterType]: value }));
+
+    if (filterType === 'brand') {
+      dispatch(setFilters({ modelLine: '', year: '', modification: '' }));
+    } else if (filterType === 'modelLine') {
+      dispatch(setFilters({ year: '', modification: '' }));
+    } else if (filterType === 'year') {
+      dispatch(setFilters({ modification: '' }));
     }
   };
 
-  const handleSearch = () => {
-    console.log('Searching for:', {
-      vehicleType: activeTab,
-      brand: selectedBrand,
-      model: selectedModel,
-      year: selectedYear,
-      modification: selectedModification
-    });
+  const handleTabChange = (tab) => {
+    setActiveTab(tab);
+    dispatch(setFilters({ brand: '', modelLine: '', year: '', modification: '' }));
   };
 
-  const CustomDropdown = ({ placeholder, value, options, onChange, disabled = false }) => {
-    const [isOpen, setIsOpen] = useState(false);
+  const handleSearch = () => {
+    // Get the selected brand name for the URL
+    const selectedBrand = filteredBrands.find(b => b._id === filters.brand);
+    const brandName = selectedBrand ? encodeURIComponent(selectedBrand.name) : '';
+    
+    // Convert activeTab to URL-friendly format
+    const vehicleType = activeTab === 'TWO WHEELER' ? 'two-wheeler' : 'four-wheeler';
+    
+    // Navigate to the dynamic route with all parameters
+    router.push(
+      `/spare/search-products/${vehicleType}/${filters.brand}/${encodeURIComponent(filters.modelLine)}/${filters.year}/${encodeURIComponent(filters.modification)}`
+    );
+  };
 
+  const CustomDropdown = ({ placeholder, value, options, onChange, disabled = false, type }) => {
     return (
       <div className="relative">
         <button
-          onClick={() => !disabled && setIsOpen(!isOpen)}
-          className={`w-full px-4 py-3 text-left border rounded-lg bg-white transition-colors duration-200 flex items-center justify-between ${
-            disabled 
-              ? 'border-gray-200 text-black cursor-not-allowed' 
+          onClick={() => !disabled && setIsDropdownOpen({ ...isDropdownOpen, [type]: !isDropdownOpen[type] })}
+          className={`w-full px-4 py-3 text-left border rounded-lg bg-white transition-colors duration-200 flex items-center justify-between ${disabled
+              ? 'border-gray-200 text-black cursor-not-allowed'
               : 'border-gray-300 hover:border-gray-400 cursor-pointer'
-          }`}
+            }`}
           disabled={disabled}
         >
           <span className={value ? 'text-black' : 'text-black'}>
             {value || placeholder}
           </span>
-          <ChevronDown className={`w-4 h-4 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+          <ChevronDown className={`w-4 h-4 transition-transform ${isDropdownOpen[type] ? 'rotate-180' : ''}`} />
         </button>
-        
-        {isOpen && !disabled && (
+
+        {isDropdownOpen[type] && !disabled && (
           <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-300 rounded-lg shadow-lg z-10 max-h-48 overflow-y-auto">
             {options.map((option) => (
               <button
-                key={option}
+                key={option._id || option}
                 onClick={() => {
-                  onChange(option);
-                  setIsOpen(false);
+                  onChange(option._id || option);
+                  setIsDropdownOpen({ ...isDropdownOpen, [type]: false });
                 }}
                 className="w-full px-4 py-3 text-left text-black hover:bg-gray-50 transition-colors duration-200"
               >
-                {option}
+                {option.name || option}
               </button>
             ))}
           </div>
@@ -76,36 +111,37 @@ export default function SearchByVehicleSection() {
     );
   };
 
+  if (brandsLoading) {
+    return (
+      <section className="py-16 bg-gray-50">
+        <div className="max-w-6xl mx-auto px-6">
+          <div className="flex justify-center items-center h-64">
+            <p>Loading brands...</p>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
   return (
     <section className="py-16 bg-gray-50">
       <div className="max-w-6xl mx-auto px-6">
-        {/* Section Header with Tabs */}
         <div className="flex items-center justify-between mb-8">
-          {/* Left - Section Title */}
           <div>
             <h2 className="text-2xl md:text-3xl font-bold text-gray-900">
               SEARCH BY VEHICLE
             </h2>
           </div>
-          
-          {/* Right - Tabs */}
+
           <div className="flex space-x-8">
             {tabs.map((tab) => (
               <button
                 key={tab}
-                onClick={() => {
-                  setActiveTab(tab);
-                  // Reset selections when switching tabs
-                  setSelectedBrand('');
-                  setSelectedModel('');
-                  setSelectedYear('');
-                  setSelectedModification('');
-                }}
-                className={`pb-2 text-sm font-medium transition-colors duration-200 border-b-2 ${
-                  activeTab === tab 
-                    ? 'text-red-600 border-red-600' 
+                onClick={() => handleTabChange(tab)}
+                className={`pb-2 text-sm font-medium transition-colors duration-200 border-b-2 ${activeTab === tab
+                    ? 'text-red-600 border-red-600'
                     : 'text-gray-400 border-transparent hover:text-gray-600'
-                }`}
+                  }`}
               >
                 {tab}
               </button>
@@ -113,51 +149,52 @@ export default function SearchByVehicleSection() {
           </div>
         </div>
 
-        {/* Search Form */}
         <div className=" ">
-          {/* Dropdown Selectors */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-            {/* Brand Selector */}
             <CustomDropdown
               placeholder="Select brand"
-              value={selectedBrand}
-              options={vehicleData[activeTab].brands}
-              onChange={setSelectedBrand}
+              value={filters.brand ? filteredBrands.find(b => b._id === filters.brand)?.name : ''}
+              options={filteredBrands}
+              onChange={(value) => handleFilterChange('brand', value)}
+              type="brand"
             />
 
-            {/* Model Selector */}
             <CustomDropdown
               placeholder="Select model line"
-              value={selectedModel}
-              options={vehicleData[activeTab].models}
-              onChange={setSelectedModel}
-              disabled={!selectedBrand}
+              value={filters.modelLine}
+              options={hierarchy.modelLines || []}
+              onChange={(value) => handleFilterChange('modelLine', value)}
+              disabled={!filters.brand}
+              type="modelLine"
             />
 
-            {/* Year Selector */}
             <CustomDropdown
               placeholder="Select year"
-              value={selectedYear}
-              options={vehicleData[activeTab].years}
-              onChange={setSelectedYear}
-              disabled={!selectedModel}
+              value={filters.year}
+              options={hierarchy.years || []}
+              onChange={(value) => handleFilterChange('year', value)}
+              disabled={!filters.modelLine}
+              type="year"
             />
 
-            {/* Modification Selector */}
             <CustomDropdown
               placeholder="Select Modification"
-              value={selectedModification}
-              options={vehicleData[activeTab].modifications}
-              onChange={setSelectedModification}
-              disabled={!selectedYear}
+              value={filters.modification}
+              options={hierarchy.modifications || []}
+              onChange={(value) => handleFilterChange('modification', value)}
+              disabled={!filters.year}
+              type="modification"
             />
           </div>
 
-          {/* Search Button */}
           <div className="flex justify-center">
             <button
               onClick={handleSearch}
-              className="px-8 py-3 bg-red-600 hover:bg-red-700 text-white font-semibold rounded-lg transition-colors duration-300 transform hover:scale-105 shadow-lg"
+              disabled={!filters.modification}
+              className={`px-8 py-3 font-semibold rounded-lg transition-colors duration-300 transform shadow-lg ${filters.modification
+                  ? 'bg-red-600 hover:bg-red-700 text-white hover:scale-105'
+                  : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                }`}
             >
               Search parts
             </button>

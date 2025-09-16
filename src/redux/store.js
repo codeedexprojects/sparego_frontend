@@ -8,6 +8,8 @@ import cartReducer from "./slices/cartSlice";
 import addressReducer from "./slices/addressSlice";
 import orderReducer from "./slices/orderSlice";
 import carouselReducer from "./slices/carouselSlice";
+import bannerReducer from "./slices/bannerSlice";
+import vehicleReducer from "./slices/vehicleSlice";
 
 export const store = configureStore({
   reducer: {
@@ -20,5 +22,7 @@ export const store = configureStore({
     address: addressReducer, 
     order: orderReducer,
     carousel: carouselReducer,
+    banner: bannerReducer,
+    vehicles: vehicleReducer,
   },
 });

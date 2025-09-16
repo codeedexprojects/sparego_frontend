@@ -3,18 +3,18 @@ import React, { useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useDispatch, useSelector } from "react-redux";
-import { getsubSubCategoryBanners } from "@/redux/slices/bannerSlice";
+import { getProductBanners } from "@/redux/slices/bannerSlice"; 
 
 export default function PromotionalBannerSection() {
   const dispatch = useDispatch();
-  const { subSubCategoryBanners, loading, error } = useSelector((state) => state.banner);
+  const { productBanners, loading, error } = useSelector((state) => state.banner);
 
   useEffect(() => {
-    dispatch(getsubSubCategoryBanners());
+    dispatch(getProductBanners());
   }, [dispatch]);
 
   
-  const limitedBanners = subSubCategoryBanners?.banners?.slice(0, 2) || [];
+  const limitedBanners = productBanners?.banners?.slice(0, 2) || [];
 
   if (loading) {
     return (

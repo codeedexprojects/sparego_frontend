@@ -4,16 +4,17 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { addToWishlist, getWishlist } from '@/redux/slices/wishlistSlice';
-import { addToCart } from '@/redux/slices/cartSlice';
+import { addToCart, buyNow } from '@/redux/slices/cartSlice';
 
 const HeroSection = ({ activeTab, setActiveTab, product }) => {
     const [mainImage, setMainImage] = useState('');
     const [isAddingToWishlist, setIsAddingToWishlist] = useState(false);
     const [isAddingToCart, setIsAddingToCart] = useState(false);
+    const [isBuyNowClick, setIsBuyNowClick] = useState(false);
     const [isFavorite, setIsFavorite] = useState(false);
     const dispatch = useDispatch();
     const router = useRouter();
-    
+
     const { wishlist } = useSelector((state) => state.wishlist);
     const tabs = ['TWO WHEELER', 'FOUR WHEELER'];
 
@@ -69,7 +70,7 @@ const HeroSection = ({ activeTab, setActiveTab, product }) => {
             if (addToWishlist.fulfilled.match(resultAction)) {
                 // Refresh wishlist to get updated data
                 await dispatch(getWishlist());
-                
+
                 // Show appropriate message based on current state
                 if (isFavorite) {
                     toast.success('Removed from wishlist!');
@@ -103,9 +104,9 @@ const HeroSection = ({ activeTab, setActiveTab, product }) => {
 
         setIsAddingToCart(true);
         try {
-            const resultAction = await dispatch(addToCart({ 
-                productId: product._id, 
-                quantity: 1 
+            const resultAction = await dispatch(addToCart({
+                productId: product._id,
+                quantity: 1
             }));
 
             if (addToCart.fulfilled.match(resultAction)) {
@@ -118,6 +119,41 @@ const HeroSection = ({ activeTab, setActiveTab, product }) => {
             toast.error('An unexpected error occurred');
         } finally {
             setIsAddingToCart(false);
+        }
+    };
+
+    const handleBuyNow = async () => {
+        // Check if user is logged in
+        const token = localStorage.getItem('token');
+        if (!token) {
+            toast.error('Please login to buy products');
+            router.push('/login');
+            return;
+        }
+
+        if (!product?._id) {
+            toast.error('Product information is not available');
+            return;
+        }
+
+        setIsBuyNowClick(true);
+        try {
+            const resultAction = await dispatch(buyNow({
+                productId: product._id,
+                quantity: 1
+            }));
+
+            if (buyNow.fulfilled.match(resultAction)) {
+                toast.success('Redirecting to checkout...');
+                router.push('/spare/checkout');
+            } else {
+                const error = resultAction.payload || 'Failed to buy now';
+                toast.error(typeof error === 'string' ? error : 'Failed to add to cart');
+            }
+        } catch (error) {
+            toast.error('An unexpected error occurred');
+        } finally {
+            setIsBuyNowClick(false);
         }
     };
 
@@ -144,11 +180,10 @@ const HeroSection = ({ activeTab, setActiveTab, product }) => {
                     <button
                         key={tab}
                         onClick={() => setActiveTab(tab)}
-                        className={`px-6 py-3 font-medium border-b-2 transition-colors ${
-                            activeTab === tab
+                        className={`px-6 py-3 font-medium border-b-2 transition-colors ${activeTab === tab
                                 ? 'border-red-500 text-black'
                                 : 'border-transparent text-gray-500 hover:text-gray-700'
-                        }`}
+                            }`}
                     >
                         {tab}
                     </button>
@@ -172,19 +207,18 @@ const HeroSection = ({ activeTab, setActiveTab, product }) => {
                             <MapPin className="w-4 h-4 mr-2 text-red-500" />
                             <span className="text-sm">Delivering To Perinthalmanna 686551</span>
                         </div>
-                        <button 
+                        <button
                             onClick={handleWishlistAction}
                             disabled={isAddingToWishlist}
-                            className={`flex items-center hover:text-red-600 transition-colors ${
-                                isFavorite ? 'text-red-500' : 'text-gray-500'
-                            } ${isAddingToWishlist ? 'opacity-50 cursor-not-allowed' : ''}`}
+                            className={`flex items-center hover:text-red-600 transition-colors ${isFavorite ? 'text-red-500' : 'text-gray-500'
+                                } ${isAddingToWishlist ? 'opacity-50 cursor-not-allowed' : ''}`}
                         >
                             <Heart className={`w-5 h-5 mr-2 ${isFavorite ? 'fill-current' : ''}`} />
                             <span className="text-sm font-medium">
-                                {isAddingToWishlist 
-                                    ? 'PROCESSING...' 
-                                    : isFavorite 
-                                        ? 'REMOVE FROM WISHLIST' 
+                                {isAddingToWishlist
+                                    ? 'PROCESSING...'
+                                    : isFavorite
+                                        ? 'REMOVE FROM WISHLIST'
                                         : 'ADD TO WISHLIST'
                                 }
                             </span>
@@ -236,15 +270,24 @@ const HeroSection = ({ activeTab, setActiveTab, product }) => {
 
                     {/* Action Buttons */}
                     <div className="flex gap-4">
-                        <button className="flex-1 bg-red-600 text-white py-3 px-6 rounded font-medium hover:bg-red-700 transition-colors">
-                            BUY NOW
+                        <button onClick={handleBuyNow}
+                            disabled={isBuyNowClick}
+                            className={`flex-1 bg-red-600 text-white py-3 px-6 rounded font-medium hover:bg-red-700 transition-colors ${isBuyNowClick ? 'opacity-50 cursor-not-allowed' : ''}`}>
+                            {isBuyNowClick ? (
+                                <>
+                                    ADDING...
+                                </>
+                            ) : (
+                                <>
+                                    BUY IT NOW
+                                </>
+                            )}
                         </button>
-                        <button 
+                        <button
                             onClick={handleAddToCart}
                             disabled={isAddingToCart}
-                            className={`flex-1 border border-gray-300 text-gray-700 py-3 px-6 rounded font-medium hover:bg-gray-50 transition-colors flex items-center justify-center ${
-                                isAddingToCart ? 'opacity-50 cursor-not-allowed' : ''
-                            }`}
+                            className={`flex-1 border border-gray-300 text-gray-700 py-3 px-6 rounded font-medium hover:bg-gray-50 transition-colors flex items-center justify-center ${isAddingToCart ? 'opacity-50 cursor-not-allowed' : ''
+                                }`}
                         >
                             {isAddingToCart ? (
                                 <>

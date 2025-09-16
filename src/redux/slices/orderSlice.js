@@ -25,6 +25,8 @@ export const createOrder = createAsyncThunk(
   }
 );
 
+
+
 export const getOrders = createAsyncThunk(
   "order/getOrders",
   async (_, { rejectWithValue }) => {
@@ -59,7 +61,7 @@ export const getOrderById = createAsyncThunk(
           },
         }
       );
-      return response.data.orders;
+      return response.data.order;
     } catch (error) {
       return rejectWithValue(error.response?.data || "Failed to create address");
     }

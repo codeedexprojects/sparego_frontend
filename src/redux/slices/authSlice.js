@@ -51,9 +51,31 @@ export const verifyOtp = createAsyncThunk(
   }
 );
 
+// get user profile 
+export const getUserProfile = createAsyncThunk(
+  "auth/getUserProfile",
+  async (_, { rejectWithValue }) => { 
+    try {
+      const token = localStorage.getItem("token");
+      const response = await axios.get( 
+        `${BASE_URL}/user-profile/`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      return response.data.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || "Failed to fetch user profile");
+    }
+  }
+);
+
 const authSlice = createSlice({
   name: "auth",
   initialState: {
+
     user: null,
     token: null,
     loading: false,
@@ -124,6 +146,19 @@ const authSlice = createSlice({
         }
       })
       .addCase(verifyOtp.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      // Get User Profile
+      .addCase(getUserProfile.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(getUserProfile.fulfilled, (state, action) => {
+        state.loading = false;
+        state.user = action.payload || null;
+      })
+      .addCase(getUserProfile.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       });

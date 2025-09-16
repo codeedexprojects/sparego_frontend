@@ -23,6 +23,28 @@ export const addToCart = createAsyncThunk(
     }
 );
 
+export const buyNow = createAsyncThunk(
+    "cart/buyNow",
+    async (productData, { rejectWithValue }) => {
+        try {
+            const token = localStorage.getItem("token");
+            const response = await axios.post(
+                `${BASE_URL}/cart/buy-now`, productData,
+                {
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`,
+                    },
+                }
+            );
+            return response.data;
+        } catch (error) {
+            return rejectWithValue(error.response?.data || "Failed to buy now");
+        }
+    }
+);
+
+
 export const getCart = createAsyncThunk(
     "cart/getCart",
     async (_, { rejectWithValue }) => {
@@ -156,6 +178,19 @@ const cartSlice = createSlice({
                 // }
             })
             .addCase(updateCartItem.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload;
+            })
+            // Buy Now
+            .addCase(buyNow.pending, (state) => {
+                state.loading = true;  
+                state.error = null;
+            })
+            .addCase(buyNow.fulfilled, (state, action) => {
+                state.loading = false;
+                // Optionally, you can handle the buy now response
+            })
+            .addCase(buyNow.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload;
             });

@@ -3,13 +3,13 @@ import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams, useRouter } from 'next/navigation';
 import { Heart, ShoppingCart } from 'lucide-react';
-import { getAllProducts } from '@/redux/slices/productSlice';
 import { addToWishlist, getWishlist } from '@/redux/slices/wishlistSlice';
 import { addToCart } from '@/redux/slices/cartSlice';
 import { toast } from 'sonner';
+import { getProductsByVehicle } from '@/redux/slices/productSlice';
 
 const AutomotiveProductsGrid = () => {
-  const { id } = useParams();
+  const params = useParams();
   const router = useRouter(); 
   const dispatch = useDispatch();
   const [favorites, setFavorites] = useState(new Set());
@@ -17,25 +17,35 @@ const AutomotiveProductsGrid = () => {
   const [cartProcessingItems, setCartProcessingItems] = useState({});
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-  const { products, loading } = useSelector((state) => state.product);
-  const { wishlist, wishlistLoading } = useSelector((state) => state.wishlist);
+  const { type, brand, modelLine, year, modification } = params;
+  
+  const decodedType = decodeURIComponent(type);
+  const decodedModelLine = decodeURIComponent(modelLine);
+  const decodedModification = decodeURIComponent(modification);
 
+  const { vehicleProducts, vehicleLoading, vehicleError } = useSelector((state) => state.product);
+  const { wishlist, wishlistLoading } = useSelector((state) => state.wishlist);
 
   useEffect(() => {
     const token = localStorage.getItem('token');
     setIsLoggedIn(!!token);
     
-   
     if (token) {
       dispatch(getWishlist());
     }
   }, [dispatch]);
 
   useEffect(() => {
-    if (id) {
-      dispatch(getAllProducts(id));
+    if (type && brand && modelLine && year && modification) {
+      dispatch(getProductsByVehicle({
+        type: decodedType,
+        brand,
+        modelLine: decodedModelLine,
+        year,
+        modification: decodedModification
+      }));
     }
-  }, [id, dispatch]);
+  }, [dispatch, type, brand, modelLine, year, modification, decodedType, decodedModelLine, decodedModification]);
 
   useEffect(() => {
     if (wishlist && wishlist.length > 0) {
@@ -46,7 +56,6 @@ const AutomotiveProductsGrid = () => {
 
   const toggleFavorite = async (productId, e) => {
     e.stopPropagation(); 
-    
     
     const token = localStorage.getItem('token');
     if (!token) {
@@ -110,31 +119,47 @@ const AutomotiveProductsGrid = () => {
     }
   };
 
-  if (loading) return (
+  if (vehicleLoading) return (
     <div className="text-center p-6 bg-white text-black">
       <div className="inline-block animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-red-600 mr-2"></div>
       Loading products...
     </div>
   );
 
+  if (vehicleError) return (
+    <div className="text-center p-6 bg-white text-black">
+      <p className="text-red-600">Error loading products: {vehicleError}</p>
+    </div>
+  );
+
   return (
     <div className="mx-auto p-6 bg-gray-50 min-h-screen">
-      {products && products.length > 0 ? (
+      {/* Search Results Header */}
+      <div className="mb-6">
+        <h1 className="text-2xl font-bold text-gray-900 mb-2">
+          Search Results
+        </h1>
+        <p className="text-gray-600">
+          Showing parts for: {decodedType} - {brand} {decodedModelLine} ({year}) - {decodedModification}
+        </p>
+      </div>
+
+      {vehicleProducts && vehicleProducts.length > 0 ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {products.map((product) => (
+          {vehicleProducts.map((product) => (
             <div
               key={product._id}
               onClick={() => router.push(`/spare/product-details/${product._id}`)}
               className="bg-white rounded-lg border border-gray-200 p-4 hover:shadow-lg transition-shadow cursor-pointer relative"
             >
-              {/* Loading overlay for wishlist action */}
+              
               {processingItems[product._id] && (
                 <div className="absolute inset-0 bg-white bg-opacity-70 flex items-center justify-center z-10 rounded-lg">
                   <div className="animate-spin rounded-full h-6 w-6 border-t-2 border-b-2 border-red-600"></div>
                 </div>
               )}
               
-              {/* Product Header with Favorite */}
+             
               <div className="flex justify-between items-start mb-3">
                 <h3 className="font-medium text-gray-900 text-sm leading-tight flex-1">
                   {product.name}
@@ -224,7 +249,9 @@ const AutomotiveProductsGrid = () => {
         </div>
       ) : (
         <div className="text-center py-10">
-          <p className="text-gray-500">No products found for this category.</p>
+          <p className="text-gray-500">
+            No products found for {decodedType} - {brand} {decodedModelLine} ({year}) - {decodedModification}
+          </p>
         </div>
       )}
     </div>
