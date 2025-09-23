@@ -75,6 +75,26 @@ export const getProductById = createAsyncThunk(
   }
 )
 
+export const searchProducts = createAsyncThunk(
+  "product/searchproducts",
+  async({section, search},{rejectWithValue})=>{
+    try{
+      const response = await axios.get(`${BASE_URL}/products`,{
+          params: {
+          section,       
+          search: search || "", 
+        },
+      })
+      return response.data;
+
+    }catch(error){
+      return rejectWithValue(error.response?.data || "failed to search product")
+    }
+  }
+)
+
+
+
 const productSlice = createSlice({
   name: "product",
   initialState: {
@@ -119,6 +139,19 @@ const productSlice = createSlice({
         state.products = action.payload;
       })
       .addCase(getAllProducts.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+
+      .addCase(searchProducts.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(searchProducts.fulfilled, (state, action) => {
+  state.searchResults = action.payload.products; 
+  state.loading = false;
+})
+      .addCase(searchProducts.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       })

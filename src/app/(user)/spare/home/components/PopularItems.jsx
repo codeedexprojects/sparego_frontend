@@ -4,6 +4,7 @@ import Image from "next/image";
 import { ArrowRight } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import { getAllSubSubCategories } from "@/redux/slices/categorySlice";
+import { IMG_URL } from "@/redux/baseUrl";
 
 export default function PopularItemsSection() {
   const dispatch = useDispatch();
@@ -16,7 +17,6 @@ export default function PopularItemsSection() {
     dispatch(getAllSubSubCategories());
   }, [dispatch]);
 
-
   const filteredItems = subSubCategories.filter(
     (item) => item.type === activeTab
   );
@@ -24,13 +24,10 @@ export default function PopularItemsSection() {
   return (
     <section className="py-16 bg-gray-50">
       <div className="max-w-7xl mx-auto px-6">
-       
         <div className="mb-12">
           <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-8">
             POPULAR ITEM
           </h2>
-
-          {/* Centered Tabs */}
           <div className="flex justify-center">
             <div className="flex space-x-12 border-b border-gray-200">
               {tabs.map((tab) => (
@@ -49,8 +46,6 @@ export default function PopularItemsSection() {
             </div>
           </div>
         </div>
-
-        {/* Product Grid */}
         {loading ? (
           <p>Loading...</p>
         ) : (
@@ -58,39 +53,39 @@ export default function PopularItemsSection() {
             {filteredItems.slice(0, 7).map((item, index) => (
               <div key={item._id}>
                 {index === 6 ? (
-                  // 8th Card: View All
-                  <div className="bg-white border border-gray-200 rounded-lg p-6 h-[120px] flex items-center justify-center hover:shadow-lg transition-shadow duration-300 cursor-pointer group">
-                    <div className="text-gray-600 group-hover:text-red-600 transition-colors duration-300 flex items-center gap-2">
+                  <div className="bg-white border border-gray-200 rounded-lg p-6 h-[120px] flex items-center justify-center hover:bg-red-600 hover:border-red-600 transition-all duration-300 cursor-pointer group overflow-hidden relative">
+                    <div className="text-gray-600 group-hover:text-white transition-colors duration-300 flex items-center gap-2 z-10">
                       <span className="text-lg font-medium">View all</span>
-                      <ArrowRight className="w-5 h-5" />
+                      <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform duration-300" />
                     </div>
+                    <div className="absolute inset-0 bg-red-600 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"></div>
                   </div>
                 ) : (
-                  
-                  <div className="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-lg transition-shadow duration-300 cursor-pointer group h-[120px]">
-                    <div className="flex items-center h-full gap-4">
+                  <div className="bg-white border border-gray-200 rounded-lg p-4 hover:bg-red-600 hover:border-red-600 hover:shadow-xl transition-all duration-300 cursor-pointer group h-[120px] overflow-hidden relative">
+                    <div className="absolute inset-0 bg-red-600 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left"></div>
+                    <div className="flex items-center h-full gap-4 relative z-10">
                       <div className="flex-1">
-                        <h3 className="text-sm font-semibold text-gray-900 mb-2 leading-tight">
+                        <h3 className="text-sm font-semibold text-gray-900 group-hover:text-white mb-2 leading-tight transition-colors duration-300">
                           {item.name}
                         </h3>
-                        {/* <p className="text-xs text-gray-500">
-                          {item.subCategory?.name}
-                        </p> */}
-                         <p className="text-xs text-gray-500">
-                        {item.productCount} Products
-                      </p>
+                        <p className="text-xs text-gray-500 group-hover:text-red-100 transition-colors duration-300">
+                          {item.productCount} Products
+                        </p>
                       </div>
 
                       <div className="flex-shrink-0">
-                        <div className="w-16 h-16 relative">
+                        <div className="w-16 h-16 relative overflow-hidden rounded-lg">
                           <Image
-                            src={item.image || "/placeholder.png"}
+                            src={`${IMG_URL}/${item.image}`}
                             alt={item.name}
                             fill
                             className="object-contain group-hover:scale-110 transition-transform duration-300"
                           />
                         </div>
                       </div>
+                    </div>
+                    <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent opacity-10 transform -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
                     </div>
                   </div>
                 )}

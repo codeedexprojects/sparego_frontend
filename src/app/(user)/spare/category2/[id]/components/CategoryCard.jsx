@@ -3,6 +3,7 @@ import React, { useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
 import { getSubCategories, getAllSubSubById } from "@/redux/slices/categorySlice";
+import { IMG_URL } from "@/redux/baseUrl";
 
 const SubCategoryPage = () => {
   const { id } = useParams();   
@@ -74,7 +75,7 @@ const SubCategoryPage = () => {
                 <div className="flex-shrink-0 ml-4">
                   <div className="w-12 h-12 bg-gray-50 rounded-lg flex items-center justify-center p-2">
                     <img
-                      src={sub.image || "/home/part1.png"}
+                      src={`${IMG_URL}/${sub.image}`}
                       alt={sub.name}
                       className="w-8 h-8 object-contain"
                     />

@@ -4,6 +4,7 @@ import { Filter } from 'lucide-react';
 import { useSelector, useDispatch } from 'react-redux';
 import { getMainCategories } from '@/redux/slices/categorySlice';
 import { useRouter } from 'next/navigation';  
+import { IMG_URL } from '@/redux/baseUrl';
 
 const AutomotivePartsCatalog = () => {
   const [activeTab, setActiveTab] = useState('Two-wheeler');
@@ -75,11 +76,7 @@ const AutomotivePartsCatalog = () => {
             FOUR WHEELER
           </button>
         </div>
-        
-        <button className="flex items-center space-x-2 px-4 py-2 text-sm text-gray-600 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors">
-          <Filter className="w-4 h-4" />
-          <span>Filter</span>
-        </button>
+     
       </div>
 
       {/* Categories Grid */}
@@ -102,7 +99,7 @@ const AutomotivePartsCatalog = () => {
                   <div className="flex-shrink-0 ml-4">
                     <div className={`w-12 h-12 ${category.bgColor} rounded-lg flex items-center justify-center p-2`}>
                       <img 
-                        src={category.image} 
+                        src={`${IMG_URL}/${category.image} `}
                         alt={category.title}
                         className="w-8 h-8 object-contain"
                       />

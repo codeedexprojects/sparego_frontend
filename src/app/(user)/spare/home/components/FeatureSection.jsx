@@ -50,21 +50,16 @@ export default function FeaturesBenefitsSection() {
   return (
     <section className="py-6 bg-gray-100 border-y border-gray-200">
       <div className="max-w-7xl mx-auto">
-        {/* Mobile: Horizontal scroll, Desktop: Grid */}
         <div className="lg:px-6">
-          {/* Mobile Scrollable Container */}
           <div className="flex overflow-x-auto scrollbar-hide gap-6 px-4 lg:hidden pb-2">
             {features.map((feature) => (
               <div 
                 key={feature.id}
                 className="flex items-center gap-4 min-w-[280px] flex-shrink-0"
               >
-                {/* Icon */}
                 <div className="flex-shrink-0 w-12 h-12 bg-red-50 rounded-full flex items-center justify-center">
                   {feature.icon}
                 </div>
-                
-                {/* Text Content */}
                 <div className="flex-1">
                   <h3 className="font-bold text-gray-900 text-sm uppercase tracking-wide">
                     {feature.title}
@@ -76,8 +71,6 @@ export default function FeaturesBenefitsSection() {
               </div>
             ))}
           </div>
-
-          {/* Desktop Grid */}
           <div className="hidden lg:grid lg:grid-cols-4 gap-6 px-6">
             {features.map((feature, index) => (
               <div 
@@ -86,12 +79,9 @@ export default function FeaturesBenefitsSection() {
                   index < features.length - 1 ? 'lg:border-r lg:border-gray-300 lg:pr-6' : ''
                 }`}
               >
-                {/* Icon */}
                 <div className="flex-shrink-0 w-12 h-12 bg-red-50 rounded-full flex items-center justify-center">
                   {feature.icon}
                 </div>
-                
-                {/* Text Content */}
                 <div className="flex-1">
                   <h3 className="font-bold text-gray-900 text-sm uppercase tracking-wide">
                     {feature.title}
@@ -105,8 +95,6 @@ export default function FeaturesBenefitsSection() {
           </div>
         </div>
       </div>
-
-      {/* Custom CSS for hiding scrollbar */}
       <style jsx>{`
         .scrollbar-hide {
           -ms-overflow-style: none;  /* Internet Explorer 10+ */

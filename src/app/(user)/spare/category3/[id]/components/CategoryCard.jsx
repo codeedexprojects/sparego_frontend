@@ -3,6 +3,7 @@ import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams, useRouter } from "next/navigation";
 import { getAllSubSubById } from "@/redux/slices/categorySlice";
+import { IMG_URL } from "@/redux/baseUrl";
 
 const AutomotivePartsCatalog = () => {
   const { id } = useParams(); 
@@ -40,7 +41,7 @@ const AutomotivePartsCatalog = () => {
             <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center">
               {item.image ? (
                 <img
-                  src={item.image}
+                  src={`${IMG_URL}/${item.image}`}
                   alt={item.name}
                   className="w-8 h-8 object-contain"
                 />

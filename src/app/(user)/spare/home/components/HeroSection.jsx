@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useSelector, useDispatch } from "react-redux";
 import { getHomeCarousel } from "@/redux/slices/carouselSlice";
+import { IMG_URL } from "@/redux/baseUrl";
 
 export default function SpareHeroSection() {
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -42,16 +43,17 @@ export default function SpareHeroSection() {
     );
   }
 
-
-  if (error) {
-    return (
-      <section className="bg-gray-100 relative overflow-hidden h-[500px] sm:h-[550px] md:h-[600px] lg:h-[500px] flex items-center justify-center">
-        <div className="text-center">
-          <p className="text-red-600">Error loading carousel: {error}</p>
-        </div>
-      </section>
-    );
-  }
+if (error) {
+  return (
+    <section className="bg-gray-100 relative overflow-hidden h-[500px] flex items-center justify-center">
+      <div className="text-center">
+        <p className="text-red-600">
+          Error loading carousel: {typeof error === "string" ? error : error.message || "Unknown error"}
+        </p>
+      </div>
+    </section>
+  );
+}
 
   
   if (carousel.length === 0) {
@@ -99,7 +101,7 @@ export default function SpareHeroSection() {
                   <div className="w-full lg:flex-1 flex justify-center items-center">
                     <div className="w-60 h-60 sm:w-72 sm:h-72 md:w-80 md:h-80 lg:w-96 lg:h-96 relative">
                       <Image
-                        src={`/uploads/${slide.image}`} // Adjust based on your API response structure
+                        src={`${IMG_URL}/${slide.image}`} // Adjust based on your API response structure
                         alt={slide.title}
                         fill
                         className="object-contain drop-shadow-2xl"

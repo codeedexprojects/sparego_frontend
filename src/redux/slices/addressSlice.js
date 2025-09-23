@@ -2,7 +2,6 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 import { BASE_URL } from "../baseUrl";
 
-// ✅ Create Address
 export const createAddress = createAsyncThunk(
   "address/createAddress",
   async (addressData, { rejectWithValue }) => {
@@ -25,7 +24,7 @@ export const createAddress = createAsyncThunk(
   }
 );
 
-// ✅ Get All Addresses
+
 export const getAddress = createAsyncThunk(
   "address/getAddress",
   async (_, { rejectWithValue }) => {
@@ -43,7 +42,6 @@ export const getAddress = createAsyncThunk(
   }
 );
 
-// ✅ Update Address
 export const updateAddress = createAsyncThunk(
   "address/updateAddress",
   async ({ id, updatedData }, { rejectWithValue }) => {
@@ -66,7 +64,6 @@ export const updateAddress = createAsyncThunk(
   }
 );
 
-// ✅ Delete Address
 export const deleteAddress = createAsyncThunk(
   "address/deleteAddress",
   async (id, { rejectWithValue }) => {
@@ -94,14 +91,13 @@ const addressSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
-      // Create
       .addCase(createAddress.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
       .addCase(createAddress.fulfilled, (state, action) => {
         state.loading = false;
-        state.address.push(action.payload); // add new address to state
+        state.address.push(action.payload); 
       })
       .addCase(createAddress.rejected, (state, action) => {
         state.loading = false;

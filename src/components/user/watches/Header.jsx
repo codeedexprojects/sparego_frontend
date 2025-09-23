@@ -9,12 +9,12 @@ const Header = () => {
   const pathname = usePathname(); // ✅ get current route
 
   const navItems = [
-    { name: "HOME", href: "/spare/home" },
-    { name: "SHOP", href: "/spare/category1" },
-    { name: "BLOG", href: "/spare/blog" },
-    { name: "ABOUT US", href: "/spare/aboutus" },
-    { name: "CONTACT US", href: "/spare/contactus" },
-    { name: "MY ORDERS", href: "/spare/orders" },
+    { name: "HOME", href: "/watches/home" },
+    { name: "SHOP", href: "/watches/category1" },
+    { name: "BLOG", href: "/watches/blog" },
+    { name: "ABOUT US", href: "/watches/aboutus" },
+    { name: "CONTACT US", href: "/watches/contactus" },
+    { name: "MY ORDERS", href: "/watches/orders" },
   ];
 
   return (
@@ -56,15 +56,15 @@ const Header = () => {
 
           {/* Icons */}
           <div className="hidden md:flex items-center space-x-4">
-            <Link href="/spare/wishlist">
+            <Link href="/watches/wishlist">
               <Heart className="h-5 w-5 text-gray-700 hover:text-red-600 cursor-pointer" />
             </Link>
-            <Link href="/spare/cart">
+            <Link href="/watches/cart">
               <ShoppingCart className="h-5 w-5 text-gray-700 hover:text-red-600 cursor-pointer" />
             </Link>
-            <Link href="/spare/profile">
+            {/* <Link href="/spare/profile">
               <User className="h-5 w-5 text-gray-700 hover:text-red-600 cursor-pointer" />
-            </Link>
+            </Link> */}
           </div>
 
           {/* Mobile Menu Button */}

@@ -13,7 +13,7 @@ import SparePartsCarousel from './components/SpareCarousal'
 
 function page() {
     return (
-        <div>
+        <div className='bg-white'>
             <Header></Header>
             <SpareHeroSection></SpareHeroSection>
             <FeaturesBenefitsSection></FeaturesBenefitsSection>

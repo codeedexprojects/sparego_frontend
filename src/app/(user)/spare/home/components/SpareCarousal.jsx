@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 import { useSelector, useDispatch } from "react-redux";
 import { getHomeCarousel } from "@/redux/slices/carouselSlice";
+import { IMG_URL } from "@/redux/baseUrl";
 
 export default function SparePartsCarousel() {
   const dispatch = useDispatch();
@@ -33,16 +34,17 @@ export default function SparePartsCarousel() {
     );
   }
 
-  // Show error state
-  if (error) {
-    return (
-      <section className="relative w-full overflow-hidden h-96 bg-red-100 rounded-lg flex items-center justify-center">
-        <div className="text-center">
-          <p className="text-red-600">Error loading carousel: {error}</p>
-        </div>
-      </section>
-    );
-  }
+if (error) {
+  return (
+    <section className="bg-gray-100 relative overflow-hidden h-[500px] flex items-center justify-center">
+      <div className="text-center">
+        <p className="text-red-600">
+          Error loading carousel: {typeof error === "string" ? error : error.message || "Unknown error"}
+        </p>
+      </div>
+    </section>
+  );
+}
 
   // Show empty state if no carousel items
   if (!carousel || carousel.length === 0) {
@@ -56,14 +58,14 @@ export default function SparePartsCarousel() {
   }
 
   return (
-    <section className="relative w-full overflow-hidden">
-      {/* Slides */}
+<section className="relative overflow-hidden mx-4 md:mx-auto max-w-7xl ">
+          {/* Slides */}
       {carousel.map((slide, index) => (
         <div
           key={slide._id}
           className={`flex flex-col md:flex-row items-center justify-between transition-opacity duration-700 ease-in-out ${
             index === currentSlide ? "opacity-100" : "opacity-0 absolute inset-0"
-          } bg-red-700 text-white px-6 md:px-12 lg:px-20 py-12 rounded-lg`}
+          } bg-red-700 text-white px-6 md:px-12 lg:px-20 py-12 `}
         >
           {/* Left Content */}
           <div className="max-w-xl mb-8 md:mb-0">
@@ -90,7 +92,7 @@ export default function SparePartsCarousel() {
           {slide.image && (
             <div className="relative w-full md:w-1/2 h-64 md:h-80 flex justify-center">
               <Image
-                src={`/uploads/${slide.image}`}
+                src={`${IMG_URL}/${slide.image}`}
                 alt={slide.title}
                 fill
                 className="object-contain"

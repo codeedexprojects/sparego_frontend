@@ -33,7 +33,7 @@ export const getCategoryBanners = createAsyncThunk(
     }
 )
 
-export const getsubCategoryBanners = createAsyncThunk(
+export const    getsubCategoryBanners = createAsyncThunk(
     "banner/getsubCategoryBanners",
     async (_, { rejectWithValue }) => {
         try {
@@ -158,7 +158,7 @@ const bannerSlice = createSlice({
             })
             .addCase(getCategoryBanners.fulfilled, (state, action) => {
                 state.loading = false;
-                state.banners = action.payload;
+                state.categoryBanners = action.payload;
             })
             .addCase(getCategoryBanners.rejected, (state, action) => {
                 state.loading = false;
@@ -170,7 +170,7 @@ const bannerSlice = createSlice({
             })
             .addCase(getsubCategoryBanners.fulfilled, (state, action) => {
                 state.loading = false;
-                state.banners = action.payload;
+                state.subCategoryBanners = action.payload;
             })
             .addCase(getsubCategoryBanners.rejected, (state, action) => {
                 state.loading = false;
@@ -182,7 +182,7 @@ const bannerSlice = createSlice({
             })
             .addCase(getsubSubCategoryBanners.fulfilled, (state, action) => {
                 state.loading = false;
-                state.banners = action.payload;
+                state.subSubCategoryBanners = action.payload;
             })
             .addCase(getsubSubCategoryBanners.rejected, (state, action) => {
                 state.loading = false;
@@ -194,7 +194,7 @@ const bannerSlice = createSlice({
             })
             .addCase(getProductBanners.fulfilled, (state, action) => {
                 state.loading = false;
-                state.banners = action.payload;
+                state.productBanners = action.payload;
             })
             .addCase(getProductBanners.rejected, (state, action) => {
                 state.loading = false;
@@ -206,7 +206,7 @@ const bannerSlice = createSlice({
             })
             .addCase(getProductDetailBanners.fulfilled, (state, action) => {
                 state.loading = false;
-                state.banners = action.payload;
+                state.productDetailBanners = action.payload;
             })
             .addCase(getProductDetailBanners.rejected, (state, action) => {
                 state.loading = false;
@@ -218,7 +218,7 @@ const bannerSlice = createSlice({
             })
             .addCase(getWishlistBanners.fulfilled, (state, action) => {
                 state.loading = false;
-                state.banners = action.payload;
+                state.wishlistBanners = action.payload;
             })
             .addCase(getWishlistBanners.rejected, (state, action) => {
                 state.loading = false;
@@ -230,7 +230,7 @@ const bannerSlice = createSlice({
             })
             .addCase(getBrandBanners.fulfilled, (state, action) => {
                 state.loading = false;
-                state.banners = action.payload;
+                state.brandBanners = action.payload;
             })
             .addCase(getBrandBanners.rejected, (state, action) => {
                 state.loading = false;

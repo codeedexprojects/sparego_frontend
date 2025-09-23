@@ -11,7 +11,7 @@ export default function HeroSection() {
         "From automotive components to machinery spares, find genuine, durable parts to keep your machines running smoothly.",
       img: "/landing/image3.png",
       btnText: "Explore parts",
-      btnLink: "/spareparts",
+      btnLink: "/spare/home/:id",
     },
     {
       id: 2,
@@ -46,7 +46,7 @@ export default function HeroSection() {
         <div className="absolute inset-0 bg-white/80 backdrop-blur-[2px]"></div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-6 text-center relative z-10">
+      <div className="max-w-7xl mx-auto px-6 text-center relative z-10" id="home">
         <div className="mb-12">
           <h2 className="text-4xl md:text-5xl font-bold text-red-600 mb-6 leading-tight">
             Your One-Stop Destination for<br />

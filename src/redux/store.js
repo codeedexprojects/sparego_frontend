@@ -10,6 +10,8 @@ import orderReducer from "./slices/orderSlice";
 import carouselReducer from "./slices/carouselSlice";
 import bannerReducer from "./slices/bannerSlice";
 import vehicleReducer from "./slices/vehicleSlice";
+import testimonialReducer from "./slices/testimonialSlice";
+import blogReducer from "./slices/blogSlice";
 
 export const store = configureStore({
   reducer: {
@@ -24,5 +26,8 @@ export const store = configureStore({
     carousel: carouselReducer,
     banner: bannerReducer,
     vehicles: vehicleReducer,
+    testimonial: testimonialReducer,
+    blogs: blogReducer,
+    
   },
 });

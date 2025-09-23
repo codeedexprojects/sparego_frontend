@@ -25,19 +25,23 @@ export default function PopularBrands() {
         {brands.map((brand) => (
           <div
             key={brand.id}
-            className="flex flex-col items-center"
+            className="flex flex-col items-center group cursor-pointer"
           >
-            {/* Brand Card */}
-            <div className="w-28 h-28 flex items-center justify-center border rounded-lg bg-white shadow-sm hover:shadow-md transition">
+            {/* Brand Card with hover effect */}
+            <div className="w-28 h-28 flex items-center justify-center border rounded-lg bg-white shadow-sm hover:shadow-md transition-all duration-300 relative overflow-hidden">
+              {/* Red fill overlay - diagonal bottom-left to top-right */}
+              <div className="absolute inset-0 bg-red-500 transform -translate-x-full translate-y-full group-hover:translate-x-0 group-hover:translate-y-0 transition-transform duration-500 ease-in-out origin-bottom-left"></div>
+              
+              {/* Brand logo */}
               <Image
                 src={brand.logo}
                 alt={brand.name}
                 width={80}
                 height={50}
-                className="object-contain"
+                className="object-contain relative z-10 group-hover:brightness-0 group-hover:invert transition-all duration-300"
               />
             </div>
-            <p className="mt-3 text-sm font-medium text-gray-700">{brand.name}</p>
+            <p className="mt-3 text-sm font-medium text-gray-700 group-hover:text-red-500 transition-colors duration-300">{brand.name}</p>
           </div>
         ))}
       </div>

@@ -1,3 +1,4 @@
+"use client";
 import React, { useState, useEffect } from 'react';
 import { Heart, MapPin, CheckCircle, Truck, ShoppingCart } from 'lucide-react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -5,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { addToWishlist, getWishlist } from '@/redux/slices/wishlistSlice';
 import { addToCart, buyNow } from '@/redux/slices/cartSlice';
+import { IMG_URL } from '@/redux/baseUrl';
 
 const HeroSection = ({ activeTab, setActiveTab, product }) => {
     const [mainImage, setMainImage] = useState('');
@@ -26,15 +28,12 @@ const HeroSection = ({ activeTab, setActiveTab, product }) => {
         }
     }, [product, wishlist]);
 
-    // Set main image when product loads
     useEffect(() => {
         if (product?.images && product.images.length > 0) {
-            const imageBaseUrl = '/api/images/';
-            setMainImage(`${imageBaseUrl}${product.images[0]}`);
+            setMainImage(`${IMG_URL}${product.images[0]}`);
         }
     }, [product]);
 
-    // Fetch wishlist on component mount if user is logged in
     useEffect(() => {
         const token = localStorage.getItem('token');
         if (token) {
@@ -43,12 +42,10 @@ const HeroSection = ({ activeTab, setActiveTab, product }) => {
     }, [dispatch]);
 
     const handleImageClick = (imageName) => {
-        const imageBaseUrl = '/api/images/';
-        setMainImage(`${imageBaseUrl}${imageName}`);
+        setMainImage(`${IMG_URL}${imageName}`);
     };
 
     const handleWishlistAction = async () => {
-        // Check if user is logged in
         const token = localStorage.getItem('token');
         if (!token) {
             toast.error('Please login to manage your wishlist');
@@ -174,30 +171,12 @@ const HeroSection = ({ activeTab, setActiveTab, product }) => {
 
     return (
         <div className="mx-auto p-6">
-            {/* Tabs */}
-            <div className="flex mb-6">
-                {tabs.map((tab) => (
-                    <button
-                        key={tab}
-                        onClick={() => setActiveTab(tab)}
-                        className={`px-6 py-3 font-medium border-b-2 transition-colors ${activeTab === tab
-                                ? 'border-red-500 text-black'
-                                : 'border-transparent text-gray-500 hover:text-gray-700'
-                            }`}
-                    >
-                        {tab}
-                    </button>
-                ))}
-            </div>
-
-            {/* Filter Info */}
             <div className="mb-6 text-sm text-gray-600">
                 <span>
                     Filtered By: {product?.mainCategory?.name || 'Category'} - {product?.name || 'Product'}
                 </span>
             </div>
 
-            {/* Main Product Section */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 {/* Left Side */}
                 <div className="space-y-6">
@@ -256,7 +235,7 @@ const HeroSection = ({ activeTab, setActiveTab, product }) => {
                                     onClick={() => handleImageClick(image)}
                                 >
                                     <img
-                                        src={`/api/images/${image}`}
+                                        src={`${IMG_URL}/${image}`}
                                         alt={`Product view ${index + 2}`}
                                         className="w-full h-full object-contain p-2"
                                         onError={(e) => {

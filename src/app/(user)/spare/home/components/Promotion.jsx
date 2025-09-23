@@ -3,7 +3,8 @@ import React, { useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useDispatch, useSelector } from "react-redux";
-import { getHomeBanners } from "@/redux/slices/bannerSlice"; // adjust path if needed
+import { getHomeBanners } from "@/redux/slices/bannerSlice";
+import { IMG_URL } from "@/redux/baseUrl";
 
 export default function PromotionalBannerSection() {
   const dispatch = useDispatch();
@@ -58,15 +59,11 @@ export default function PromotionalBannerSection() {
                       {promo.discountText}
                     </div>
                   )}
-
-                  {/* Description */}
                   <p className="text-xs sm:text-sm mb-4 sm:mb-6 leading-relaxed opacity-90 max-w-sm mx-auto sm:mx-0">
                     {promo.description}
                   </p>
-
-                  {/* CTA Button */}
                   <Link
-                    href={`/deals/${promo.section || "offer"}`}
+                    href={`${IMG_URL}/${promo.section || "offer"}`}
                     className={`inline-block px-4 sm:px-6 py-2 border-2 rounded font-semibold text-xs sm:text-sm transition-all duration-300 hover:scale-105 ${
                       index === 0
                         ? "border-white text-white hover:bg-white hover:text-red-600"
@@ -81,7 +78,7 @@ export default function PromotionalBannerSection() {
                 <div className="flex-shrink-0 order-first sm:order-last">
                   <div className="w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 lg:w-40 lg:h-40 relative mx-auto">
                     <Image
-                      src={`/uploads/${promo.image}`}
+                      src={`${IMG_URL}/${promo.image}`}
                       alt={promo.title}
                       fill
                       className="object-contain drop-shadow-lg"
