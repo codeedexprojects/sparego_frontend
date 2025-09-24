@@ -3,19 +3,20 @@ import React, { useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useDispatch, useSelector } from "react-redux";
-import { getWishlistBanners } from "@/redux/slices/bannerSlice"; 
 import { IMG_URL } from "@/redux/baseUrl";
+import { getDynamicBanners } from "@/redux/slices/dynamicBannerSlice";
 
-export default function PromotionalBannerSection() {
+
+export default function PromotionalBannerSection({ section, page }) {
   const dispatch = useDispatch();
-  const { wishlistBanners, loading, error } = useSelector((state) => state.banner);
+   const { data, loading, error } = useSelector((state) => state.dynamicBanners);
 
   useEffect(() => {
-    dispatch(getWishlistBanners());
-  }, [dispatch]);
+    dispatch(getDynamicBanners({ section, page }));
+  }, [dispatch, section, page]);
 
-  
-  const limitedBanners = wishlistBanners?.banners?.slice(0, 2) || [];
+  const banners = data[section]?.[page] || []
+  const limitedBanners = banners?.slice(0, 2) ;
 
   if (loading) {
     return (

@@ -12,6 +12,7 @@ import bannerReducer from "./slices/bannerSlice";
 import vehicleReducer from "./slices/vehicleSlice";
 import testimonialReducer from "./slices/testimonialSlice";
 import blogReducer from "./slices/blogSlice";
+import dynamicBannerReducer from "./slices/dynamicBannerSlice";
 
 export const store = configureStore({
   reducer: {
@@ -28,6 +29,7 @@ export const store = configureStore({
     vehicles: vehicleReducer,
     testimonial: testimonialReducer,
     blogs: blogReducer,
+    dynamicBanners:dynamicBannerReducer
     
   },
 });
