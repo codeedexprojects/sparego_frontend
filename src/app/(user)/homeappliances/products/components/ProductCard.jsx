@@ -3,11 +3,12 @@ import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useParams, useRouter } from 'next/navigation';
 import { Heart, ShoppingCart } from 'lucide-react';
-import { getAllProducts } from '@/redux/slices/productSlice';
 import { addToWishlist, getWishlist } from '@/redux/slices/wishlistSlice';
 import { addToCart } from '@/redux/slices/cartSlice';
 import { toast } from 'sonner';
 import { IMG_URL } from '@/redux/baseUrl';
+import { getProductsBySection } from '@/redux/slices/dynamicProductsSlice';
+
 
 const AutomotiveProductsGrid = () => {
   const { id } = useParams();
@@ -17,9 +18,20 @@ const AutomotiveProductsGrid = () => {
   const [processingItems, setProcessingItems] = useState({});
   const [cartProcessingItems, setCartProcessingItems] = useState({});
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-
-  const { products, loading } = useSelector((state) => state.product);
   const { wishlist, wishlistLoading } = useSelector((state) => state.wishlist);
+    const { id: section } = useParams();
+  const { products, loading, error } = useSelector((state) => state.productsBySection);
+
+useEffect(() => {
+  const sectionId = localStorage.getItem("sectionId");
+  if (sectionId) {
+    dispatch(getProductsBySection({ sectionId }))
+      .unwrap()
+      .then(res => console.log("Fetched products:", res))
+      .catch(err => console.error("Error fetching products:", err));
+  }
+}, [dispatch]);
+
 
 
   useEffect(() => {
@@ -32,11 +44,7 @@ const AutomotiveProductsGrid = () => {
     }
   }, [dispatch]);
 
-  useEffect(() => {
-    if (id) {
-      dispatch(getAllProducts(id));
-    }
-  }, [id, dispatch]);
+
 
   useEffect(() => {
     if (wishlist && wishlist.length > 0) {
@@ -187,7 +195,7 @@ const AutomotiveProductsGrid = () => {
                 <button
                   onClick={(e) => handleAddToCart(product._id, e)}
                   disabled={cartProcessingItems[product._id]}
-                  className={`px-3 py-1.5 text-xs text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-50 transition-colors flex items-center ${
+                  className={`px-3 py-1.5 te  xt-xs text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-50 transition-colors flex items-center ${
                     cartProcessingItems[product._id] ? 'opacity-50 cursor-not-allowed' : ''
                   }`}
                 >
@@ -214,7 +222,7 @@ const AutomotiveProductsGrid = () => {
         </div>
       ) : (
         <div className="text-center py-10">
-          <p className="text-gray-500">No products found for this category.</p>
+          <p className="text-gray-500">No products found.</p>
         </div>
       )}
     </div>

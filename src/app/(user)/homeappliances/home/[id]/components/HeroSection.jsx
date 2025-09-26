@@ -2,60 +2,66 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { useDispatch, useSelector } from "react-redux";
+import { getHomeCarouselBySection } from "@/redux/slices/carouselSlice";
+import { IMG_URL } from "@/redux/baseUrl";
 
 export default function FullBackgroundHeroSection() {
-  const [currentSlide, setCurrentSlide] = useState(0);
+  const dispatch = useDispatch();
+  const { carousel, loading, error } = useSelector((state) => state.carousel);
 
-  const slides = [
-    {
-      id: 1,
-      buttonText: "Start Exploring",
-      buttonLink: "/spareparts",
-      description: "Explore timeless designs and modern innovations — premium watches built for precision, durability, and elegance.",
-      image: "/watches/watch.png",
-    },
-    {
-      id: 2,
-      buttonText: "Browse Parts",
-      buttonLink: "/spareparts/automotive",
-      description: "Genuine automotive and machinery components available.",
-      image: "/watches/watch.png",
-    },
-    {
-      id: 3,
-      buttonText: "Get Help",
-      buttonLink: "/support",
-      description: "Get help finding the perfect part for your vehicle.",
-      image: "/watches/watch.png",
-    },
-  ];
+  const [currentSlide, setCurrentSlide] = useState(0);
+  useEffect(() => {
+    const sectionId = localStorage.getItem("sectionId");
+    if (sectionId) {
+      dispatch(getHomeCarouselBySection(sectionId));
+    }
+  }, [dispatch]);
+
+  const slides = carousel?.mainCarousels || [];
 
   useEffect(() => {
-    const timer = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % slides.length);
-    }, 6000);
+    if (slides.length > 0) {
+      const timer = setInterval(() => {
+        setCurrentSlide((prev) => (prev + 1) % slides.length);
+      }, 6000);
+      return () => clearInterval(timer);
+    }
+  }, [slides]);
 
-    return () => clearInterval(timer);
-  }, [slides.length]);
+  const goToSlide = (index) => setCurrentSlide(index);
 
-  const goToSlide = (index) => {
-    setCurrentSlide(index);
-  };
+  if (loading) {
+    return (
+      <section className="h-[500px] flex items-center justify-center bg-gray-100">
+        <p className="text-gray-600">Loading carousel...</p>
+      </section>
+    );
+  }
+
+  if (error) {
+    return (
+      <section className="h-[500px] flex items-center justify-center bg-gray-100">
+        <p className="text-red-600">
+          {typeof error === "string" ? error : error.message}
+        </p>
+      </section>
+    );
+  }
 
   return (
     <section className="relative overflow-hidden h-[500px] sm:h-[550px] md:h-[600px] lg:h-[700px]">
-      {/* Background Images */}
       <div className="absolute inset-0">
         {slides.map((slide, index) => (
           <div
-            key={slide.id}
+            key={slide._id}
             className={`absolute inset-0 transition-opacity duration-700 ease-in-out ${
               index === currentSlide ? "opacity-100" : "opacity-0"
             }`}
           >
             <Image
-              src={slide.image}
-              alt={slide.buttonText}
+              src={`${IMG_URL}/${slide.image}`}
+              alt={slide.title}
               fill
               className="object-cover"
               priority={index === 0}
@@ -64,21 +70,21 @@ export default function FullBackgroundHeroSection() {
         ))}
       </div>
 
-      {/* Content overlay - only button + description */}
-      <div className="relative z-10 flex flex-col items-center justify-end h-full text-center pb-16">
-        <Link
-          href={slides[currentSlide].buttonLink}
-          className="inline-block px-8 sm:px-10 py-4 bg-white hover:bg-gray-50 text-black font-medium text-lg rounded-lg transition-all duration-300 transform hover:scale-105 shadow-2xl hover:shadow-red-600/25"
-        >
-          {slides[currentSlide].buttonText}
-        </Link>
+      {slides.length > 0 && (
+        <div className="relative z-10 flex flex-col items-center justify-end h-full text-center pb-16">
+          <Link
+            href={`/product/${slides[currentSlide]?.products?.[0]?._id || ""}`}
+            className="inline-block px-8 sm:px-10 py-4 bg-white hover:bg-gray-50 text-black font-medium text-lg rounded-lg transition-all duration-300 transform hover:scale-105 shadow-2xl hover:shadow-red-600/25"
+          >
+            {slides[currentSlide]?.title || "Explore"}
+          </Link>
 
-        <p className="mt-4 text-white text-sm sm:text-base max-w-md drop-shadow-lg">
-          {slides[currentSlide].description}
-        </p>
-      </div>
+          <p className="mt-4 text-white text-sm sm:text-base max-w-md drop-shadow-lg">
+            {slides[currentSlide]?.section?.name}
+          </p>
+        </div>
+      )}
 
-      {/* Dot Navigation */}
       <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 z-20 flex space-x-3">
         {slides.map((_, index) => (
           <button

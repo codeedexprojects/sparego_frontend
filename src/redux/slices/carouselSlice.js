@@ -18,6 +18,21 @@ export const getHomeCarousel = createAsyncThunk(
     }
 )
 
+export const getHomeCarouselBySection = createAsyncThunk(
+    "carousel/getHomeCarouselBySection",
+    async (sectionId, { rejectWithValue }) => {
+        try {
+            const response = await axios.get(
+                `${BASE_URL}/main-carousel/section/${sectionId}`,
+            );
+            return response.data;
+        } catch (error) {
+            return rejectWithValue(error.response?.data || "Failed to fetch carousel"
+            )
+        }
+    }
+)
+
 export const getLandingCarousel = createAsyncThunk(
     "carousel/getLandingCarousel",
     async (_, { rejectWithValue }) => {
@@ -71,6 +86,21 @@ const carouselSlice = createSlice({
             .addCase(getHomeCarousel.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload;
+            })
+            // get section carousel
+             .addCase(getHomeCarouselBySection.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(getHomeCarouselBySection.fulfilled, (state, action) => {
+                state.loading = false;
+                state.error = null;
+                state.carousel = action.payload.mainCarousels || [];
+            })
+            .addCase(getHomeCarouselBySection.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload;
+                state.carousel = [];
             })
             .addCase(getBottomCarousel.pending, (state) => {
                 state.loading = true;

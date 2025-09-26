@@ -16,7 +16,7 @@ function Page() {
         <HeroSection></HeroSection>
         <FeatureSection></FeatureSection>
         <PopularItems></PopularItems>
-        <OfferSection section="home-appliances" page="home"></OfferSection>
+        <OfferSection></OfferSection>
         <Brands></Brands>
         <ApplianceCarousel></ApplianceCarousel>
         <Testimonials></Testimonials>

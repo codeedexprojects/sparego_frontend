@@ -9,7 +9,7 @@ function page() {
     <div className='bg-white'>
       <Header></Header>
       <WishlistPage></WishlistPage>
-      <PromotionalBannerSection section="home-appliances" page="wishlist"></PromotionalBannerSection>
+      <PromotionalBannerSection></PromotionalBannerSection>
       <Footer></Footer>
     </div>
   )

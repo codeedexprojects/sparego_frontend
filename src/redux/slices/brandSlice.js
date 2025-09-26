@@ -28,6 +28,19 @@ export const getSectionBrands = createAsyncThunk(
     }
   }
 );
+export const getSectionBrandById = createAsyncThunk(
+  "brands/getSectionBrandById",
+  async (sectionId, { rejectWithValue }) => {
+    try {
+      const response = await axios.get(`${BASE_URL}/brands/product/section/${sectionId}`);
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data || "failed to get product brands"
+      );
+    }
+  }
+);
 
 const brandSlice = createSlice({
   name: "brand",
@@ -64,6 +77,20 @@ const brandSlice = createSlice({
         state.brands = action.payload;
       })
       .addCase(getSectionBrands.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      // getsectiobbrandbyid
+      .addCase(getSectionBrandById.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+
+      .addCase(getSectionBrandById.fulfilled, (state, action) => {
+        state.loading = false;
+        state.brands = action.payload;
+      })
+      .addCase(getSectionBrandById.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       });
