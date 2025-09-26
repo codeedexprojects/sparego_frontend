@@ -80,9 +80,11 @@ const carouselSlice = createSlice({
                 state.error = null;
             })
             .addCase(getHomeCarousel.fulfilled, (state, action) => {
-                state.loading = false;
-                state.carousel = action.payload;
-            })
+    state.loading = false;
+    // Ensure it's always an array
+    state.carousel = action.payload.mainCarousels || action.payload || [];
+})
+
             .addCase(getHomeCarousel.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload;

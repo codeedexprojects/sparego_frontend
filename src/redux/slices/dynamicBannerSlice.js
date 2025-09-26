@@ -145,18 +145,33 @@ const dynamicBannerSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       })
+
+      //   product-detail
       .addCase(getProductDetailBanners.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
       .addCase(getProductDetailBanners.fulfilled, (state, action) => {
         state.loading = false;
-        state.productDetailBanners = action.payload;
+        const { sectionId, banners } = action.payload;
+
+        if (!state.bannersBySection[sectionId]) {
+          state.bannersBySection[sectionId] = {};
+        }
+
+        banners.forEach((banner) => {
+          const page = banner.page || "default";
+          if (!state.bannersBySection[sectionId][page]) {
+            state.bannersBySection[sectionId][page] = [];
+          }
+          state.bannersBySection[sectionId][page].push(banner);
+        });
       })
       .addCase(getProductDetailBanners.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       })
+
       // wishlist
       .addCase(getdynamicWishlistBanners.pending, (state) => {
         state.loading = true;

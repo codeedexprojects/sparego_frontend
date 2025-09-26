@@ -6,7 +6,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { IMG_URL } from "@/redux/baseUrl";
 import { getProductDetailBanners } from "@/redux/slices/dynamicBannerSlice";
 
-export default function PromotionalBannerSection({ page = "wishlist" }) {
+export default function PromotionalBannerSection({ page = "product-detail" }) {
   const dispatch = useDispatch();
   const { bannersBySection, loading, error } = useSelector(
     (state) => state.dynamicBanners
@@ -21,6 +21,7 @@ export default function PromotionalBannerSection({ page = "wishlist" }) {
       dispatch(getProductDetailBanners(id)); 
     }
   }, [dispatch]);
+  
   useEffect(() => {
     if (sectionId && bannersBySection?.[sectionId]) {
       const sectionBanners = bannersBySection[sectionId][page];

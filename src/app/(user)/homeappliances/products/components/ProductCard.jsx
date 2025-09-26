@@ -133,7 +133,7 @@ useEffect(() => {
           {products.map((product) => (
             <div
               key={product._id}
-              onClick={() => router.push(`/spare/product-details/${product._id}`)}
+              onClick={() => router.push(`/homeappliances/product-details/${product._id}`)}
               className="bg-white rounded-lg border border-gray-200 p-4 hover:shadow-lg transition-shadow cursor-pointer relative"
             >
               {processingItems[product._id] && (
