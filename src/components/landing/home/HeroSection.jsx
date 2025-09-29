@@ -7,13 +7,12 @@ import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 export default function HeroSection() {
-  // 🔹 Hardcoded spare parts card
   const staticCard = [
     {
       _id: "static-1",
       title: "Spare Parts",
       description: "All types of precision spare parts for your vehicles.",
-      image: "/landing/spares.png",
+      image: "/landing/spare.png",
       buttonText: "Explore Spare Parts",
       path: "/spare/home",
     },
@@ -92,9 +91,8 @@ export default function HeroSection() {
           {allCards.map((item) => (
             <div key={item._id} className="group relative">
               <div className="bg-gray-800 rounded-3xl shadow-2xl overflow-hidden hover:shadow-3xl transition-all duration-500 transform hover:-translate-y-2 border-4 border-gray-700">
-                {/* image */}
                 <div className="bg-white mx-4 mt-4 rounded-2xl p-8 flex items-center justify-center min-h-[200px]">
-                  <div className="w-20 h-20 relative">
+                  <div className="w-40 h-40 relative">
                     <Image
                       src={item.path ? item.image : `${IMG_URL}/${item.image}`}
                       alt={item.title}
@@ -104,7 +102,6 @@ export default function HeroSection() {
                   </div>
                 </div>
 
-                {/* text */}
                 <div className="px-6 py-6 text-white">
                   <h3 className="text-xl font-bold mb-4 text-white group-hover:text-red-300 transition-colors">
                     {item.title}
@@ -114,13 +111,12 @@ export default function HeroSection() {
                   </p>
                 </div>
 
-                {/* Button */}
                 <div className="px-6 pb-6">
                   <Link
                     href={
                       item._id === "static-1"
-                        ? "/spare/home" // fixed route for Spare Parts
-                        : `/homeappliances/home/${item.section?._id}` // fixed "section" path
+                        ? "/spare/home" 
+                        : `/homeappliances/home/${item.section?._id}` 
                     }
                     onClick={() => {
                       if (item._id === "static-1") {

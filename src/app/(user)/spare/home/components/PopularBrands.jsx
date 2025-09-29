@@ -49,33 +49,45 @@ export default function PopularBrandsSection() {
               ))}
             </div>
           </div>
-          <div className="grid grid-cols-2 md:grid-cols-5 lg:grid-cols-10 gap-6 mb-8">
-            {Array.from({ length: 10 }).map((_, index) => (
-              <div key={index} className="flex flex-col items-center">
-                <div className="w-16 h-16 mb-3 bg-gray-200 rounded-lg animate-pulse"></div>
-                <div className="h-4 w-16 bg-gray-200 rounded animate-pulse"></div>
-              </div>
-            ))}
+          {/* Loading state with mobile scroll */}
+          <div className="md:grid md:grid-cols-5 lg:grid-cols-10 md:gap-6 mb-8">
+            <div className="flex md:hidden overflow-x-auto scrollbar-hide gap-4 pb-4">
+              {Array.from({ length: 10 }).map((_, index) => (
+                <div key={index} className="flex flex-col items-center flex-shrink-0">
+                  <div className="w-16 h-16 mb-3 bg-gray-200 rounded-lg animate-pulse"></div>
+                  <div className="h-4 w-16 bg-gray-200 rounded animate-pulse"></div>
+                </div>
+              ))}
+            </div>
+            <div className="hidden md:contents">
+              {Array.from({ length: 10 }).map((_, index) => (
+                <div key={index} className="flex flex-col items-center">
+                  <div className="w-16 h-16 mb-3 bg-gray-200 rounded-lg animate-pulse"></div>
+                  <div className="h-4 w-16 bg-gray-200 rounded animate-pulse"></div>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </section>
     );
   }
-if (error) {
-  return (
-    <section className="bg-gray-100 relative overflow-hidden h-[500px] flex items-center justify-center">
-      <div className="text-center">
-        <p className="text-red-600">
-          Error loading carousel: {typeof error === "string" ? error : error.message || "Unknown error"}
-        </p>
-      </div>
-    </section>
-  );
-}
+
+  if (error) {
+    return (
+      <section className="bg-gray-100 relative overflow-hidden h-[500px] flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-red-600">
+            Error loading carousel: {typeof error === "string" ? error : error.message || "Unknown error"}
+          </p>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section className="py-16 bg-white">
-      <div className="max-w-7xl mx-auto px-6">
+      <div className="max-w-8xl mx-auto px-4 md:px-15">
         <div className="flex items-center justify-between mb-12">
           <div>
             <h2 className="text-2xl md:text-3xl font-bold text-gray-900">
@@ -100,34 +112,71 @@ if (error) {
         </div>
         {displayedBrands.length > 0 ? (
           <>
-            <div className="grid grid-cols-2 md:grid-cols-5 lg:grid-cols-10 gap-6 mb-8">
-              {displayedBrands.map((brand) => (
-                <Link
-                  key={brand._id}
-                  href={`/brands/${brand.name
-                    .toLowerCase()
-                    .replace(/\s+/g, "-")}`}
-                  className="group relative flex flex-col items-center"
-                >
-                  <div className="relative w-16 h-16 mb-3 flex items-center justify-center bg-gray-50 rounded-lg border border-gray-100 overflow-hidden">
-                    <div className="absolute inset-0 bg-gradient-to-tr from-red-600 to-red-600 opacity-0 scale-0 group-hover:opacity-100 group-hover:scale-100 transition-all duration-500 origin-bottom-left rounded-lg"></div>
-                    <div className="w-10 h-10 relative z-10">
-                   <Image
-  src={getLogoUrl(brand.logo) || "/home/brand1.png"}
-  alt={`${brand.name} logo`}
-  fill
-  className="object-contain filter grayscale group-hover:grayscale-0 transition-all duration-300"
-/>
+            {/* Mobile: Horizontal scroll, Desktop: Grid */}
+            <div className="mb-8">
+              {/* Mobile horizontal scroll */}
+              <div className="flex md:hidden overflow-x-auto scrollbar-hide gap-4 pb-4 px-2">
+                {displayedBrands.map((brand) => (
+                  <Link
+                    key={brand._id}
+                    href={`/brands/${brand.name
+                      .toLowerCase()
+                      .replace(/\s+/g, "-")}`}
+                    className="group relative flex flex-col items-center flex-shrink-0"
+                  >
+                    <div className="relative w-20 h-20 mb-3 flex flex-col items-center justify-between bg-white rounded-lg border border-gray-400 overflow-hidden group">                     
+                      <div className="absolute inset-0 bg-gradient-to-tr from-red-600 to-red-600 opacity-0 scale-0 group-hover:opacity-100 group-hover:scale-100 transition-all duration-500 origin-bottom-left rounded-lg"></div>                     
+                      
+                      <div className="w-15 h-15 relative z-10 flex-1 flex items-center justify-center p-2">
+                        <Image   
+                          src={getLogoUrl(brand.logo) || "/home/brand1.png"}   
+                          alt={`${brand.name} logo`}   
+                          fill   
+                          className="object-contain filter grayscale group-hover:grayscale-0 transition-all duration-300" 
+                        />                     
+                      </div>                       
+                      
+                      <span className="text-xs text-gray-600 font-medium group-hover:text-red-600 transition-colors duration-300 relative z-10 pb-1 text-center px-1 truncate w-full">
+                        {brand.name}
+                      </span>
                     </div>
-                  </div>
-                  <span className="text-xs text-gray-600 text-center font-medium group-hover:text-red-600 transition-colors duration-300">
-                    {brand.name}
-                  </span>
-                </Link>
-              ))}
+                  </Link>
+                ))}
+              </div>
+
+              {/* Desktop grid */}
+              <div className="hidden md:grid md:grid-cols-5 lg:grid-cols-10 gap-6">
+                {displayedBrands.map((brand) => (
+                  <Link
+                    key={brand._id}
+                    href={`/brands/${brand.name
+                      .toLowerCase()
+                      .replace(/\s+/g, "-")}`}
+                    className="group relative flex flex-col items-center"
+                  >
+                    <div className="relative w-25 h-25 mb-3 flex flex-col items-center justify-between bg-white rounded-lg border border-gray-400 overflow-hidden group">                     
+                      <div className="absolute inset-0 bg-gradient-to-tr from-red-600 to-red-600 opacity-0 scale-0 group-hover:opacity-100 group-hover:scale-100 transition-all duration-500 origin-bottom-left rounded-lg"></div>                     
+                      
+                      <div className="w-15 h-15 relative z-10 flex-1 flex items-center justify-center">
+                        <Image   
+                          src={getLogoUrl(brand.logo) || "/home/brand1.png"}   
+                          alt={`${brand.name} logo`}   
+                          fill   
+                          className="object-contain filter grayscale group-hover:grayscale-0 transition-all duration-300" 
+                        />                     
+                      </div>                       
+                      
+                      <span className="text-xs text-gray-600 font-medium group-hover:text-red-600 transition-colors duration-300 relative z-10 pb-1">
+                        {brand.name}
+                      </span>
+                    </div>
+                  </Link>
+                ))}
+              </div>
             </div>
+
             {filteredBrands.length > 10 && (
-              <div className="flex justify-center">
+              <div className="flex justify-center mb-4">
                 <button className="px-6 py-2 border border-gray-300 text-gray-600 rounded-lg hover:border-red-300 hover:text-red-600 transition-colors duration-300 text-sm">
                   View more
                 </button>
@@ -136,14 +185,14 @@ if (error) {
           </>
         ) : (
           <div className="text-center py-8">
-            <p className="text-gray-500">No brands found for{activeTab}</p>
+            <p className="text-gray-500">No brands found for {activeTab}</p>
           </div>
         )}
         <div className="text-center">
           <button 
-          onClick={()=>router.push('/spare/brands')}
-          className="px-8 py-2 border border-gray-300 text-gray-700 font-medium text-sm hover:bg-gray-50 transition-colors rounded">
-            Load more
+            onClick={()=>router.push('/spare/brands')}
+            className="px-8 py-2 border border-red-700 text-gray-700 font-medium text-sm hover:bg-gray-50 transition-colors rounded">
+            View more
           </button>
         </div>
       </div>

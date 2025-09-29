@@ -9,7 +9,7 @@ function page() {
     <div>
       <Header></Header>
       <BrandSelectionSection></BrandSelectionSection>
-      <PromotionalBannerSection section="home-appliances" page="brand"></PromotionalBannerSection>
+      <PromotionalBannerSection></PromotionalBannerSection>
       <Footer></Footer>
     </div>
   )

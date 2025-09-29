@@ -1,157 +1,19 @@
 "use client";
 import React, { useState, useEffect } from 'react';
 import { Heart, MapPin, CheckCircle, Truck, ShoppingCart } from 'lucide-react';
-import { useDispatch, useSelector } from 'react-redux';
-import { useRouter } from 'next/navigation';
-import { toast } from 'sonner';
-import { addToWishlist, getWishlist } from '@/redux/slices/wishlistSlice';
-import { addToCart, buyNow } from '@/redux/slices/cartSlice';
 import { IMG_URL } from '@/redux/baseUrl';
 
-const HeroSection = ({ activeTab, setActiveTab, product }) => {
+const HeroSection = ({ product }) => {
     const [mainImage, setMainImage] = useState('');
-    const [isAddingToWishlist, setIsAddingToWishlist] = useState(false);
-    const [isAddingToCart, setIsAddingToCart] = useState(false);
-    const [isBuyNowClick, setIsBuyNowClick] = useState(false);
-    const [isFavorite, setIsFavorite] = useState(false);
-    const dispatch = useDispatch();
-    const router = useRouter();
-
-    const { wishlist } = useSelector((state) => state.wishlist);
-    const tabs = ['TWO WHEELER', 'FOUR WHEELER'];
-
-    // Check if product is in wishlist
-    useEffect(() => {
-        if (product?._id && wishlist) {
-            const isInWishlist = wishlist.some(item => item._id === product._id || item.productId === product._id);
-            setIsFavorite(isInWishlist);
-        }
-    }, [product, wishlist]);
 
     useEffect(() => {
-        if (product?.images && product.images.length > 0) {
+        if (product?.images && product.images?.length > 0) {
             setMainImage(`${IMG_URL}${product.images[0]}`);
         }
     }, [product]);
 
-    useEffect(() => {
-        const token = localStorage.getItem('token');
-        if (token) {
-            dispatch(getWishlist());
-        }
-    }, [dispatch]);
-
     const handleImageClick = (imageName) => {
         setMainImage(`${IMG_URL}${imageName}`);
-    };
-
-    const handleWishlistAction = async () => {
-        const token = localStorage.getItem('token');
-        if (!token) {
-            toast.error('Please login to manage your wishlist');
-            router.push('/login');
-            return;
-        }
-
-        if (!product?._id) {
-            toast.error('Product information is not available');
-            return;
-        }
-
-        setIsAddingToWishlist(true);
-        try {
-            const resultAction = await dispatch(addToWishlist({
-                productId: product._id
-            }));
-
-            if (addToWishlist.fulfilled.match(resultAction)) {
-                // Refresh wishlist to get updated data
-                await dispatch(getWishlist());
-
-                // Show appropriate message based on current state
-                if (isFavorite) {
-                    toast.success('Removed from wishlist!');
-                } else {
-                    toast.success('Added to wishlist successfully!');
-                }
-            } else {
-                const error = resultAction.payload || 'Failed to update wishlist';
-                toast.error(typeof error === 'string' ? error : 'Failed to update wishlist');
-            }
-        } catch (error) {
-            toast.error('An unexpected error occurred');
-        } finally {
-            setIsAddingToWishlist(false);
-        }
-    };
-
-    const handleAddToCart = async () => {
-        // Check if user is logged in
-        const token = localStorage.getItem('token');
-        if (!token) {
-            toast.error('Please login to add items to your cart');
-            router.push('/login');
-            return;
-        }
-
-        if (!product?._id) {
-            toast.error('Product information is not available');
-            return;
-        }
-
-        setIsAddingToCart(true);
-        try {
-            const resultAction = await dispatch(addToCart({
-                productId: product._id,
-                quantity: 1
-            }));
-
-            if (addToCart.fulfilled.match(resultAction)) {
-                toast.success('Added to cart successfully!');
-            } else {
-                const error = resultAction.payload || 'Failed to add to cart';
-                toast.error(typeof error === 'string' ? error : 'Failed to add to cart');
-            }
-        } catch (error) {
-            toast.error('An unexpected error occurred');
-        } finally {
-            setIsAddingToCart(false);
-        }
-    };
-
-    const handleBuyNow = async () => {
-        // Check if user is logged in
-        const token = localStorage.getItem('token');
-        if (!token) {
-            toast.error('Please login to buy products');
-            router.push('/login');
-            return;
-        }
-
-        if (!product?._id) {
-            toast.error('Product information is not available');
-            return;
-        }
-
-        setIsBuyNowClick(true);
-        try {
-            const resultAction = await dispatch(buyNow({
-                productId: product._id,
-                quantity: 1
-            }));
-
-            if (buyNow.fulfilled.match(resultAction)) {
-                toast.success('Redirecting to checkout...');
-                router.push('/spare/checkout');
-            } else {
-                const error = resultAction.payload || 'Failed to buy now';
-                toast.error(typeof error === 'string' ? error : 'Failed to add to cart');
-            }
-        } catch (error) {
-            toast.error('An unexpected error occurred');
-        } finally {
-            setIsBuyNowClick(false);
-        }
     };
 
     const calculateDiscountedPrice = () => {
@@ -169,44 +31,55 @@ const HeroSection = ({ activeTab, setActiveTab, product }) => {
         return 'Compatible Vehicle Information';
     };
 
+    const getCategoryName = () => {
+        if (!product?.mainCategory) {
+            // If mainCategory is not available, try category or section
+            if (product?.category) {
+                if (typeof product.category === 'string') return product.category;
+                if (product.category?.name) return product.category.name;
+            }
+            if (product?.section) {
+                if (typeof product.section === 'string') return product.section;
+                if (product.section?.name) return product.section.name;
+            }
+            return 'Category';
+        }
+        if (typeof product.mainCategory === 'string') {
+            return product.mainCategory;
+        }
+        if (product.mainCategory?.name) {
+            return product.mainCategory.name;
+        }
+        if (typeof product.mainCategory === 'object') {
+            return 'Category';
+        }
+        return 'Category';
+    };
+
     return (
         <div className="mx-auto p-6">
             <div className="mb-6 text-sm text-gray-600">
                 <span>
-                    Filtered By: {product?.mainCategory?.name || 'Category'} - {product?.name || 'Product'}
+                    Filtered By: {getCategoryName()} - {product?.name || 'Product'}
                 </span>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                {/* Left Side */}
                 <div className="space-y-6">
-                    {/* Delivery and Wishlist Row */}
                     <div className="flex justify-between items-center">
                         <div className="flex items-center text-gray-600">
                             <MapPin className="w-4 h-4 mr-2 text-red-500" />
                             <span className="text-sm">Delivering To Perinthalmanna 686551</span>
                         </div>
                         <button
-                            onClick={handleWishlistAction}
-                            disabled={isAddingToWishlist}
-                            className={`flex items-center hover:text-red-600 transition-colors ${isFavorite ? 'text-red-500' : 'text-gray-500'
-                                } ${isAddingToWishlist ? 'opacity-50 cursor-not-allowed' : ''}`}
+                            className="flex items-center text-gray-500 hover:text-red-600 transition-colors"
                         >
-                            <Heart className={`w-5 h-5 mr-2 ${isFavorite ? 'fill-current' : ''}`} />
-                            <span className="text-sm font-medium">
-                                {isAddingToWishlist
-                                    ? 'PROCESSING...'
-                                    : isFavorite
-                                        ? 'REMOVE FROM WISHLIST'
-                                        : 'ADD TO WISHLIST'
-                                }
-                            </span>
+                            <Heart className="w-5 h-5 mr-2" />
+                            <span className="text-sm font-medium">ADD TO WISHLIST</span>
                         </button>
                     </div>
 
-                    {/* Image Section */}
                     <div className="flex gap-4">
-                        {/* Main Image */}
                         <div className="flex-1">
                             <div className="bg-white border rounded-lg p-4 flex items-center justify-center">
                                 {mainImage ? (
@@ -215,7 +88,7 @@ const HeroSection = ({ activeTab, setActiveTab, product }) => {
                                         alt={product?.name || 'Product Image'}
                                         className="max-w-[250px] max-h-[250px] object-contain"
                                         onError={(e) => {
-                                            e.target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjUwIiBoZWlnaHQ9IjI1MCIgeG1lbnNpb249IjEuMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMjUwIiBoZWlnaHQ9IjI1MCIgZmlsbD0iI2YzZjRmNSIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBkeT0iLjM1ZW0iIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtc2l6ZT0iMTQiIGZvbnQtZmFtaWx5PSJzYW5zLXNlcmlmIiBmaWxsPSIjOTk5Ij5ObyBJbWFnZTwvdGV4dD48L3N2Zz4=';
+                                            e.target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjUwIiBoZWlnaHQ9IjI1MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMjUwIiBoZWlnaHQ9IjI1MCIgZmlsbD0iI2YzZjRmNSIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBkeT0iLjM1ZW0iIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtc2l6ZT0iMTQiIGZvbnQtZmFtaWx5PSJzYW5zLXNlcmlmIiBmaWxsPSIjOTk5Ij5ObyBJbWFnZTwvdGV4dD48L3N2Zz4=';
                                         }}
                                     />
                                 ) : (
@@ -226,9 +99,8 @@ const HeroSection = ({ activeTab, setActiveTab, product }) => {
                             </div>
                         </div>
 
-                        {/* Thumbnail Images */}
                         <div className="flex flex-col gap-2 w-20">
-                            {product?.images && product.images.slice(1, 4).map((image, index) => (
+                            {product?.images && product.images?.slice(1, 4).map((image, index) => (
                                 <div
                                     key={index}
                                     className="bg-white border rounded cursor-pointer hover:border-red-500 transition-colors aspect-square"
@@ -249,43 +121,17 @@ const HeroSection = ({ activeTab, setActiveTab, product }) => {
 
                     {/* Action Buttons */}
                     <div className="flex gap-4">
-                        <button onClick={handleBuyNow}
-                            disabled={isBuyNowClick}
-                            className={`flex-1 bg-red-600 text-white py-3 px-6 rounded font-medium hover:bg-red-700 transition-colors ${isBuyNowClick ? 'opacity-50 cursor-not-allowed' : ''}`}>
-                            {isBuyNowClick ? (
-                                <>
-                                    ADDING...
-                                </>
-                            ) : (
-                                <>
-                                    BUY IT NOW
-                                </>
-                            )}
+                        <button className="flex-1 bg-red-600 text-white py-3 px-6 rounded font-medium hover:bg-red-700 transition-colors">
+                            BUY IT NOW
                         </button>
-                        <button
-                            onClick={handleAddToCart}
-                            disabled={isAddingToCart}
-                            className={`flex-1 border border-gray-300 text-gray-700 py-3 px-6 rounded font-medium hover:bg-gray-50 transition-colors flex items-center justify-center ${isAddingToCart ? 'opacity-50 cursor-not-allowed' : ''
-                                }`}
-                        >
-                            {isAddingToCart ? (
-                                <>
-                                    <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-red-600 mr-2"></div>
-                                    ADDING...
-                                </>
-                            ) : (
-                                <>
-                                    <ShoppingCart className="w-4 h-4 mr-2" />
-                                    ADD TO CART
-                                </>
-                            )}
+                        <button className="flex-1 border border-gray-300 text-gray-700 py-3 px-6 rounded font-medium hover:bg-gray-50 transition-colors flex items-center justify-center">
+                            <ShoppingCart className="w-4 h-4 mr-2" />
+                            ADD TO CART
                         </button>
                     </div>
                 </div>
 
-                {/* Right Side */}
                 <div className="space-y-6">
-                    {/* Brand and Delivery Info */}
                     <div className="flex justify-between items-center">
                         <div className="flex items-center">
                             <span className="text-lg font-semibold text-gray-800">
@@ -297,8 +143,7 @@ const HeroSection = ({ activeTab, setActiveTab, product }) => {
                             <span className="text-sm font-medium">Deliver Within 8 Days</span>
                         </div>
                     </div>
-
-                    {/* Product Title */}
+                    
                     <div>
                         <h1 className="text-2xl font-bold text-gray-900 mb-2">
                             {product?.name || 'Product Name'}
@@ -313,7 +158,7 @@ const HeroSection = ({ activeTab, setActiveTab, product }) => {
                         {product?.discount && (
                             <>
                                 <span className="text-lg text-gray-500 line-through">
-                                    ₹{product.price.toLocaleString()}
+                                    ₹{product.price?.toLocaleString()}
                                 </span>
                                 <span className="text-green-600 font-medium">
                                     ({product.discount}% Off)

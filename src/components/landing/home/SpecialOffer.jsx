@@ -9,15 +9,12 @@ import { IMG_URL } from "@/redux/baseUrl";
 export default function SpecialOffersCarousel() {
   const dispatch = useDispatch();
   const { landingCarousel, loading, error } = useSelector((s) => s.carousel);
-
   const [currentSlide, setCurrentSlide] = useState(0);
 
-  // fetch data on mount
   useEffect(() => {
     dispatch(getLandingCarousel());
   }, [dispatch]);
 
-  // auto-slide
   useEffect(() => {
     if (!landingCarousel.length) return;
     const timer = setInterval(() => {
@@ -36,12 +33,14 @@ export default function SpecialOffersCarousel() {
   };
 
   const prevSlide = () => {
-    setCurrentSlide((prev) => (prev - 1 + landingCarousel.length) % landingCarousel.length);
+    setCurrentSlide(
+      (prev) => (prev - 1 + landingCarousel.length) % landingCarousel.length
+    );
   };
 
-  // loading / error handling
   if (loading) return <p className="text-center py-8">Loading carousel…</p>;
-  if (error) return <p className="text-center text-red-500 py-8">Error: {error}</p>;
+  if (error)
+    return <p className="text-center text-red-500 py-8">Error: {error}</p>;
 
   return (
     <section className="py-16 bg-gray-50" id="shop">
@@ -51,7 +50,8 @@ export default function SpecialOffersCarousel() {
             Special Offers
           </h2>
           <p className="text-gray-600 text-lg max-w-2xl mx-auto">
-            Save more across our four stores — limited deals, bundles, and exclusive member savings.
+            Save more across our four stores — limited deals, bundles, and
+            exclusive member savings.
           </p>
         </div>
 
@@ -67,16 +67,13 @@ export default function SpecialOffersCarousel() {
                     key={offer._id}
                     className="w-full flex-shrink-0 relative min-h-[400px] overflow-hidden"
                   >
-               <div className="absolute inset-0">
-  <img
-    src={`${IMG_URL}/${offer.image}`}
-    alt={offer.title}
-    className="w-full h-full object-cover"
-  />
-</div>
-
-
-                    {/* text overlay */}
+                    <div className="absolute inset-0">
+                      <img
+                        src={`${IMG_URL}/${offer.image}`}
+                        alt={offer.title}
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
                     <div className="relative z-10 flex items-center min-h-[400px] p-8 md:p-12 bg-black/40">
                       <div className="max-w-lg text-white">
                         <h3 className="text-3xl md:text-4xl font-bold mb-4 leading-tight">
@@ -109,13 +106,22 @@ export default function SpecialOffersCarousel() {
               </div>
             </div>
 
-            {/* prev / next buttons */}
             <button
               onClick={prevSlide}
               className="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-white bg-opacity-80 hover:bg-opacity-100 rounded-full shadow-lg flex items-center justify-center transition-all duration-300 hover:scale-110"
             >
-              <svg className="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              <svg
+                className="w-6 h-6 text-gray-700"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M15 19l-7-7 7-7"
+                />
               </svg>
             </button>
 
@@ -123,14 +129,23 @@ export default function SpecialOffersCarousel() {
               onClick={nextSlide}
               className="absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-white bg-opacity-80 hover:bg-opacity-100 rounded-full shadow-lg flex items-center justify-center transition-all duration-300 hover:scale-110"
             >
-              <svg className="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              <svg
+                className="w-6 h-6 text-gray-700"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M9 5l7 7-7 7"
+                />
               </svg>
             </button>
           </div>
         )}
 
-        {/* dots */}
         <div className="flex justify-center mt-8 space-x-3">
           {landingCarousel.map((_, index) => (
             <button

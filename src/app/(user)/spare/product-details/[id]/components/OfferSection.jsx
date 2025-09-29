@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useDispatch, useSelector } from "react-redux";
 import { getProductDetailBanners } from "@/redux/slices/bannerSlice";
+import { IMG_URL } from "@/redux/baseUrl";
 
 export default function PromotionalBannerSection() {
   const dispatch = useDispatch();
@@ -33,7 +34,7 @@ export default function PromotionalBannerSection() {
   }
 
   return (
-    <section className="py-8 md:py-16 bg-gray-50">
+    <section className="py-8 md:py-16 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
           {limitedBanners.map((promo, index) => (
@@ -81,7 +82,7 @@ export default function PromotionalBannerSection() {
                 <div className="flex-shrink-0 order-first sm:order-last">
                   <div className="w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 lg:w-40 lg:h-40 relative mx-auto">
                     <Image
-                      src={`/uploads/${promo.image}`}
+                      src={`${IMG_URL}/${promo.image}`}
                       alt={promo.title}
                       fill
                       className="object-contain drop-shadow-lg"

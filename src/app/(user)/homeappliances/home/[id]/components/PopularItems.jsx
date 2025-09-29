@@ -51,24 +51,26 @@ export default function PopularItems() {
     );
   }
 
-  return (
-    <section className="py-12 px-4 sm:px-6 lg:px-16 bg-white">
-      <div className="flex items-center justify-between mb-8">
-        <h2 className="text-xl sm:text-2xl text-black font-semibold tracking-wide">POPULAR ITEMS</h2>
-      </div>
+return (
+  <section className="py-12 px-4 sm:px-6 lg:px-16 bg-white">
+    <div className="flex items-center justify-between mb-8">
+      <h2 className="text-xl sm:text-2xl text-black font-semibold tracking-wide">POPULAR ITEMS</h2>
+    </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+    {/* Mobile: Horizontal scroll, Desktop: Grid */}
+    <div className="block sm:hidden">
+      <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide">
         {products?.map((product) => (
           <div
-            key={product._id} // ✅ Make sure to use _id from API
-            className="bg-white border rounded-lg overflow-hidden shadow-sm hover:shadow-lg transition relative"
+            key={product._id}
+            className="bg-white border rounded-lg overflow-hidden shadow-sm hover:shadow-lg transition relative flex-none w-64"
           >
-            <div className="relative w-full h-70">
+            <div className="relative w-full h-48">
               <Image
                 src={`${IMG_URL}/${product.images[0]}`}
                 alt={product.name}
                 fill
-                className="object-cover"
+                className="object-contain"
               />
               <button className="absolute top-3 right-3 bg-white rounded-full p-2 shadow hover:bg-gray-100">
                 <Heart className="h-5 w-5 text-gray-600" />
@@ -80,21 +82,53 @@ export default function PopularItems() {
               <p className="text-sm text-gray-500 mb-2">{product.description}</p>
               <div className="flex items-center justify-between">
                 <span className="text-lg font-semibold text-black">{product.price}</span>
-                <span className="text-red-500 text-sm font-medium">Dis: {product.discount}</span>
+                <span className="text-red-500 text-sm font-medium">Dis: {product.discount}%Off</span>
               </div>
             </div>
           </div>
         ))}
       </div>
+    </div>
 
-      <div className="flex justify-center mt-10">
-        <button
-          onClick={() => router.push("/homeappliances/products")}
-          className="px-6 py-2 border rounded-full text-sm bg-white text-black font-medium hover:bg-black hover:text-white transition"
+    {/* Desktop: Grid layout */}
+    <div className="hidden sm:grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+      {products?.map((product) => (
+        <div
+          key={product._id}
+          className="bg-white border rounded-lg overflow-hidden shadow-sm hover:shadow-lg transition relative"
         >
-          View more
-        </button>
-      </div>
-    </section>
-  );
+          <div className="relative w-full h-70 sm:h-80 md:h-50">
+            <Image
+              src={`${IMG_URL}/${product.images[0]}`}
+              alt={product.name}
+              fill
+              className="object-contain"
+            />
+            <button className="absolute top-3 right-3 bg-white rounded-full p-2 shadow hover:bg-gray-100">
+              <Heart className="h-5 w-5 text-gray-600" />
+            </button>
+          </div>
+
+          <div className="p-4">
+            <h3 className="text-lg font-medium text-gray-900">{product.name}</h3>
+            <p className="text-sm text-gray-500 mb-2">{product.description}</p>
+            <div className="flex items-center justify-between">
+              <span className="text-lg font-semibold text-black">{product.price}</span>
+              <span className="text-red-500 text-sm font-medium">Dis: {product.discount}</span>
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+
+    <div className="flex justify-center mt-10">
+      <button
+        onClick={() => router.push("/homeappliances/products")}
+        className="px-6 py-2 border rounded-full text-sm bg-white text-black font-medium hover:bg-black hover:text-white transition"
+      >
+        View more
+      </button>
+    </div>
+  </section>
+)
 }

@@ -20,7 +20,6 @@ const HeroSection = ({ activeTab, setActiveTab, product }) => {
     const { wishlist } = useSelector((state) => state.wishlist);
     const tabs = ['TWO WHEELER', 'FOUR WHEELER'];
 
-    // Check if product is in wishlist
     useEffect(() => {
         if (product?._id && wishlist) {
             const isInWishlist = wishlist.some(item => item._id === product._id || item.productId === product._id);
@@ -29,7 +28,7 @@ const HeroSection = ({ activeTab, setActiveTab, product }) => {
     }, [product, wishlist]);
 
     useEffect(() => {
-        if (product?.images && product.images.length > 0) {
+        if (product?.images && product.images?.length > 0) {
             setMainImage(`${IMG_URL}${product.images[0]}`);
         }
     }, [product]);

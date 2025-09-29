@@ -39,7 +39,23 @@ if (error) {
 
   return (
    <div className="bg-white">
-      <section className="py-16 bg-white">
+
+    <section className="py-20 bg-[#EEEEEE]">
+        <div className="max-w-5xl mx-auto px-6 text-center">
+          <h2 className="text-4xl md:text-5xl font-bold text-red-600 mb-8 leading-tight">
+            Four Specialized Stores. One Easy Access.
+          </h2>
+          
+          <p className="text-gray-700 text-lg md:text-xl leading-relaxed max-w-4xl mx-auto">
+            Why search across multiple platforms when everything you need is under one roof? Our 
+            platform connects you to four unique shopping experiences, each dedicated to quality, 
+            authenticity, and service. Whether you're fixing, upgrading, styling, or cleaning — we 
+            bring the best of every category together.
+          </p>
+        </div>
+      </section>
+      
+      <section className="py-16 bg-[#EEEEEE]">
         <div className="px-6">
           <div className="relative">
             <div className="flex gap-8 overflow-x-auto pb-6 scrollbar-hide snap-x snap-mandatory">
@@ -74,7 +90,7 @@ if (error) {
                         </span>
                       </div>
                       
-                      <button className="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-lg font-semibold text-sm transition-all duration-300 transform hover:scale-105 hover:shadow-lg">
+                      <button id="section" className="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-lg font-semibold text-sm transition-all duration-300 transform hover:scale-105 hover:shadow-lg">
                         Explore
                       </button>
                     </div>
@@ -87,20 +103,7 @@ if (error) {
           </div>
         </div>
       </section>
-        <section className="py-20 bg-gradient-to-br from-gray-50 to-gray-100">
-        <div className="max-w-5xl mx-auto px-6 text-center">
-          <h2 className="text-4xl md:text-5xl font-bold text-red-600 mb-8 leading-tight">
-            Four Specialized Stores. One Easy Access.
-          </h2>
-          
-          <p className="text-gray-700 text-lg md:text-xl leading-relaxed max-w-4xl mx-auto">
-            Why search across multiple platforms when everything you need is under one roof? Our 
-            platform connects you to four unique shopping experiences, each dedicated to quality, 
-            authenticity, and service. Whether you're fixing, upgrading, styling, or cleaning — we 
-            bring the best of every category together.
-          </p>
-        </div>
-      </section>
+        
     </div>
   );
 }

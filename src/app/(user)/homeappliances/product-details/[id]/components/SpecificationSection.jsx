@@ -2,7 +2,6 @@ import React from 'react';
 import { Zap, Shield, Droplets, Gauge, Settings, Clock, Star } from 'lucide-react';
 
 const SpecificationsSection = ({ product }) => {
-  // Default specifications if none provided
   const defaultSpecs = [
     {
       icon: Zap,
@@ -36,9 +35,20 @@ const SpecificationsSection = ({ product }) => {
     return colors[color] || colors.red;
   };
 
+  // Safe function to get section name
+  const getSectionName = () => {
+    if (!product?.section) return 'N/A';
+    if (typeof product.section === 'string') return product.section;
+    if (product.section?.name) return product.section.name;
+    return 'N/A';
+  };
+
   const renderSpecifications = () => {
     if (product?.specifications && product.specifications.length > 0) {
       return product.specifications.map((spec, index) => {
+        // Ensure spec is a string, not an object
+        const specText = typeof spec === 'string' ? spec : JSON.stringify(spec);
+        
         const iconOptions = [Zap, Shield, Droplets, Gauge, Settings, Clock, Star];
         const colorOptions = ['red', 'orange', 'blue', 'green', 'purple', 'teal'];
         
@@ -51,7 +61,7 @@ const SpecificationsSection = ({ product }) => {
               <IconComponent className={`w-4 h-4 ${colorScheme.text}`} />
             </div>
             <div>
-              <h3 className="font-medium text-gray-900">{spec}</h3>
+              <h3 className="font-medium text-gray-900">{specText}</h3>
               <p className="text-sm text-gray-600">Feature</p>
             </div>
           </div>
@@ -102,7 +112,7 @@ const SpecificationsSection = ({ product }) => {
           {product?.section && (
             <div className="text-center p-3 bg-gray-50 rounded">
               <div className="font-medium text-gray-900">Section</div>
-              <div className="text-gray-600">{product.section}</div>
+              <div className="text-gray-600">{getSectionName()}</div>
             </div>
           )}
           {product?.partNumber && (

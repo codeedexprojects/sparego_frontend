@@ -11,7 +11,6 @@ export default function SparePartsCarousel() {
   const [currentSlide, setCurrentSlide] = useState(0);
 
   useEffect(() => {
-    // Get sectionId from localStorage
     const sectionId = localStorage.getItem('sectionId');
     
     if (sectionId) {
@@ -30,7 +29,6 @@ export default function SparePartsCarousel() {
     }
   }, [carousel.length]);
 
-  // Show loading state
   if (loading) {
     return (
       <section className="relative w-full overflow-hidden h-96 bg-gray-200 animate-pulse rounded-lg flex items-center justify-center">
@@ -65,7 +63,7 @@ export default function SparePartsCarousel() {
   }
 
   return (
-    <section className="relative overflow-hidden mx-4 md:mx-auto max-w-7xl ">
+    <section className="relative overflow-hidden max-w-8xl mx-auto px-4 md:px-15 bg-white ">
       {/* Slides */}
       {carousel.map((slide, index) => (
         <div

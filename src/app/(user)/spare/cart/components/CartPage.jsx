@@ -136,7 +136,7 @@ if (error)
           <p className="text-gray-600 mb-6">Add some items to get started!</p>
           <button
             className="bg-red-600 text-white px-6 py-2 rounded-md hover:bg-red-700 transition-colors"
-            onClick={() => window.history.back()}
+            onClick={() => router.push("/spare/category1")}
           >
             Continue Shopping
           </button>

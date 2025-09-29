@@ -58,7 +58,7 @@ if (error) {
   }
 
   return (
-<section className="relative overflow-hidden mx-4 md:mx-auto max-w-7xl ">
+<section className="relative overflow-hidden max-w-8xl mx-auto px-4 md:px-15 ">
           {/* Slides */}
       {carousel.map((slide, index) => (
         <div

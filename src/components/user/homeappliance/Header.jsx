@@ -9,7 +9,7 @@ const Header = () => {
   const pathname = usePathname(); 
 
   const navItems = [
-    { name: "HOME", href: "/homeappliances/home" },
+    { name: "HOME", href: "/homeappliances/home/:id" },
     { name: "SHOP", href: "/homeappliances/products" },
     { name: "BLOG", href: "/homeappliances/blog" },
     { name: "ABOUT US", href: "/homeappliances/aboutus" },
@@ -59,9 +59,9 @@ const Header = () => {
             <Link href="/homeappliances/cart">
               <ShoppingCart className="h-5 w-5 text-gray-700 hover:text-red-600 cursor-pointer" />
             </Link>
-            {/* <Link href="/spare/profile">
+            <Link href="/homeappliances/profile">
               <User className="h-5 w-5 text-gray-700 hover:text-red-600 cursor-pointer" />
-            </Link> */}
+            </Link>
           </div>
 
           <div className="md:hidden">

@@ -62,8 +62,8 @@ export default function PromotionalBannerSection({ page = "home" }) {
   }
 
   return (
-    <section className="py-8 md:py-16 bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6">
+    <section className="py-8 md:py-16 bg-white">
+      <div className=" px-4 sm:px-6">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
           {limitedBanners.map((promo, index) => (
             <div

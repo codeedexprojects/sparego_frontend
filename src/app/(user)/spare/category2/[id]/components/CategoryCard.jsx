@@ -59,7 +59,7 @@ const SubCategoryPage = () => {
           {subCategories.map((sub) => (
             <div
               key={sub._id}
-              className="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-lg transition-shadow cursor-pointer"
+              className="bg-white rounded-lg border border-gray-600 p-6 hover:shadow-lg transition-shadow cursor-pointer"
               onClick={() => handleSubCategoryClick(sub._id)}
             >
               <div className="flex items-start justify-between">
@@ -75,7 +75,7 @@ const SubCategoryPage = () => {
                 <div className="flex-shrink-0 ml-4">
                   <div className="w-12 h-12 bg-gray-50 rounded-lg flex items-center justify-center p-2">
                     <img
-                      src={`${IMG_URL}/${sub.image}`}
+                      src={`${IMG_URL}${sub.image}`}
                       alt={sub.name}
                       className="w-8 h-8 object-contain"
                     />

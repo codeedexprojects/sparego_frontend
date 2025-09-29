@@ -86,7 +86,7 @@ const page = () => {
         <SpecificationsSection product={product} />
         <HowToUseSection product={product} />
         <SpecTable product={product} />
-        <SimilarProducts />
+        <SimilarProducts  />
         <PromotionalBannerSection />
       </div>
       <Footer />

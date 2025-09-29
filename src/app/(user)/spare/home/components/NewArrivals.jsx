@@ -15,6 +15,7 @@ export default function NewArrivalsSection() {
   useEffect(() => {
     dispatch(getFullProductList());
   }, [dispatch]);
+
   const filterProductsByVehicleType = (vehicleType) => {
     if (!products || !products.products) return [];
 
@@ -28,11 +29,12 @@ export default function NewArrivalsSection() {
       })
       .slice(0, 4);
   };
+
   const formatProductData = (products) => {
     return products.map((product) => ({
       id: product._id,
       title: product.name,
-      brand: product.brand?.name || "Multiple brands",
+      brand: product.productBrand?.name || "Multiple brands", 
       discount: product.discount ? `${product.discount}% off` : "Special offer",
       image:
         product.images && product.images.length > 0
@@ -54,6 +56,7 @@ export default function NewArrivalsSection() {
       filterProductsByVehicleType("Two-Wheeler")
     ),
   };
+
   if (loading) {
     return (
       <section className="py-16 bg-white">
@@ -99,6 +102,7 @@ export default function NewArrivalsSection() {
       </section>
     );
   }
+
   if (error) {
     return (
       <section className="py-16 bg-white">
@@ -113,7 +117,7 @@ export default function NewArrivalsSection() {
 
   return (
     <section className="py-16 bg-white">
-      <div className="max-w-7xl mx-auto px-6">
+      <div className="max-w-8xl mx-auto px-4 md:px-15">
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-12 gap-4">
           <div>
             <h2 className="text-2xl md:text-3xl font-bold text-gray-900">
@@ -148,20 +152,22 @@ export default function NewArrivalsSection() {
                       </div>
                     )}
                     <div className="mb-4 flex justify-center flex-grow">
-                      <div className="w-40 h-40 relative">
+                      <div className="w-40 h-40 relative ">
                         <Image
-                          src={product.image}
+                          src={product.image} 
                           alt={product.title}
                           fill
                           className="object-contain group-hover:scale-105 transition-transform duration-300"
-                          // onError={(e) => {
-                          //   e.target.src = '/home/product1.png';
-                          // }}
+                          onError={(e) => {
+                            e.target.src = '/home/product1.png';
+                          }}
+                          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
+                          priority={false}
                         />
                       </div>
                     </div>
                     <div className="mt-auto">
-                      <h3 className="text-md font-semibold text-gray-900 mb-1 line-clamp-2 h-12">
+                      <h3 className="text-md font-semibold text-gray-900 mb-1 line-clamp-2 h-12 ">
                         {product.title}
                       </h3>
                       <p className="text-sm text-gray-500 mb-2">
@@ -172,7 +178,7 @@ export default function NewArrivalsSection() {
                           <span className="text-lg font-bold text-gray-900">
                             ₹{product.price}
                           </span>
-                          {product.originalPrice && (
+                          {product.originalPrice && product.originalPrice !== product.price && (
                             <span className="text-sm text-gray-500 line-through ml-2">
                               ₹{product.originalPrice}
                             </span>

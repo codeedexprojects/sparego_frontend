@@ -5,11 +5,13 @@ import { useDispatch, useSelector } from "react-redux";
 import { toast } from "sonner";
 import { getWishlist, addToWishlist } from "@/redux/slices/wishlistSlice";
 import { IMG_URL } from "@/redux/baseUrl";
+import { useRouter } from "next/navigation";
 
 const WishlistPage = () => {
   const dispatch = useDispatch();
   const { wishlist, loading, error } = useSelector((state) => state.wishlist);
   const [processingItems, setProcessingItems] = useState({});
+  const router = useRouter();
 
   useEffect(() => {
     dispatch(getWishlist());
@@ -82,7 +84,7 @@ const WishlistPage = () => {
         <p className="text-gray-600 mb-6">Items you save will appear here</p>
         <button 
           className="bg-red-600 text-white px-6 py-2 rounded-md hover:bg-red-700 transition-colors flex items-center mx-auto"
-          onClick={() => window.history.back()}
+          onClick={() => router.push("/spare/category1")}
         >
           <ArrowLeft className="w-4 h-4 mr-2" /> Continue Shopping
         </button>

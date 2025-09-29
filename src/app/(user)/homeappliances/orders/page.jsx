@@ -1,6 +1,6 @@
 "use client";
 import Footer from "@/components/landing/Footer";
-import Header from "@/components/user/watches/Header";
+import Header from "@/components/user/homeappliance/Header";
 import { IMG_URL } from "@/redux/baseUrl";
 import { getOrders } from "@/redux/slices/orderSlice";
 import { useRouter } from "next/navigation";

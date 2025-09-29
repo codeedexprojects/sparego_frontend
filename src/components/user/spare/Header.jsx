@@ -108,7 +108,29 @@ const Header = () => {
           </div>
         </div>
       </div>
-      {/* rest of your code ... */}
+        <div style={{ backgroundColor: "#333333" }}>
+              <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div className="hidden md:flex space-x-0">
+                  {navItems.map((item) => {
+                    const isActive = pathname === item.href; 
+                    return (
+                      <Link
+                        key={item.name}
+                        href={item.href}
+                        className={`px-6 py-4 text-sm font-medium transition-colors duration-200 ${
+                          isActive
+                            ? "bg-red-600 text-white"
+                            : "text-gray-300 hover:bg-gray-700 hover:text-white"
+                        }`}
+                      >
+                        {item.name}
+                      </Link>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+      
     </header>
   );
 };

@@ -18,6 +18,7 @@ export const getHomeBanners = createAsyncThunk(
     }
 )
 
+
 export const getCategoryBanners = createAsyncThunk(
     "banner/getCategoryBanners",
     async (_, { rejectWithValue }) => {
@@ -140,6 +141,8 @@ const bannerSlice = createSlice({
     reducers: {},
     extraReducers: (builder) => {
         builder
+
+        // home
             .addCase(getHomeBanners.pending, (state) => {
                 state.loading = true;
                 state.error = null;
@@ -152,6 +155,8 @@ const bannerSlice = createSlice({
                 state.loading = false;
                 state.error = action.payload;
             })
+
+            // category
             .addCase(getCategoryBanners.pending, (state) => {
                 state.loading = true;
                 state.error = null;
@@ -164,6 +169,8 @@ const bannerSlice = createSlice({
                 state.loading = false;
                 state.error = action.payload;
             })
+
+            // subcategory
             .addCase(getsubCategoryBanners.pending, (state) => {
                 state.loading = true;
                 state.error = null;
@@ -176,6 +183,9 @@ const bannerSlice = createSlice({
                 state.loading = false;
                 state.error = action.payload;
             })
+
+
+            // subsubcategory
             .addCase(getsubSubCategoryBanners.pending, (state) => {
                 state.loading = true;
                 state.error = null;
@@ -188,6 +198,9 @@ const bannerSlice = createSlice({
                 state.loading = false;
                 state.error = action.payload;
             })
+
+
+            // products
             .addCase(getProductBanners.pending, (state) => {
                 state.loading = true;
                 state.error = null;
@@ -200,6 +213,9 @@ const bannerSlice = createSlice({
                 state.loading = false;
                 state.error = action.payload;
             })
+
+
+            // productdetails
             .addCase(getProductDetailBanners.pending, (state) => {
                 state.loading = true;
                 state.error = null;
@@ -212,6 +228,8 @@ const bannerSlice = createSlice({
                 state.loading = false;
                 state.error = action.payload;
             })
+
+            // wishlist
             .addCase(getWishlistBanners.pending, (state) => {
                 state.loading = true;
                 state.error = null;
@@ -224,6 +242,9 @@ const bannerSlice = createSlice({
                 state.loading = false;
                 state.error = action.payload;
             })
+
+
+            // brandbanners
             .addCase(getBrandBanners.pending, (state) => {
                 state.loading = true;
                 state.error = null;

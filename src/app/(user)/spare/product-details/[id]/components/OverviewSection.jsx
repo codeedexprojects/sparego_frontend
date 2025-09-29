@@ -15,19 +15,19 @@ const OverviewSection = ({ product }) => {
         
         {product?.category && (
           <p>
-            <strong>Category:</strong> {product.category.name}
+            <strong>Category:</strong> {typeof product.category === 'object' ? product.category.name : product.category}
           </p>
         )}
         
         {product?.subCategory && (
           <p>
-            <strong>Sub Category:</strong> {product.subCategory.name}
+            <strong>Sub Category:</strong> {typeof product.subCategory === 'object' ? product.subCategory.name : product.subCategory}
           </p>
         )}
         
         {product?.warranty && (
           <p>
-            <strong>Warranty:</strong> {product.warranty}
+            <strong>Warranty:</strong> {typeof product.warranty === 'object' ? product.warranty.period : product.warranty}
           </p>
         )}
       </div>

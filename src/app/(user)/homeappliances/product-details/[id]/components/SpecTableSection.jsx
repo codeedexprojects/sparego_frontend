@@ -1,11 +1,9 @@
 import React from 'react';
 
 const SpecTable = ({ product }) => {
-  // Build specifications array from product data
   const getSpecifications = () => {
     const specs = [];
 
-    // Add technical specs from API
     if (product?.technicalSpecs && product.technicalSpecs.length > 0) {
       product.technicalSpecs.forEach(spec => {
         specs.push({

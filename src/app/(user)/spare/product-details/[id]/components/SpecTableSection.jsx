@@ -5,20 +5,46 @@ const SpecTable = ({ product }) => {
   const getSpecifications = () => {
     const specs = [];
 
-    // Add technical specs from API
+    // Add technical specs from API - filter out null values
     if (product?.technicalSpecs && product.technicalSpecs.length > 0) {
       product.technicalSpecs.forEach(spec => {
-        specs.push({
-          key: spec.key,
-          value: spec.value
-        });
+        // Check if spec is not null and has key and value properties
+        if (spec && spec.key && spec.value) {
+          specs.push({
+            key: spec.key,
+            value: spec.value
+          });
+        }
       });
     }
 
-   
+    // If no valid technical specs, try to create from other product properties
+    if (specs.length === 0) {
+      // Add basic product information as specs
+      if (product?.partNumber) {
+        specs.push({ key: 'Part Number', value: product.partNumber });
+      }
+      if (product?.vehicleType) {
+        specs.push({ 
+          key: 'Vehicle Type', 
+          value: typeof product.vehicleType === 'object' ? product.vehicleType.name : product.vehicleType 
+        });
+      }
+      if (product?.warranty) {
+        specs.push({ 
+          key: 'Warranty', 
+          value: typeof product.warranty === 'object' ? product.warranty.period : product.warranty 
+        });
+      }
+      if (product?.stock !== undefined) {
+        specs.push({ key: 'Stock', value: `${product.stock} units` });
+      }
+    }
+
+    // If still no specs, show message
     if (specs.length === 0) {
       return [
-        { key: 'Specifications', value: 'No technical specifications available' }
+        { key: 'Information', value: 'No technical specifications available for this product' }
       ];
     }
 

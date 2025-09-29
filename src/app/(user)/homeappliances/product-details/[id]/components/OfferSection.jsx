@@ -4,9 +4,9 @@ import Image from "next/image";
 import Link from "next/link";
 import { useDispatch, useSelector } from "react-redux";
 import { IMG_URL } from "@/redux/baseUrl";
-import { getProductDetailBanners } from "@/redux/slices/dynamicBannerSlice";
+import {  getProductDetailBanners } from "@/redux/slices/dynamicBannerSlice";
 
-export default function PromotionalBannerSection({ page = "product-detail" }) {
+export default function PromotionalBannerSection({ page = "brand" }) {
   const dispatch = useDispatch();
   const { bannersBySection, loading, error } = useSelector(
     (state) => state.dynamicBanners
@@ -21,25 +21,19 @@ export default function PromotionalBannerSection({ page = "product-detail" }) {
       dispatch(getProductDetailBanners(id)); 
     }
   }, [dispatch]);
-  
+
   useEffect(() => {
-    if (sectionId && bannersBySection?.[sectionId]) {
-      const sectionBanners = bannersBySection[sectionId][page];
-      if (sectionBanners) {
-        setBanners(sectionBanners);
-      } else {
-        const allBanners = bannersBySection[sectionId];
-        if (Array.isArray(allBanners)) {
-          const filteredBanners = allBanners.filter(banner => banner.page === page);
-          setBanners(filteredBanners);
-        }
-      }
+    if (sectionId && bannersBySection[sectionId]?.[page]) {
+      // Access the nested structure correctly
+      setBanners(bannersBySection[sectionId][page]);
+    } else {
+      setBanners([]);
     }
   }, [bannersBySection, sectionId, page]);
 
   const limitedBanners = banners.slice(0, 2);
 
-  // // Debug logs
+  // Debug logs - uncomment to troubleshoot
   // console.log('Debug Info:');
   // console.log('sectionId:', sectionId);
   // console.log('page:', page);

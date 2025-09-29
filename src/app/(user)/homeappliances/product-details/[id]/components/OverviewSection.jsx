@@ -1,6 +1,30 @@
 import React from 'react';
 
 const OverviewSection = ({ product }) => {
+  // Safe function to get category name
+  const getCategoryName = () => {
+    if (!product?.category) return 'N/A';
+    if (typeof product.category === 'string') return product.category;
+    if (product.category?.name) return product.category.name;
+    return 'N/A';
+  };
+
+  // Safe function to get subcategory name
+  const getSubCategoryName = () => {
+    if (!product?.subCategory) return 'N/A';
+    if (typeof product.subCategory === 'string') return product.subCategory;
+    if (product.subCategory?.name) return product.subCategory.name;
+    return 'N/A';
+  };
+
+  // Safe function to get section name
+  const getSectionName = () => {
+    if (!product?.section) return 'N/A';
+    if (typeof product.section === 'string') return product.section;
+    if (product.section?.name) return product.section.name;
+    return 'N/A';
+  };
+
   return (
     <div className="p-6">
       <h2 className="text-xl font-bold text-red-600 mb-4">Overview</h2>
@@ -13,15 +37,17 @@ const OverviewSection = ({ product }) => {
           <p>No overview available for this product.</p>
         )}
         
-        {product?.category && (
-          <p>
-            <strong>Category:</strong> {product.category.name}
-          </p>
-        )}
+        <p>
+          <strong>Category:</strong> {getCategoryName()}
+        </p>
         
-        {product?.subCategory && (
+        <p>
+          <strong>Sub Category:</strong> {getSubCategoryName()}
+        </p>
+        
+        {product?.section && (
           <p>
-            <strong>Sub Category:</strong> {product.subCategory.name}
+            <strong>Section:</strong> {getSectionName()}
           </p>
         )}
         

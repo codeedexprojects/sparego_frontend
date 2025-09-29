@@ -1,15 +1,15 @@
 "use client";
 import React, { useState, useEffect } from 'react';
-import {  useDispatch, useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import HeroSection from './components/HeroSection';
 import OverviewSection from './components/OverviewSection';
 import SpecificationsSection from './components/SpecificationSection';
 import HowToUseSection from './components/HowToUseSection';
 import SpecTable from './components/SpecTableSection';
-import Header from '@/components/user/spare/Header';
+import Header from '@/components/user/homeappliance/Header';
 import Footer from '@/components/landing/Footer';
 import SimilarProducts from './components/SimilarProducts';
-import PromotionalBannerSection from './components/OfferSection';
+// import PromotionalBannerSection from './components/OfferSection';
 import { getProductById } from '@/redux/slices/productSlice';
 import { useParams } from 'next/navigation';
 import { Toaster } from 'sonner';
@@ -20,7 +20,6 @@ const page = () => {
   const { product, loading, error } = useSelector((state) => state.product);
   
   const [activeTab, setActiveTab] = useState('TWO WHEELER');
-  const [isFavorite, setIsFavorite] = useState(false);
 
   useEffect(() => {
     if (id) {
@@ -28,7 +27,6 @@ const page = () => {
     }
   }, [id, dispatch]);
 
-  
   useEffect(() => {
     if (product?.vehicleType) {
       setActiveTab(product.vehicleType.toUpperCase().replace('-', ' '));
@@ -75,19 +73,13 @@ const page = () => {
     <div>
       <Header />
       <div className="mx-auto p-6 bg-white min-h-screen space-y-8">
-        <HeroSection 
-          activeTab={activeTab} 
-          setActiveTab={setActiveTab}
-          isFavorite={isFavorite}
-          setIsFavorite={setIsFavorite}
-          product={product}
-        />
+        <HeroSection product={product} />
         <OverviewSection product={product} />
         <SpecificationsSection product={product} />
         <HowToUseSection product={product} />
         <SpecTable product={product} />
         <SimilarProducts />
-        <PromotionalBannerSection />
+        {/* <PromotionalBannerSection /> */}
       </div>
       <Footer />
       <Toaster position="top-center" richColors closeButton />

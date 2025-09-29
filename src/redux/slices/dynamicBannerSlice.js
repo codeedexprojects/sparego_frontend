@@ -78,10 +78,11 @@ export const getDynamicBanners = createAsyncThunk(
 
 export const getBrandBanners = createAsyncThunk(
   "banner/getBrandBanners",
-  async (_, { rejectWithValue }) => {
+  async (sectionId, { rejectWithValue }) => {
     try {
       const response = await axios.get(
-        `${BASE_URL}/deal-banner/spare-parts/brand/`
+        `${BASE_URL}/deal-banner/${sectionId}/brand/`,
+         { headers: { "Cache-Control": "no-cache" } }
       );
       return response.data;
     } catch (error) {
@@ -199,19 +200,22 @@ const dynamicBannerSlice = createSlice({
         state.loading = true;
         state.error = null;
       })
-      .addCase(getBrandBanners.fulfilled, (state, action) => {
-        state.loading = false;
-        const { sectionId, banners } = action.payload;
-        state.bannersBySection[sectionId] = {};
+     .addCase(getBrandBanners.fulfilled, (state, action) => {
+  state.loading = false;
 
-        banners.forEach((banner) => {
-          const page = banner.page || "default";
-          if (!state.bannersBySection[sectionId][page]) {
-            state.bannersBySection[sectionId][page] = [];
-          }
-          state.bannersBySection[sectionId][page].push(banner);
-        });
-      })
+  const { banners } = action.payload; // only banners exist
+  banners.forEach((banner) => {
+    const sectionId = banner.section?._id; // get sectionId from each banner
+    if (!state.bannersBySection[sectionId]) {
+      state.bannersBySection[sectionId] = {};
+    }
+    const page = banner.page || "default";
+    if (!state.bannersBySection[sectionId][page]) {
+      state.bannersBySection[sectionId][page] = [];
+    }
+    state.bannersBySection[sectionId][page].push(banner);
+  })
+})
       .addCase(getBrandBanners.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;

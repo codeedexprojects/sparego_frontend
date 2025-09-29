@@ -2,6 +2,7 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 import { BASE_URL } from "../baseUrl";
 
+// Products by Vehicle
 export const getProductsByVehicle = createAsyncThunk(
   "product/getProductsByVehicle",
   async (vehicleParams, { rejectWithValue }) => {
@@ -10,108 +11,115 @@ export const getProductsByVehicle = createAsyncThunk(
       if (!type || !brand || !modelLine || !year || !modification) {
         return rejectWithValue("All vehicle parameters are required");
       }
-      const response = await axios.get(
-        `${BASE_URL}/products/vehicle`,
-        {
-          params: {
-            type,
-            brand,
-            modelLine,
-            year,
-            modification
-          }
-        }
-      );
+      const response = await axios.get(`${BASE_URL}/products/vehicle`, {
+        params: { type, brand, modelLine, year, modification },
+      });
       return response.data;
     } catch (error) {
-      return rejectWithValue(error.response?.data || "Failed to fetch products by vehicle");
+      return rejectWithValue(
+        error.response?.data || "Failed to fetch products by vehicle"
+      );
     }
   }
 );
 
-// get all products 
+// All Products
 export const getAllProducts = createAsyncThunk(
   "product/getAllProducts",
   async (id, { rejectWithValue }) => {
     try {
-      const response = await axios.get(
-        `${BASE_URL}/products/product/${id}`,
-      );
+      const response = await axios.get(`${BASE_URL}/products/category/${id}`);
       return response.data;
     } catch (error) {
-      return rejectWithValue(error.response?.data || "Failed to fetch products"
-      )
+      return rejectWithValue(error.response?.data || "Failed to fetch products");
     }
   }
-)
+);
 
+// Full Product List
 export const getFullProductList = createAsyncThunk(
   "product/getFullProductList",
   async (_, { rejectWithValue }) => {
     try {
-      const response = await axios.get(
-        `${BASE_URL}/products/`,
-      );
+      const response = await axios.get(`${BASE_URL}/products/`);
       return response.data;
     } catch (error) {
-      return rejectWithValue(error.response?.data || "Failed to fetch products"
-      )
+      return rejectWithValue(error.response?.data || "Failed to fetch products");
     }
   }
-)
+);
 
+// Product by ID
 export const getProductById = createAsyncThunk(
   "product/getProductById",
   async (id, { rejectWithValue }) => {
     try {
-      const response = await axios.get(
-        `${BASE_URL}/products/${id}`,
-      );
+      const response = await axios.get(`${BASE_URL}/products/${id}`);
       return response.data;
     } catch (error) {
-      return rejectWithValue(error.response?.data || "Failed to fetch products"
-      )
+      return rejectWithValue(error.response?.data || "Failed to fetch product");
     }
   }
-)
+);
 
+// Search Products
 export const searchProducts = createAsyncThunk(
   "product/searchproducts",
-  async({section, search},{rejectWithValue})=>{
-    try{
-      const response = await axios.get(`${BASE_URL}/products`,{
-          params: {
-          section,       
-          search: search || "", 
-        },
-      })
+  async ({ section, search }, { rejectWithValue }) => {
+    try {
+      const response = await axios.get(`${BASE_URL}/products`, {
+        params: { section, search: search || "" },
+      });
       return response.data;
-
-    }catch(error){
-      return rejectWithValue(error.response?.data || "failed to search product")
+    } catch (error) {
+      return rejectWithValue(error.response?.data || "failed to search product");
     }
   }
-)
+);
 
-
+// Similar Products
+export const getSimilarProducts = createAsyncThunk(
+  "product/getSimilarProducts",
+  async (id, { rejectWithValue }) => {
+    try {
+      const response = await axios.get(
+        `${BASE_URL}/products/similar-products/${id}`
+      );
+      return response.data?.products;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || "Failed to fetch products");
+    }
+  }
+);
 
 const productSlice = createSlice({
   name: "product",
   initialState: {
     products: [],
-    vehicleProducts: [], 
+    vehicleProducts: [],
+    similarProducts: [],
+
     product: null,
+
+    // loading & error states
     loading: false,
-    vehicleLoading: false, 
     error: null,
-    vehicleError: null, 
+
+    vehicleLoading: false,
+    vehicleError: null,
+
+    similarLoading: false,
+    similarError: null,
   },
   reducers: {
-   
     clearVehicleProducts: (state) => {
       state.vehicleProducts = [];
       state.vehicleError = null;
-    }
+    },
+    clearSimilarProducts: (state) => {
+      state.similarProducts = [];
+      state.similarError = null;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -128,7 +136,7 @@ const productSlice = createSlice({
         state.vehicleLoading = false;
         state.vehicleError = action.payload;
       })
-      
+
       // All Products
       .addCase(getAllProducts.pending, (state) => {
         state.loading = true;
@@ -143,14 +151,15 @@ const productSlice = createSlice({
         state.error = action.payload;
       })
 
+      // Search
       .addCase(searchProducts.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
       .addCase(searchProducts.fulfilled, (state, action) => {
-  state.searchResults = action.payload.products; 
-  state.loading = false;
-})
+        state.loading = false;
+        state.searchResults = action.payload.products;
+      })
       .addCase(searchProducts.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
@@ -164,13 +173,13 @@ const productSlice = createSlice({
       })
       .addCase(getProductById.fulfilled, (state, action) => {
         state.loading = false;
-        state.product = action.payload; 
+        state.product = action.payload;
       })
       .addCase(getProductById.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       })
-      
+
       // Full Product List
       .addCase(getFullProductList.pending, (state) => {
         state.loading = true;
@@ -183,9 +192,23 @@ const productSlice = createSlice({
       .addCase(getFullProductList.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
+      })
+
+      // Similar Products
+      .addCase(getSimilarProducts.pending, (state) => {
+        state.similarLoading = true;
+        state.similarError = null;
+      })
+      .addCase(getSimilarProducts.fulfilled, (state, action) => {
+        state.similarLoading = false;
+        state.similarProducts = action.payload;
+      })
+      .addCase(getSimilarProducts.rejected, (state, action) => {
+        state.similarLoading = false;
+        state.similarError = action.payload;
       });
-  },  
+  },
 });
 
-export const { clearVehicleProducts } = productSlice.actions;
+export const { clearVehicleProducts, clearSimilarProducts } = productSlice.actions;
 export default productSlice.reducer;

@@ -1,15 +1,15 @@
-import Header from '@/components/user/spare/Header'
 import React from 'react'
 import SpareHeroSection from './components/HeroSection'
 import FeaturesBenefitsSection from './components/FeatureSection'
 import PopularItemsSection from './components/PopularItems'
-// import PromotionalBannerSection from './components/Promotion'
+import PromotionalBannerSection from './components/Promotion'
 import NewArrivalsSection from './components/NewArrivals'
 import SearchByVehicleSection from './components/SearchParts'
 import PopularBrandsSection from './components/PopularBrands'
 import TestimonialsSection from './components/Testimonilels'
 import Footer from '@/components/landing/Footer'
 import SparePartsCarousel from './components/SpareCarousal'
+import Header from '@/components/user/spare/Header'
 
 function page() {
     return (
@@ -18,7 +18,7 @@ function page() {
             <SpareHeroSection></SpareHeroSection>
             <FeaturesBenefitsSection></FeaturesBenefitsSection>
             <PopularItemsSection></PopularItemsSection>
-            {/* <PromotionalBannerSection></PromotionalBannerSection> */}
+            <PromotionalBannerSection></PromotionalBannerSection>
             <NewArrivalsSection></NewArrivalsSection>
             <SearchByVehicleSection></SearchByVehicleSection>
             <PopularBrandsSection></PopularBrandsSection>

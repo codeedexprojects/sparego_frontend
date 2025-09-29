@@ -1,28 +1,25 @@
 "use client";
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import Image from 'next/image';
 import { IMG_URL } from '@/redux/baseUrl';
-import { getSectionBrands } from '@/redux/slices/brandSlice';
-
+import { getSectionBrandById } from '@/redux/slices/brandSlice';
 
 const BrandSelectionSection = () => {
   const dispatch = useDispatch();
   const { brands, loading, error } = useSelector((state) => state.brand);
 
   useEffect(() => {
-    dispatch(getSectionBrands());
+    const sectionId = localStorage.getItem("sectionId");
+    if (sectionId) {
+      dispatch(getSectionBrandById(sectionId));
+    }
   }, [dispatch]);
-
-const filteredBrands = brands && Array.isArray(brands)
-  ? brands.filter(brand => brand.section?.toLowerCase() === "home appliances")
-  : [];
 
   if (loading) {
     return (
       <div className="bg-white py-12 px-6">
         <div className="max-w-6xl mx-auto">
-         
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
             {[...Array(8)].map((_, index) => (
               <div key={index} className="bg-white border border-gray-200 rounded-lg p-6 animate-pulse">
@@ -53,12 +50,12 @@ const filteredBrands = brands && Array.isArray(brands)
         <div className="mb-6">
           <h2 className="text-sm font-medium text-gray-700">Popular Brands</h2>
         </div>
-        {filteredBrands.length > 0 ? (
+        {brands.length > 0 ? (
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-            {filteredBrands.map((brand) => (
+            {brands.map((brand) => (
               <div
                 key={brand._id}
-                className="bg-white border border-gray-200 rounded-lg p-6 hover:shadow-md transition-shadow cursor-pointer"
+                className="bg-white border border-gray-600 rounded-lg p-6 hover:shadow-md transition-shadow cursor-pointer"
               >
                 <div className="w-26 h-22 rounded mb-4 flex items-center justify-center mx-auto">
                   {brand.logo ? (
@@ -68,50 +65,25 @@ const filteredBrands = brands && Array.isArray(brands)
                       width={80}
                       height={60}
                       className="object-contain"
-                      onError={(e) => {
-                        e.target.style.display = 'none';
-                        e.target.nextSibling.style.display = 'flex';
-                      }}
                     />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center">
                       <span className="text-xs text-gray-400">No Logo</span>
                     </div>
                   )}
-                  {brand.logo && (
-                    <div className="hidden w-full h-full items-center justify-center">
-                      <span className="text-xs text-gray-400">No Logo</span>
-                    </div>
-                  )}
                 </div>
                 <div className="text-center mb-3">
-                  <h3 className="font-semibold text-gray-900 text-sm">
-                    {brand.name}
-                  </h3>
+                  <h3 className="font-semibold text-gray-900 text-sm">{brand.name}</h3>
                   {brand.description && (
-                    <p className="text-sm text-gray-900">
-                      {brand.description}
-                    </p>
+                    <p className="text-sm text-gray-900">{brand.description}</p>
                   )}
                 </div>
-                {/* <div className="text-center">
-                  <span className="text-xs text-gray-500 font-medium">
-                    {brand.partsCount || '0'} Parts
-                  </span>
-                </div> */}
               </div>
             ))}
           </div>
         ) : (
           <div className="text-center py-8">
             <p className="text-gray-500">No brands found</p>
-          </div>
-        )}
-        {filteredBrands.length > 8 && (
-          <div className="text-center">
-            <button className="px-8 py-2 border border-gray-300 text-gray-700 font-medium text-sm hover:bg-gray-50 transition-colors rounded">
-              Load more
-            </button>
           </div>
         )}
       </div>

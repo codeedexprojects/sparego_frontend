@@ -26,10 +26,9 @@ export const AddressList = ({
       {error && (
         <div className="bg-red-100 text-red-800 flex items-center gap-2 p-3 rounded">
           <Info size={16} />
-          <p className="text-gray-600">
-            {typeof error === "string" ? error : error?.message}
-          </p>
-        </div>
+<p className="text-gray-600">
+  {typeof error === "string" ? error : error?.message}
+</p>        </div>
       )}
 
       {!loading && addresses.length === 0 && (
@@ -41,9 +40,9 @@ export const AddressList = ({
 
       {addresses.length > 0 && (
         <div className="space-y-4">
-          {addresses.map((addr, index) => (
+          {addresses.map((addr) => (
             <AddressCard
-              key={addr.id || `address-${index}`} // Fallback to index if id is missing
+              key={addr.id} 
               address={addr} 
               onEdit={onEdit}
               onDelete={onDelete}

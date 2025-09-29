@@ -29,8 +29,8 @@ const AutomotivePartsCatalog = () => {
         {subSubById?.map((item) => (
           <div
             key={item._id}
-            onClick={() => router.push(`/spare/products/${item._id}`)} // 🔹 navigate on click
-            className="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-lg transition-shadow cursor-pointer"
+            onClick={() => router.push(`/spare/products/${item._id}`)}
+            className="bg-white rounded-lg border border-gray-600 p-6 hover:shadow-lg transition-shadow cursor-pointer"
           >
             <h3 className="font-medium text-gray-900 mb-3 text-sm">
               {item.name}

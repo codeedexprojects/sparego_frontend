@@ -52,7 +52,7 @@ const AutomotivePartsCatalog = () => {
   }
 
   return (
-    <div className="mx-auto p-6 bg-gray-50 min-h-screen">
+    <div className="mx-auto p-6 bg-white min-h-screen">
       <div className="flex justify-between items-center mb-8">
         <div className="flex space-x-8">
           <button 
@@ -82,12 +82,12 @@ const AutomotivePartsCatalog = () => {
       {/* Categories Grid */}
       {mappedCategories.length > 0 ? (
         <>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8 ">
             {visibleCategories.map((category, index) => (
               <div
                 key={category.id || index}
                 onClick={() => router.push(`/spare/category2/${category.id}`)}
-                className="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-lg transition-shadow cursor-pointer group"
+                className="bg-white rounded-lg border border-gray-400 p-6 hover:shadow-lg transition-shadow cursor-pointer group"
               >
                 <div className="flex items-start justify-between">
                   <div className="flex-1">

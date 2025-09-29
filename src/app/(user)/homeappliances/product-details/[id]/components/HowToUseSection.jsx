@@ -1,7 +1,6 @@
 import React from 'react';
 
 const HowToUseSection = ({ product }) => {
-  // Default usage instructions if none provided
   const defaultUsage = [
     "Follow manufacturer's instructions for installation",
     "Ensure compatibility with your vehicle model",

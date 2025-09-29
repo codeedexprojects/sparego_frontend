@@ -11,12 +11,10 @@ export default function SpareHeroSection() {
   const dispatch = useDispatch();
   const { carousel, loading, error } = useSelector((state) => state.carousel);
 
-  
   useEffect(() => {
     dispatch(getHomeCarousel());
   }, [dispatch]);
 
-  
   useEffect(() => {
     if (carousel.length > 0) {
       const timer = setInterval(() => {
@@ -31,7 +29,6 @@ export default function SpareHeroSection() {
     setCurrentSlide(index);
   };
 
-  
   if (loading) {
     return (
       <section className="bg-gray-100 relative overflow-hidden h-[500px] sm:h-[550px] md:h-[600px] lg:h-[500px] flex items-center justify-center">
@@ -43,19 +40,21 @@ export default function SpareHeroSection() {
     );
   }
 
-if (error) {
-  return (
-    <section className="bg-gray-100 relative overflow-hidden h-[500px] flex items-center justify-center">
-      <div className="text-center">
-        <p className="text-red-600">
-          Error loading carousel: {typeof error === "string" ? error : error.message || "Unknown error"}
-        </p>
-      </div>
-    </section>
-  );
-}
+  if (error) {
+    return (
+      <section className="bg-gray-100 relative overflow-hidden h-[500px] flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-red-600">
+            Error loading carousel:{" "}
+            {typeof error === "string"
+              ? error
+              : error.message || "Unknown error"}
+          </p>
+        </div>
+      </section>
+    );
+  }
 
-  
   if (carousel.length === 0) {
     return (
       <section className="bg-gray-100 relative overflow-hidden h-[500px] sm:h-[550px] md:h-[600px] lg:h-[500px] flex items-center justify-center">
@@ -67,7 +66,7 @@ if (error) {
   }
 
   return (
-    <section className="bg-gray-100 relative overflow-hidden">
+    <section className="bg-[#F3F3F3] relative overflow-hidden">
       <div className="max-w-7xl mx-auto">
         <div className="relative h-[500px] sm:h-[550px] md:h-[600px] lg:h-[500px] flex items-center">
           <div className="w-full h-full">
@@ -75,20 +74,20 @@ if (error) {
               <div
                 key={slide._id}
                 className={`absolute inset-0 transition-opacity duration-700 ease-in-out ${
-                  index === currentSlide ? 'opacity-100' : 'opacity-0'
+                  index === currentSlide ? "opacity-100" : "opacity-0"
                 }`}
               >
                 <div className="flex flex-col lg:flex-row items-center h-full px-4 sm:px-6 lg:px-12 py-8 lg:py-0">
                   {/* Text Content */}
-                  <div className="w-full lg:flex-1 lg:max-w-lg text-center lg:text-left mb-8 lg:mb-0 lg:pr-8">
-                    <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-light text-gray-800 leading-tight mb-4 md:mb-6">
+                  <div className="w-full lg:flex-1 text-center lg:text-left mb-8 lg:mb-0 lg:pr-8">
+                    <h1 className="text-4xl sm:text-4xl md:text-5xl lg:text-6xl font-light text-gray-800 leading-tight mb-4 md:mb-6">
                       {slide.title}
                     </h1>
-                    
+
                     <p className="text-gray-600 text-base sm:text-lg mb-6 md:mb-8 leading-relaxed max-w-md mx-auto lg:mx-0">
                       Browse our collection of quality parts
                     </p>
-                    
+
                     <Link
                       href="/spareparts"
                       className="inline-block px-6 sm:px-8 py-3 bg-red-600 hover:bg-red-700 text-white font-medium rounded transition-all duration-300 transform hover:scale-105 shadow-lg"
@@ -96,12 +95,12 @@ if (error) {
                       Start Exploring
                     </Link>
                   </div>
-                  
+
                   {/* Image */}
                   <div className="w-full lg:flex-1 flex justify-center items-center">
                     <div className="w-60 h-60 sm:w-72 sm:h-72 md:w-80 md:h-80 lg:w-96 lg:h-96 relative">
                       <Image
-                        src={`${IMG_URL}/${slide.image}`} // Adjust based on your API response structure
+                        src={`${IMG_URL}/${slide.image}`} 
                         alt={slide.title}
                         fill
                         className="object-contain drop-shadow-2xl"
@@ -121,16 +120,17 @@ if (error) {
             <button
               key={index}
               onClick={() => goToSlide(index)}
-              className={`w-3 h-3 rounded-full transition-all duration-300 ${
-                index === currentSlide 
-                  ? 'bg-red-600 scale-125' 
-                  : 'bg-gray-400 hover:bg-gray-500'
+              className={`w-1 h-1 rounded-full transition-all duration-300 ${
+                index === currentSlide
+                  ? "bg-red-600 scale-125"
+                  : "bg-gray-400 hover:bg-gray-500"
               }`}
               aria-label={`Go to slide ${index + 1}`}
             />
           ))}
         </div>
       </div>
+      <div className="bg-white p-5 "></div>
     </section>
   );
 }
