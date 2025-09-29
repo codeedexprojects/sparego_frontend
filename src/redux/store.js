@@ -15,7 +15,6 @@ import vehicleReducer from "./slices/vehicleSlice";
 import adminAuthReducer from "./slices/adminAuthSlice";
 import adminCarouselReducer from "./slices/adminCarouselSlice";
 import adminBrandReducer from "./slices/adminBrandSlice";
-import adminCategoryReducer from "./slices/adminCategorySlice";
 import adminVehicleReducer from "./slices/adminVehicleSlice";
 import adminOrderReducer from "./slices/adminOrderSlice";
 import adminDealBannerReducer from "./slices/adminDealBannerSlice";
@@ -24,6 +23,13 @@ import adminHomeCardReducer from "./slices/adminHomeCardSlice";
 import adminUserManagementReducer from "./slices/adminUserManagementSlice";
 import adminReviewReducer from "./slices/adminReviewSlice";
 import adminSubAdminManagementReducer from "./slices/adminSubAdminManagementSlice";
+import sectionsReducer from "./slices/sectionSlice";
+import adminMainCategoryReducer from "./slices/adminMainCategorySlice";
+import adminCategoryReducer from "./slices/adminCategorySlice";
+import adminSubCategoryReducer from "./slices/adminSubCategorySlice";
+import adminSubSubCategoryReducer from "./slices/adminSubSubCategorySlice";
+
+
 
 export const store = configureStore({
   reducer: {
@@ -44,7 +50,7 @@ export const store = configureStore({
     adminAuth: adminAuthReducer,
     adminCarousel: adminCarouselReducer,
     adminBrand: adminBrandReducer,
-    adminCategory: adminCategoryReducer,
+   
     adminVehicle: adminVehicleReducer,
     adminOrder: adminOrderReducer,
     adminDealBanner: adminDealBannerReducer,
@@ -53,5 +59,10 @@ export const store = configureStore({
     adminUserManagement: adminUserManagementReducer,
     adminReview: adminReviewReducer,
     adminSubAdminManagement: adminSubAdminManagementReducer,
+    sections : sectionsReducer,
+    adminMainCategory: adminMainCategoryReducer,
+    adminCategory : adminCategoryReducer,
+    adminSubCategory : adminSubCategoryReducer,
+    adminSubSubCategory : adminSubSubCategoryReducer,
   },
 });

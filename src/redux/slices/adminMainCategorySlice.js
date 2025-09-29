@@ -2,29 +2,30 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 import { BASE_URL } from "../baseUrl";
 
-export const fetchCategories = createAsyncThunk(
-  "adminCategory/fetchAll",
+
+// GET - fetch all categories
+export const fetchMainCategories = createAsyncThunk(
+  "mainCategories/fetchAll",
   async (_, { rejectWithValue }) => {
     try {
       const token = localStorage.getItem("adminToken");
-      const res = await axios.get(`${BASE_URL}/categories`, {
+      const res = await axios.get(`${BASE_URL}/main-categories`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      console.log("API Response:", res.data);
-      return Array.isArray(res.data) ? res.data : res.data.categories || res.data;
+      return res.data.categories;
     } catch (err) {
-      console.error("Fetch error:", err);
       return rejectWithValue(err.response?.data?.message || "Failed to fetch categories");
     }
   }
 );
 
-export const addCategory = createAsyncThunk(
-  "adminCategory/add",
+// POST - add new category
+export const addMainCategory = createAsyncThunk(
+  "mainCategories/add",
   async (data, { rejectWithValue }) => {
     try {
       const token = localStorage.getItem("adminToken");
-      const res = await axios.post(`${BASE_URL}/categories`, data, {
+      const res = await axios.post(`${BASE_URL}/main-categories`, data, {
         headers: { Authorization: `Bearer ${token}`, "Content-Type": "multipart/form-data" },
       });
       return res.data;
@@ -34,12 +35,13 @@ export const addCategory = createAsyncThunk(
   }
 );
 
-export const editCategory = createAsyncThunk(
-  "adminCategory/edit",
+// PUT - edit category
+export const editMainCategory = createAsyncThunk(
+  "mainCategories/edit",
   async ({ id, data }, { rejectWithValue }) => {
     try {
       const token = localStorage.getItem("adminToken");
-      const res = await axios.patch(`${BASE_URL}/categories/${id}`, data, {
+      const res = await axios.patch(`${BASE_URL}/main-categories/${id}`, data, {
         headers: { Authorization: `Bearer ${token}`, "Content-Type": "multipart/form-data" },
       });
       return res.data;
@@ -49,12 +51,13 @@ export const editCategory = createAsyncThunk(
   }
 );
 
-export const deleteCategory = createAsyncThunk(
-  "adminCategory/delete",
+// DELETE - delete category
+export const deleteMainCategory = createAsyncThunk(
+  "mainCategories/delete",
   async (id, { rejectWithValue }) => {
     try {
       const token = localStorage.getItem("adminToken");
-      await axios.delete(`${BASE_URL}/categories/${id}`, {
+      await axios.delete(`${BASE_URL}/main-categories/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       return id;
@@ -64,10 +67,10 @@ export const deleteCategory = createAsyncThunk(
   }
 );
 
-const adminCategorySlice = createSlice({
-  name: "adminCategory",
+const mainCategorySlice = createSlice({
+  name: "mainCategories",
   initialState: {
-    categories: [],
+    mainCategories: [],
     loading: false,
     error: null,
   },
@@ -75,49 +78,47 @@ const adminCategorySlice = createSlice({
   extraReducers: (builder) => {
     // Fetch
     builder
-      .addCase(fetchCategories.pending, (state) => {
+      .addCase(fetchMainCategories.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
-      .addCase(fetchCategories.fulfilled, (state, action) => {
+      .addCase(fetchMainCategories.fulfilled, (state, action) => {
         state.loading = false;
-        state.categories = action.payload;
-        console.log("Categories updated in Redux:", action.payload);
+        state.mainCategories = action.payload;
       })
-      .addCase(fetchCategories.rejected, (state, action) => {
+      .addCase(fetchMainCategories.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
-        console.error("Fetch rejected:", action.payload);
       });
 
     // Add
     builder
-      .addCase(addCategory.fulfilled, (state, action) => {
-        state.categories.push(action.payload);
+      .addCase(addMainCategory.fulfilled, (state, action) => {
+        state.mainCategories.push(action.payload);
       })
-      .addCase(addCategory.rejected, (state, action) => {
+      .addCase(addMainCategory.rejected, (state, action) => {
         state.error = action.payload;
       });
 
     // Edit
     builder
-      .addCase(editCategory.fulfilled, (state, action) => {
-        const index = state.categories.findIndex((c) => c._id === action.payload._id);
-        if (index !== -1) state.categories[index] = action.payload;
+      .addCase(editMainCategory.fulfilled, (state, action) => {
+        const index = state.mainCategories.findIndex((c) => c._id === action.payload._id);
+        if (index !== -1) state.mainCategories[index] = action.payload;
       })
-      .addCase(editCategory.rejected, (state, action) => {
+      .addCase(editMainCategory.rejected, (state, action) => {
         state.error = action.payload;
       });
 
     // Delete
     builder
-      .addCase(deleteCategory.fulfilled, (state, action) => {
-        state.categories = state.categories.filter((c) => c._id !== action.payload);
+      .addCase(deleteMainCategory.fulfilled, (state, action) => {
+        state.mainCategories = state.mainCategories.filter((c) => c._id !== action.payload);
       })
-      .addCase(deleteCategory.rejected, (state, action) => {
+      .addCase(deleteMainCategory.rejected, (state, action) => {
         state.error = action.payload;
       });
   },
 });
 
-export default adminCategorySlice.reducer;
+export default mainCategorySlice.reducer;

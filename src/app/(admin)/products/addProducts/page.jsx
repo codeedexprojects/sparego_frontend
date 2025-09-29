@@ -20,7 +20,7 @@ import {
   clearCategories,
   clearSubCategories,
   clearSubSubCategories
-} from "../../../../redux/slices/adminCategorySlice";
+} from "../../../../redux/slices/adminCategorySlices";
 import { 
   getVehicles 
 } from "../../../../redux/slices/adminVehicleSlice";

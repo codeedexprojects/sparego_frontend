@@ -28,7 +28,7 @@ import {
   clearCategories,
   clearSubCategories,
   clearSubSubCategories
-} from "../../../redux/slices/adminCategorySlice";
+} from "../../../redux/slices/adminCategorySlices";
 
 const CategoryPage = ({ 
   title = "Category Management", 
