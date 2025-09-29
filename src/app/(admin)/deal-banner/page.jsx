@@ -1,96 +1,194 @@
-// pages/deal-banners/index.jsx
 "use client";
-import { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import ProtectedRoute from '../../../components/admin/ProtectedRoute';
-import DealBannerTable from "./components/DealBannerTable/DealBannerTable";
+import { toast } from "sonner";
+import { fetchSections } from "../../../redux/slices/sectionSlice";
 import { 
-  getDealBanners, 
-  createDealBanner, 
-  updateDealBanner, 
-  deleteDealBanner,
-  toggleDealBannerStatus,
-  clearError,
-  clearOperationSuccess 
+  fetchDealBanners, 
+  addDealBanner, 
+  editDealBanner, 
+  deleteDealBanner 
 } from "../../../redux/slices/adminDealBannerSlice";
+import DeleteConfirmationModal from "../main-categories/components/DeleteModal";
+import DealBannerHeader from "./components/DealBannerHeader";
+import DealBannerList from "./components/DealBannerList";
+import DealBannerModal from "./components/DealBannerModel";
 
-const DealBannersPage = () => {
+const DealBannerManager = () => {
   const dispatch = useDispatch();
-  const { dealBanners, loading, error, operationSuccess } = useSelector((state) => state.adminDealBanner);
+  const { banners, loading, error } = useSelector((s) => s.adminDealBanner);
+  const { sections } = useSelector((s) => s.sections);
 
-  // Fetch deal banners on component mount
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [deleteConfirm, setDeleteConfirm] = useState(null);
+  const [formData, setFormData] = useState({
+    title: "",
+    description: "",
+    discountText: "",
+    section: "",
+    page: "",
+    image: null,
+  });
+  const [editingBanner, setEditingBanner] = useState(null);
+  const [preview, setPreview] = useState(null);
+
+  // Page options
+  const pageOptions = [
+    { value: "home", label: "Home Page" },
+    { value: "category", label: "Category Page" },
+    { value: "product", label: "Product Page" },
+    { value: "cart", label: "Cart Page" },
+    { value: "checkout", label: "Checkout Page" },
+  ];
+
   useEffect(() => {
-    dispatch(getDealBanners());
+    dispatch(fetchDealBanners());
+    dispatch(fetchSections());
   }, [dispatch]);
 
-  // Handle errors
-  useEffect(() => {
-    if (error) {
-      console.error("Deal banner error:", error?.message || error);
-      const timer = setTimeout(() => dispatch(clearError()), 4000);
-      return () => clearTimeout(timer);
-    }
-  }, [error, dispatch]);
+  // Open add modal
+  const openAddModal = () => {
+    setFormData({ 
+      title: "", 
+      description: "", 
+      discountText: "", 
+      section: "", 
+      page: "", 
+      image: null 
+    });
+    setPreview(null);
+    setEditingBanner(null);
+    setIsModalOpen(true);
+  };
 
-  // Handle success messages
-  useEffect(() => {
-    if (operationSuccess) {
-      console.log("Success:", operationSuccess);
-      const timer = setTimeout(() => dispatch(clearOperationSuccess()), 3000);
-      return () => clearTimeout(timer);
-    }
-  }, [operationSuccess, dispatch]);
+  // Open edit modal
+  const openEditModal = (banner) => {
+    setFormData({
+      title: banner.title,
+      description: banner.description,
+      discountText: banner.discountText,
+      section: banner.section?._id || "",
+      page: banner.page,
+      image: null,
+    });
+    setPreview(banner.image || null);
+    setEditingBanner(banner);
+    setIsModalOpen(true);
+  };
 
-  const handleAddDealBanner = async (dealBannerData) => {
-    try {
-      await dispatch(createDealBanner(dealBannerData)).unwrap();
-    } catch (error) {
-      console.error("Failed to add deal banner:", error?.message || error);
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setFormData({ 
+      title: "", 
+      description: "", 
+      discountText: "", 
+      section: "", 
+      page: "", 
+      image: null 
+    });
+    setEditingBanner(null);
+    setPreview(null);
+  };
+
+  const handleChange = (e) => {
+    const { name, value, files } = e.target;
+    if (name === "image" && files[0]) {
+      setFormData({ ...formData, image: files[0] });
+      setPreview(URL.createObjectURL(files[0]));
+    } else {
+      setFormData({ ...formData, [name]: value });
     }
   };
 
-  const handleEditDealBanner = async (oldDealBanner, newData) => {
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const form = new FormData();
+    form.append("title", formData.title);
+    form.append("description", formData.description);
+    form.append("discountText", formData.discountText);
+    form.append("section", formData.section);
+    form.append("page", formData.page);
+    if (formData.image) form.append("image", formData.image);
+
     try {
-      const dealBannerId = oldDealBanner._id || oldDealBanner.id;
-      await dispatch(updateDealBanner({ id: dealBannerId, dealBannerData: newData })).unwrap();
-    } catch (error) {
-      console.error("Failed to update deal banner:", error?.message || error);
+      if (editingBanner) {
+        await dispatch(editDealBanner({ id: editingBanner._id, data: form })).unwrap();
+        toast.success("Deal banner updated successfully");
+      } else {
+        await dispatch(addDealBanner(form)).unwrap();
+        toast.success("Deal banner added successfully");
+      }
+      closeModal();
+      dispatch(fetchDealBanners());
+    } catch (err) {
+      toast.error(err?.message || "Error saving deal banner");
     }
   };
 
-  const handleDeleteDealBanner = async (dealBannerToDelete) => {
+  const confirmDelete = async () => {
+    if (!deleteConfirm) return;
     try {
-      const dealBannerId = dealBannerToDelete._id || dealBannerToDelete.id;
-      await dispatch(deleteDealBanner(dealBannerId)).unwrap();
-    } catch (error) {
-      console.error("Failed to delete deal banner:", error?.message || error);
-    }
-  };
-
-  const handleToggleStatus = async (dealBannerToToggle) => {
-    try {
-      const dealBannerId = dealBannerToToggle._id || dealBannerToToggle.id;
-      await dispatch(toggleDealBannerStatus({ 
-        id: dealBannerId, 
-        currentStatus: dealBannerToToggle.isActive 
-      })).unwrap();
-    } catch (error) {
-      console.error("Failed to toggle deal banner status:", error?.message || error);
+      await dispatch(deleteDealBanner(deleteConfirm._id)).unwrap();
+      toast.success("Deal banner deleted successfully");
+      setDeleteConfirm(null);
+      dispatch(fetchDealBanners());
+    } catch (err) {
+      toast.error("Failed to delete deal banner");
     }
   };
 
   return (
-    <ProtectedRoute>
-      <DealBannerTable
-        dealBanners={dealBanners}
-        onAddDealBanner={handleAddDealBanner}
-        onEditDealBanner={handleEditDealBanner}
-        onDeleteDealBanner={handleDeleteDealBanner}
-        onToggleStatus={handleToggleStatus}
-        itemsPerPage={6}
-      />
-    </ProtectedRoute>
+    <div className="min-h-screen">
+      <div className="mx-auto">
+        {/* Header */}
+        <DealBannerHeader
+          bannerCount={banners.length}
+          onAddBanner={openAddModal}
+        />
+
+        {/* Banners List */}
+        <DealBannerList
+          banners={banners}
+          loading={loading}
+          error={error}
+          onEdit={openEditModal}
+          onDelete={setDeleteConfirm}
+          onAddBanner={openAddModal}
+          pageOptions={pageOptions}
+        />
+
+        {/* Add/Edit Modal */}
+        {isModalOpen && (
+          <DealBannerModal
+            isOpen={isModalOpen}
+            onClose={closeModal}
+            onSubmit={handleSubmit}
+            formData={formData}
+            onChange={handleChange}
+            preview={preview}
+            onRemoveImage={() => {
+              setPreview(null);
+              setFormData({...formData, image: null});
+            }}
+            sections={sections}
+            pageOptions={pageOptions}
+            editingBanner={editingBanner}
+          />
+        )}
+
+        {/* Delete Confirmation Modal */}
+        {deleteConfirm && (
+          <DeleteConfirmationModal
+            item={deleteConfirm}
+            onClose={() => setDeleteConfirm(null)}
+            onConfirm={confirmDelete}
+            title="Delete Banner"
+            description={`Are you sure you want to delete "${deleteConfirm.title}"? This action cannot be undone.`}
+          />
+        )}
+      </div>
+    </div>
   );
 };
 
-export default DealBannersPage;
+export default DealBannerManager;

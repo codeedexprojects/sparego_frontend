@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from 'react-redux';
 import ProtectedRoute from '../../../components/admin/ProtectedRoute';
-import { CategoryTabs } from "../category/components/CategoryTabs";
+// import { CategoryTabs } from "../category/components/CategoryTabs";
 import BrandTable from "./components/BrandTable/BrandTable";
 import {
   getBrands,
@@ -140,11 +140,11 @@ const BrandPage = ({
       </div>
 
       {/* Reusable Tabs Component */}
-      <CategoryTabs 
+      {/* <CategoryTabs 
         tabs={tabs} 
         activeTab={activeTab} 
         setActiveTab={handleTabChange} 
-      />
+      /> */}
 
       {/* Content */}
       <div>
