@@ -28,18 +28,6 @@ const UserTableFilters = ({
           </div>
         </div>
         
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Role</label>
-          <select
-            className="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-            value={roleFilter}
-            onChange={(e) => setRoleFilter(e.target.value)}
-          >
-            <option value="all">All Roles</option>
-            <option value="admin">Admin</option>
-            <option value="user">User</option>
-          </select>
-        </div>
         
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>

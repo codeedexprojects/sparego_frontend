@@ -21,7 +21,6 @@ const UserTable = ({
 }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
-  const [roleFilter, setRoleFilter] = useState("all");
   const [statusFilter, setStatusFilter] = useState("all");
 
   // Filter users based on search and filters
@@ -38,12 +37,11 @@ const UserTable = ({
                           (user.number && typeof user.number === 'string' && user.number.includes(searchTerm)) ||
                           (user.email && typeof user.email === 'string' && user.email.toLowerCase().includes(searchLower));
     
-    const matchesRole = roleFilter === "all" || user.role === roleFilter;
     const matchesStatus = statusFilter === "all" || 
                          (statusFilter === "active" && user.isActive === true) ||
                          (statusFilter === "inactive" && user.isActive === false);
     
-    return matchesSearch && matchesRole && matchesStatus;
+    return matchesSearch && matchesStatus;
   });
 
   const totalPages = Math.ceil(filteredUsers.length / itemsPerPage);
@@ -103,8 +101,6 @@ const UserTable = ({
         <UserTableFilters
           searchTerm={searchTerm}
           setSearchTerm={setSearchTerm}
-          roleFilter={roleFilter}
-          setRoleFilter={setRoleFilter}
           statusFilter={statusFilter}
           setStatusFilter={setStatusFilter}
         />
@@ -125,7 +121,6 @@ const UserTable = ({
                 <tr className="text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   <th className="px-6 py-3">User</th>
                   <th className="px-6 py-3">Contact</th>
-                  <th className="px-6 py-3">Role</th>
                   <th className="px-6 py-3">Status</th>
                   <th className="px-6 py-3">Actions</th>
                 </tr>

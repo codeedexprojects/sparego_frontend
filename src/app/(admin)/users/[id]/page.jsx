@@ -10,7 +10,7 @@ import {
   toggleUserStatus,
   clearError,
   clearOperationSuccess 
-} from "../../../../redux/slices/adminUserManagementSlice";
+} from "../../../../redux/slices/adminUserManagementSlice"; 
 
 const UserDetailPage = ({ params }) => {
   const router = useRouter();

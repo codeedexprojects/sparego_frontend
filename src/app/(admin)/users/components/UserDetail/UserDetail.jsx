@@ -12,7 +12,6 @@ const UserDetail = ({
   error = null,
   operationSuccess = null,
   onBack, 
-  onEdit, 
   onToggleStatus
 }) => {
   // Helper function to safely get string values
@@ -92,32 +91,18 @@ const UserDetail = ({
         
         <div className="flex flex-col md:flex-row md:items-center justify-between">
           <h1 className="text-2xl font-bold text-gray-800">User Details</h1>
-          <div className="flex space-x-2 mt-4 md:mt-0">
-            {onEdit && (
-              <button 
-                onClick={() => onEdit(user)}
-                className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
-              >
-                Edit
-              </button>
-            )}
-            {onToggleStatus && (
-              <button 
-                onClick={() => {
-                  console.log("Button clicked, user object:", user);
-                  console.log("User ID from button click:", user._id || user.id);
-                  onToggleStatus(user);
-                }}
-                className={`px-4 py-2 rounded-lg transition-colors ${
-                  user.isActive 
-                    ? 'bg-yellow-100 text-yellow-700 hover:bg-yellow-200' 
-                    : 'bg-green-100 text-green-700 hover:bg-green-200'
-                }`}
-              >
-                {user.isActive ? 'Deactivate' : 'Activate'}
-              </button>
-            )}
-          </div>
+          {onToggleStatus && (
+            <button 
+              onClick={() => onToggleStatus(user)}
+              className={`px-4 py-2 rounded-lg transition-colors ${
+                user.isActive 
+                  ? 'bg-yellow-100 text-yellow-700 hover:bg-yellow-200' 
+                  : 'bg-green-100 text-green-700 hover:bg-green-200'
+              }`}
+            >
+              {user.isActive ? 'Deactivate' : 'Activate'}
+            </button>
+          )}
         </div>
       </div>
 

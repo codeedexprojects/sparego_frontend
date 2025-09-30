@@ -1,39 +1,21 @@
 // components/UserDetail/UserActivitySection.jsx
 const UserActivitySection = ({ user }) => {
-  // Sample activity data - in a real app, this would come from an API
-  const activities = [
-    {
-      id: 1,
-      type: "account_created",
-      title: "Account created",
-      description: "User registered on the platform",
-      date: user.joinDate,
-      icon: (
-        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-blue-600" viewBox="0 0 20 20" fill="currentColor">
-          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-        </svg>
-      ),
-      bgColor: "bg-blue-100"
-    },
-    {
-      id: 2,
-      type: "email_verified",
-      title: "Email verified",
-      description: "User verified their email address",
-      date: user.joinDate, // In real app, this would be a separate date
-      icon: (
-        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-green-600" viewBox="0 0 20 20" fill="currentColor">
-          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-        </svg>
-      ),
-      bgColor: "bg-green-100"
-    },
-    {
-      id: 3,
-      type: "last_login",
-      title: "Last login",
-      description: "User logged in to the platform",
-      date: user.lastLogin,
+  if (!user?.devices || user.devices.length === 0) {
+    return (
+      <div className="bg-white rounded-lg shadow-md border border-gray-200 p-6 mt-6">
+        <h2 className="text-xl font-bold text-gray-800 mb-6">Recent Activity</h2>
+        <p className="text-gray-500">No login activity available.</p>
+      </div>
+    );
+  }
+
+  const loginActivities = user.devices
+    .filter(device => device.lastLogin) // only include devices with login dates
+    .map((device, index) => ({
+      id: index,
+      title: `Login from ${device.deviceName || "Unknown device"}`,
+      description: `IP: ${device.ip || "Unknown IP"}`,
+      date: device.lastLogin,
       icon: (
         <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-purple-600" viewBox="0 0 20 20" fill="currentColor">
           <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
@@ -41,15 +23,14 @@ const UserActivitySection = ({ user }) => {
         </svg>
       ),
       bgColor: "bg-purple-100"
-    }
-  ];
+    }))
+    .sort((a, b) => new Date(b.date) - new Date(a.date)); // newest first
 
   return (
     <div className="bg-white rounded-lg shadow-md border border-gray-200 p-6 mt-6">
-      <h2 className="text-xl font-bold text-gray-800 mb-6">Recent Activity</h2>
-      
+      <h2 className="text-xl font-bold text-gray-800 mb-6">Recent Login Activity</h2>
       <div className="space-y-4">
-        {activities.map((activity) => (
+        {loginActivities.map(activity => (
           <div key={activity.id} className="flex items-start">
             <div className="flex-shrink-0">
               <div className={`h-10 w-10 rounded-full ${activity.bgColor} flex items-center justify-center`}>

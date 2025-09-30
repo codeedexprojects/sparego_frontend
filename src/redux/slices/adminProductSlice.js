@@ -43,35 +43,32 @@ const createFormData = (data) => {
 // GET Operations
 export const getProducts = createAsyncThunk(
   "adminProduct/getProducts",
-  async ({ category, brand, search, status } = {}, { rejectWithValue }) => {
+  async ({ search, productBrand, status, minPrice, maxPrice } = {}, { rejectWithValue }) => {
     try {
       const token = localStorage.getItem("adminToken");
       const params = {};
-      if (category) params.category = category;
-      if (brand) params.brand = brand;
       if (search) params.search = search;
-      if (status) params.status = status;
-      
-      const response = await axios.get(`${BASE_URL}/products/`, {
+      if (productBrand) params.productBrand = productBrand; // ← key matches backend
+      if (status) params.status = status; // backend maps "active"/"inactive" → isActive
+      if (minPrice) params.minPrice = minPrice;
+      if (maxPrice) params.maxPrice = maxPrice;
+
+      const response = await axios.get(`${BASE_URL}/products`, {
         params,
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
+        headers: { Authorization: `Bearer ${token}` },
       });
-      
-      console.log("Products response:", response.data);
-      const data = Array.isArray(response.data) ? response.data : 
-                   response.data?.products || response.data?.data || [];
+
+      const data = Array.isArray(response.data) ? response.data : response.data?.products || [];
       return data;
     } catch (error) {
-      console.error("Error fetching products:", error);
       return rejectWithValue({
-        message: error?.response?.data?.message || error.message || "Failed to fetch products",
-        status: error?.response?.status
+        message: error?.response?.data?.message || error.message,
+        status: error?.response?.status,
       });
     }
   }
 );
+
 
 export const getProductById = createAsyncThunk(
   "adminProduct/getProductById",

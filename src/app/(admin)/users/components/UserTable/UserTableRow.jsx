@@ -46,15 +46,7 @@ const UserTableRow = ({ user, onEdit, onView, onToggleStatus }) => {
           }
         </div>
       </td>
-      <td className="px-6 py-4">
-        <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium ${
-          user.role === 'admin' || user.role === 'superadmin' || user.role === 'subadmin'
-            ? 'bg-purple-100 text-purple-800' 
-            : 'bg-blue-100 text-blue-800'
-        }`}>
-          {getStringValue(user.role)}
-        </span>
-      </td>
+
       <td className="px-6 py-4">
         <div className="flex flex-col gap-1">
           <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium ${

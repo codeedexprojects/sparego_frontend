@@ -181,7 +181,6 @@ const ProductActions = ({ product, onBack, onEdit, onDelete, onToggleStatus, loa
             <div className="flex items-center gap-1">
               <Star className="w-5 h-5 text-yellow-400 fill-current" />
               <span className="font-medium">{getStringValue(product.rating) || "4.8"}</span>
-              <span className="text-gray-500">({getStringValue(product.reviews) || "128"} reviews)</span>
             </div>
             <div className="w-1 h-1 bg-gray-300 rounded-full"></div>
             <span className="text-green-600 font-medium">{getStringValue(product.sold) || "1,234"} sold</span>
@@ -284,7 +283,6 @@ const ProductDetailsTabs = ({ product }) => {
   const tabs = [
     { id: 'description', label: 'Description' },
     { id: 'specs', label: 'Specifications' },
-    { id: 'reviews', label: 'Reviews' },
   ];
 
   return (
@@ -388,62 +386,7 @@ const ProductDetailsTabs = ({ product }) => {
             </div>
           </div>
         )}
-        
-        {activeTab === 'reviews' && (
-          <div className="space-y-6">
-            <div className="flex items-center gap-6">
-              <div className="text-center">
-                <div className="text-5xl font-bold text-gray-900">{getStringValue(product.rating) || "4.8"}</div>
-                <div className="flex justify-center mt-1">
-                  {[1, 2, 3, 4, 5].map((star) => (
-                    <Star key={star} className="w-5 h-5 text-yellow-400 fill-current" />
-                  ))}
-                </div>
-                <div className="text-sm text-gray-600 mt-1">{getStringValue(product.reviews) || "128"} reviews</div>
-              </div>
-              
-              <div className="flex-1 space-y-2">
-                {[5, 4, 3, 2, 1].map((rating) => (
-                  <div key={rating} className="flex items-center gap-3">
-                    <span className="text-sm text-gray-600 w-4">{rating}</span>
-                    <div className="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden">
-                      <div 
-                        className="h-full bg-yellow-400" 
-                        style={{ width: `${rating * 20}%` }}
-                      ></div>
-                    </div>
-                    <span className="text-sm text-gray-600 w-8">{(rating * 20)}%</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-            
-            <div className="border-t border-gray-100 pt-6 space-y-6">
-              {/* Sample review - in a real app, this would come from the API */}
-              <div className="flex gap-4">
-                <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                  <span className="font-medium text-blue-600">JD</span>
-                </div>
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-2">
-                    <span className="font-medium">John Doe</span>
-                    <span className="text-gray-500 text-sm">2 weeks ago</span>
-                  </div>
-                  <div className="flex gap-1 mb-2">
-                    {[1, 2, 3, 4, 5].map((star) => (
-                      <Star key={star} className="w-4 h-4 text-yellow-400 fill-current" />
-                    ))}
-                  </div>
-                  <p className="text-gray-600">
-                    Absolutely love this device! The camera quality is exceptional and 
-                    battery life lasts all day even with heavy usage. The titanium finish 
-                    feels premium and the device is surprisingly lightweight.
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
+      
       </div>
     </div>
   );
