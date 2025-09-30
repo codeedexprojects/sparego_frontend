@@ -87,7 +87,7 @@ const AutomotivePartsCatalog = () => {
               <div
                 key={category.id || index}
                 onClick={() => router.push(`/spare/category2/${category.id}`)}
-                className="bg-white rounded-lg border border-gray-400 p-6 hover:shadow-lg transition-shadow cursor-pointer group"
+                className="bg-white rounded-lg border border-gray-700 p-6 hover:shadow-lg transition-shadow cursor-pointer group"
               >
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
@@ -96,12 +96,12 @@ const AutomotivePartsCatalog = () => {
                     </h3>
                   </div>
                   
-                  <div className="flex-shrink-0 ml-4">
-                    <div className={`w-12 h-12 ${category.bgColor} rounded-lg flex items-center justify-center p-2`}>
+                  <div className="flex-shrink-0 ml-4 ">
+                    <div className={`w-20 h-20 ${category.bgColor} rounded-lg flex items-center justify-center `}>
                       <img 
                         src={`${IMG_URL}/${category.image} `}
                         alt={category.title}
-                        className="w-8 h-8 object-contain"
+                        className="w-20 h-20 object-contain"
                       />
                     </div>
                   </div>

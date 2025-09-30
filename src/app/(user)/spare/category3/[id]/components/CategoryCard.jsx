@@ -38,12 +38,12 @@ const AutomotivePartsCatalog = () => {
             <p className="text-xs text-gray-500 mb-4">
               {item.subCategory?.name}
             </p>
-            <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center">
+            <div className="w-20 h-20 bg-gray-100 rounded-lg flex items-center justify-center">
               {item.image ? (
                 <img
                   src={`${IMG_URL}/${item.image}`}
                   alt={item.name}
-                  className="w-8 h-8 object-contain"
+                  className="w-20 h-20 object-contain"
                 />
               ) : (
                 <span className="text-xs text-gray-400">No Img</span>
