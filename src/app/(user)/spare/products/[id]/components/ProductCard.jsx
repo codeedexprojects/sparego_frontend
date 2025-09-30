@@ -52,7 +52,7 @@ const AutomotiveProductsGrid = () => {
     const token = localStorage.getItem('token');
     if (!token) {
       toast.error('Please login to add items to your wishlist');
-      router.push('/login'); 
+      router.push('/spare/login'); 
       return;
     }
     
@@ -86,7 +86,7 @@ const AutomotiveProductsGrid = () => {
     const token = localStorage.getItem('token');
     if (!token) {
       toast.error('Please login to add items to your cart');
-      router.push('/login'); 
+      router.push('/spare/login'); 
       return;
     }
     

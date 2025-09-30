@@ -3,7 +3,9 @@ import Header from "@/components/user/spare/Header";
 import { useState, useRef, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { verifyOtp } from "@/redux/slices/authSlice";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
+import { toast, Toaster } from "sonner";
+
 
 export default function VerifyOtpPage() {
   const [otp, setOtp] = useState(new Array(6).fill(""));
@@ -25,6 +27,15 @@ export default function VerifyOtpPage() {
       }
     }
   }, []);
+
+  const searchParams = useSearchParams();
+  const otps = searchParams.get("otp");
+
+  useEffect(() => {
+    if (otps) {
+      toast.success(`OTP: ${otps}`, { duration: 7000 });
+    }
+  }, [otps]);
 
   const handleChange = (value, index) => {
     if (isNaN(value)) return;
@@ -111,6 +122,7 @@ export default function VerifyOtpPage() {
           </div>
         </div>
       </div>
+      <Toaster position="top-right" richColors/>
     </div>
   );
 }

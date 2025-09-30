@@ -1,11 +1,12 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import Header from "@/components/user/spare/Header";
 import Footer from "@/components/landing/Footer";
 import { loginUser } from "@/redux/slices/authSlice";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 export default function LoginPage() {
   const [number, setNumber] = useState("");
@@ -16,14 +17,18 @@ export default function LoginPage() {
   const handleLogin = (e) => {
     e.preventDefault();
     if (!number) return;
+
     dispatch(loginUser({ number }))
       .unwrap()
-      .then(() => {
-        // Redirect after the action is completed
-        router.push("/spare/verify-otp");
+      .then((res) => {
+        if (res?.userId) {
+          // ✅ Pass otp via query param
+          router.push(`/spare/verify-otp?otp=${res.otp}`);
+        }
       })
       .catch((error) => {
         console.error("Login failed:", error);
+        toast.error(error?.message || "Failed to send OTP");
       });
   };
 
