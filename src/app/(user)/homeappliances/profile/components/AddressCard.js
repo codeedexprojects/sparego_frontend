@@ -43,7 +43,7 @@ export const AddressCard = ({ address, onEdit, onDelete, loading = false }) => {
           <Pencil size={16} />
         </button>
         <button 
-          onClick={() => onDelete(address.id)}
+          onClick={() => onDelete(address._id)}
           disabled={loading}
           className="text-gray-500 hover:text-red-600 disabled:opacity-50"
         >

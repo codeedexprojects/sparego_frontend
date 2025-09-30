@@ -32,7 +32,7 @@ const page = () => {
           <div className="space-y-6">
             {blogs.map((blog) => (
               <div
-                key={blog.id}
+                key={blog._id}
                 className="flex items-center justify-between bg-white border rounded-lg shadow-sm p-4"
               >
                 <div className="flex items-center gap-4">

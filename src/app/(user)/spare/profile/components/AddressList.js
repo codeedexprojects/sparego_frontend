@@ -43,7 +43,7 @@ export const AddressList = ({
         <div className="space-y-4">
           {addresses.map((addr, index) => (
             <AddressCard
-              key={addr.id || `address-${index}`} // Fallback to index if id is missing
+              key={addr._id || `address-${index}`}
               address={addr} 
               onEdit={onEdit}
               onDelete={onDelete}

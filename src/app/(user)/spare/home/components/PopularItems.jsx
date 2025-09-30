@@ -75,7 +75,7 @@ export default function PopularItemsSection() {
                           </p>
                         </div>
                         <div className="flex-shrink-0">
-                          <div className="w-20 h-20 relative overflow-hidden rounded-lg">
+                          <div className="w-25 h-25 relative overflow-hidden rounded-lg">
                             <Image
                               src={`${IMG_URL}/${item.image}`}
                               alt={item.name}

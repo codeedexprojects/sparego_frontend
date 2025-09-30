@@ -34,6 +34,7 @@ export default function NewArrivalsSection() {
     return products.map((product) => ({
       id: product._id,
       title: product.name,
+      description: product.description || "",
       brand: product.productBrand?.name || "Multiple brands", 
       discount: product.discount ? `${product.discount}% off` : "Special offer",
       image:
@@ -108,8 +109,7 @@ export default function NewArrivalsSection() {
       <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center">
-            <p className="text-red-600">Error loading products: {error}</p>
-          </div>
+Error loading products: {typeof error === "string" ? error : error?.message || "Unknown error"}          </div>
         </div>
       </section>
     );
@@ -167,9 +167,12 @@ export default function NewArrivalsSection() {
                       </div>
                     </div>
                     <div className="mt-auto">
-                      <h3 className="text-md font-semibold text-gray-900 mb-1 line-clamp-2 h-12 ">
+                      <h3 className="text-md font-semibold text-gray-900 line-clamp-2 h-8 ">
                         {product.title}
                       </h3>
+                      <p className="text-sm text-gray-500 mb-2">
+                        {product.description}
+                      </p>
                       <p className="text-sm text-gray-500 mb-2">
                         {product.brand}
                       </p>

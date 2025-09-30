@@ -14,56 +14,77 @@ const SimilarProducts = () => {
   const dispatch = useDispatch();
   const router = useRouter();
   const { id } = useParams();   
-const { similarProducts, similarLoading, similarError } = useSelector(
-  (state) => state.product
-);
-const { wishlist } = useSelector((state) => state.wishlist);
+  const { similarProducts, similarLoading, similarError } = useSelector(
+    (state) => state.product
+  );
+  const { wishlist } = useSelector((state) => state.wishlist);
+  const { user } = useSelector((state) => state.auth); // Get user from auth state
 
-const isInWishlist = (productId) => {
-  return wishlist.some((item) => item._id === productId);
-};
+  const isInWishlist = (productId) => {
+    return wishlist.some((item) => item._id === productId);
+  };
 
+  // Check if user is authenticated
+  const isAuthenticated = () => {
+    return !!user || !!localStorage.getItem('token') || !!localStorage.getItem('user');
+  };
 
-useEffect(() => {
-  if (id) {
-    dispatch(getSimilarProducts(id));
-  }
-}, [id]);
-
-const handleAddToCart = async (e, product) => {
-  e.stopPropagation();
-  try {
-    const resultAction = await dispatch(addToCart({ productId: product._id, quantity: 1 }));
-    if (addToCart.fulfilled.match(resultAction)) {
-      toast.success(`${product.name} added to cart!`);
-    } else {
-      toast.error(resultAction.payload || "Failed to add to cart");
+  useEffect(() => {
+    if (id) {
+      dispatch(getSimilarProducts(id));
+      if (isAuthenticated()) {
+        dispatch(getWishlist()); // Fetch wishlist only if authenticated
+      }
     }
-  } catch (error) {
-    toast.error("Unexpected error occurred");
-  }
-};
+  }, [id, dispatch]);
 
-useEffect(() => {
-  if (id) {
-    dispatch(getSimilarProducts(id));
-  }
-  dispatch(getWishlist()); // Fetch wishlist
-}, [id]);
-const handleAddToWishlist = async (e, product) => {
-  e.stopPropagation();
-  try {
-    const result = await dispatch(addToWishlist({ productId: product._id })).unwrap();
-    toast.success(`${product.name} added to wishlist!`);
+  const handleAddToCart = async (e, product) => {
+    e.stopPropagation();
+    
+    // Check authentication first
+    if (!isAuthenticated()) {
+      toast.error("Please login to add items to cart");
+      setTimeout(() => {
+        router.push('/spare/login');
+      }, 1500);
+      return;
+    }
 
-    // Update local Redux state instantly
-    dispatch(getWishlist()); // re-fetch wishlist to include the new product
-  } catch (error) {
-    toast.error(error || "Failed to add to wishlist");
-  }
-};
+    try {
+      const resultAction = await dispatch(addToCart({ productId: product._id, quantity: 1 }));
+      if (addToCart.fulfilled.match(resultAction)) {
+        toast.success(`${product.name} added to cart!`);
+      } else {
+        const errorMessage = resultAction.payload?.message || resultAction.payload || "Failed to add to cart";
+        toast.error(typeof errorMessage === 'string' ? errorMessage : "Failed to add to cart");
+      }
+    } catch (error) {
+      const errorMessage = error?.message || error?.response?.data?.message || "Unexpected error occurred";
+      toast.error(typeof errorMessage === 'string' ? errorMessage : "Unexpected error occurred");
+    }
+  };
 
+  const handleAddToWishlist = async (e, product) => {
+    e.stopPropagation();
+    
+    // Check authentication first
+    if (!isAuthenticated()) {
+      toast.error("Please login to add items to wishlist");
+      setTimeout(() => {
+        router.push('/spare/login');
+      }, 1500);
+      return;
+    }
 
+    try {
+      const result = await dispatch(addToWishlist({ productId: product._id })).unwrap();
+      toast.success(`${product.name} added to wishlist!`);
+      dispatch(getWishlist());
+    } catch (error) {
+      const errorMessage = error?.message || error?.response?.data?.message || "Failed to add to wishlist";
+      toast.error(typeof errorMessage === 'string' ? errorMessage : "Failed to add to wishlist");
+    }
+  };
 
   // Show loading state
   if (similarLoading) {
@@ -106,7 +127,7 @@ const handleAddToWishlist = async (e, product) => {
   }
 
   // Show empty state
- if (!similarProducts || similarProducts.length === 0){
+  if (!similarProducts || similarProducts.length === 0) {
     return (
       <div className="max-w-7xl mx-auto p-6">
         <h2 className="text-xl font-semibold text-red-600 mb-6">Similar Products</h2>
@@ -122,16 +143,20 @@ const handleAddToWishlist = async (e, product) => {
       <h2 className="text-xl font-semibold text-red-600 mb-6">Similar Products</h2>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         {similarProducts.map((product) => (
-          <div key={product._id} 
-          onClick={() => router.push(`/spare/product-details/${product._id}`)}
-          className="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+          <div 
+            key={product._id} 
+            onClick={() => router.push(`/spare/product-details/${product._id}`)}
+            className="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow cursor-pointer"
+          >
             <div className="flex justify-end mb-2">
-             <button 
-  className="transition-colors" 
-  onClick={(e) => handleAddToWishlist(e, product)}
->
-  <Heart className={`w-5 h-5 ${isInWishlist(product._id) ? "text-red-500" : "text-gray-400"}`} />
-</button>
+              <button 
+                className="transition-colors" 
+                onClick={(e) => handleAddToWishlist(e, product)}
+              >
+                <Heart 
+                  className={`w-5 h-5 ${isInWishlist(product._id) ? "text-red-500 fill-red-500" : "text-gray-400"}`} 
+                />
+              </button>
             </div>
             
             <div className="flex justify-center mb-4">
@@ -141,9 +166,6 @@ const handleAddToWishlist = async (e, product) => {
                   : '/placeholder-image.png'} 
                 alt={product.name}
                 className="w-24 h-24 object-contain"
-                // onError={(e) => {
-                //   e.target.src = '/placeholder-image.png'; // Fallback for broken images
-                // }}
               />
             </div>
             
@@ -172,8 +194,9 @@ const handleAddToWishlist = async (e, product) => {
             </p>
             
             <button 
-             onClick={(e) => handleAddToCart(e, product)} 
-            className="w-full border border-gray-300 text-gray-700 py-2 px-3 rounded text-sm font-medium hover:bg-gray-50 transition-colors">
+              onClick={(e) => handleAddToCart(e, product)} 
+              className="w-full border border-gray-300 text-gray-700 py-2 px-3 rounded text-sm font-medium hover:bg-gray-50 transition-colors"
+            >
               Add to Cart
             </button>
           </div>

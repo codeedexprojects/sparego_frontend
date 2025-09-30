@@ -16,7 +16,7 @@ const Header = () => {
   const dispatch = useDispatch();
   const { count } = useSelector((state) => state.cart);
 
-  const section = "SpareParts";
+  const section = "spare";
 
   const handleSearch = (e) => {
     e.preventDefault();

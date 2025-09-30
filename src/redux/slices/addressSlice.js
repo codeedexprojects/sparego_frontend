@@ -47,7 +47,7 @@ export const updateAddress = createAsyncThunk(
   async ({ id, updatedData }, { rejectWithValue }) => {
     try {
       const token = localStorage.getItem("token");
-      const response = await axios.put(
+      const response = await axios.patch(
         `${BASE_URL}/address/${id}/`,
         updatedData,
         {

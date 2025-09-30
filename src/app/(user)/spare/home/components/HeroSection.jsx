@@ -70,47 +70,59 @@ export default function SpareHeroSection() {
       <div className="max-w-7xl mx-auto">
         <div className="relative h-[500px] sm:h-[550px] md:h-[600px] lg:h-[500px] flex items-center">
           <div className="w-full h-full">
-            {carousel.map((slide, index) => (
-              <div
-                key={slide._id}
-                className={`absolute inset-0 transition-opacity duration-700 ease-in-out ${
-                  index === currentSlide ? "opacity-100" : "opacity-0"
-                }`}
-              >
-                <div className="flex flex-col lg:flex-row items-center h-full px-4 sm:px-6 lg:px-12 py-8 lg:py-0">
-                  {/* Text Content */}
-                  <div className="w-full lg:flex-1 text-center lg:text-left mb-8 lg:mb-0 lg:pr-8">
-                    <h1 className="text-4xl sm:text-4xl md:text-5xl lg:text-6xl font-light text-gray-800 leading-tight mb-4 md:mb-6">
-                      {slide.title}
-                    </h1>
+            {carousel.map((slide, index) => {
+              // Get the first product ID if products exist
+              const productId = slide.products && slide.products.length > 0 
+                ? slide.products[0]._id 
+                : null;
+              
+              return (
+                <div
+                  key={slide._id}
+                  className={`absolute inset-0 transition-opacity duration-700 ease-in-out ${
+                    index === currentSlide ? "opacity-100" : "opacity-0"
+                  }`}
+                >
+                  <div className="flex flex-col lg:flex-row items-center h-full px-4 sm:px-6 lg:px-12 py-8 lg:py-0">
+                    {/* Text Content */}
+                    <div className="w-full lg:flex-1 text-center lg:text-left mb-8 lg:mb-0 lg:pr-8">
+                      <h1 className="text-4xl sm:text-4xl md:text-5xl lg:text-6xl font-light text-gray-800 leading-tight mb-4 md:mb-6">
+                        {slide.title}
+                      </h1>
 
-                    <p className="text-gray-600 text-base sm:text-lg mb-6 md:mb-8 leading-relaxed max-w-md mx-auto lg:mx-0">
-                      Browse our collection of quality parts
-                    </p>
+                      {productId ? (
+                        <Link
+                          href={`/spare/product-details/${productId}`}
+                          className="inline-block px-6 sm:px-8 py-3 bg-red-600 hover:bg-red-700 text-white font-medium rounded transition-all duration-300 transform hover:scale-105 shadow-lg"
+                        >
+                          Start Exploring
+                        </Link>
+                      ) : (
+                        <Link
+                          href="/spareparts"
+                          className="inline-block px-6 sm:px-8 py-3 bg-red-600 hover:bg-red-700 text-white font-medium rounded transition-all duration-300 transform hover:scale-105 shadow-lg"
+                        >
+                          Start Exploring
+                        </Link>
+                      )}
+                    </div>
 
-                    <Link
-                      href="/spareparts"
-                      className="inline-block px-6 sm:px-8 py-3 bg-red-600 hover:bg-red-700 text-white font-medium rounded transition-all duration-300 transform hover:scale-105 shadow-lg"
-                    >
-                      Start Exploring
-                    </Link>
-                  </div>
-
-                  {/* Image */}
-                  <div className="w-full lg:flex-1 flex justify-center items-center">
-                    <div className="w-60 h-60 sm:w-72 sm:h-72 md:w-80 md:h-80 lg:w-96 lg:h-96 relative">
-                      <Image
-                        src={`${IMG_URL}/${slide.image}`} 
-                        alt={slide.title}
-                        fill
-                        className="object-contain drop-shadow-2xl"
-                        priority={index === 0}
-                      />
+                    {/* Image */}
+                    <div className="w-full lg:flex-1 flex justify-center items-center">
+                      <div className="w-60 h-60 sm:w-72 sm:h-72 md:w-80 md:h-80 lg:w-96 lg:h-96 relative">
+                        <Image
+                          src={`${IMG_URL}/${slide.image}`} 
+                          alt={slide.title}
+                          fill
+                          className="object-contain drop-shadow-2xl"
+                          priority={index === 0}
+                        />
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
 

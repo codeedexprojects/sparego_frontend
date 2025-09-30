@@ -37,7 +37,11 @@ export default function PromotionalBannerSection() {
     <section className="py-8 md:py-16 bg-white">
 <div className="max-w-8xl mx-auto px-6 sm:px-12 lg:px-16">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 md:gap-10">
-          {limitedBanners.map((promo, index) => (
+          {limitedBanners.map((promo, index) => {
+            const productId = promo.productId?._id || promo.productId;
+            // Construct the product detail URL
+            const productUrl = productId ? `/spare/product-details/${productId}` : `/spare/brands`;
+            return(
             <div
               key={promo._id}
               className={`${
@@ -67,7 +71,7 @@ export default function PromotionalBannerSection() {
 
                   {/* CTA Button */}
                   <Link
-                    href={`/deals/${promo.section || "offer"}`}
+                     href={productUrl}
                     className={`inline-block px-4 sm:px-6 py-2 border-2 rounded font-semibold text-xs sm:text-sm transition-all duration-300 hover:scale-105 ${
                       index === 0
                         ? "border-white text-white hover:bg-white hover:text-red-600"
@@ -91,7 +95,8 @@ export default function PromotionalBannerSection() {
                 </div>
               </div>
             </div>
-          ))}
+          );
+})}
 
           {limitedBanners.length === 0 && (
             <div className="col-span-2 text-center text-gray-500">

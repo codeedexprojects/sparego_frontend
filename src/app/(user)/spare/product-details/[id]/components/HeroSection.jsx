@@ -48,7 +48,7 @@ const HeroSection = ({ activeTab, setActiveTab, product }) => {
         const token = localStorage.getItem('token');
         if (!token) {
             toast.error('Please login to manage your wishlist');
-            router.push('/login');
+            router.push('/spare/login');
             return;
         }
 
@@ -89,7 +89,7 @@ const HeroSection = ({ activeTab, setActiveTab, product }) => {
         const token = localStorage.getItem('token');
         if (!token) {
             toast.error('Please login to add items to your cart');
-            router.push('/login');
+            router.push('/spare/login');
             return;
         }
 
@@ -123,7 +123,7 @@ const HeroSection = ({ activeTab, setActiveTab, product }) => {
         const token = localStorage.getItem('token');
         if (!token) {
             toast.error('Please login to buy products');
-            router.push('/login');
+            router.push('/spare/login');
             return;
         }
 

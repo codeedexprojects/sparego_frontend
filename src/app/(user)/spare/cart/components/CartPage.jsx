@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { Minus, Plus, ShoppingCart, Trash2 } from "lucide-react";
+import { Minus, Plus, ShoppingBasket, ShoppingCart, Trash2 } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "sonner";
 import {
@@ -17,6 +17,8 @@ const MyCart = () => {
   const [updatingItems, setUpdatingItems] = useState({});
   const [removingItems, setRemovingItems] = useState({});
   const router = useRouter();
+    const { user } = useSelector((state) => state.auth);
+  
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -110,17 +112,49 @@ const MyCart = () => {
       </div>
     );
 
-if (error)
+if (!user) {
   return (
-    <div className="mx-auto p-6 bg-gray-50 min-h-screen">
-      <div className="text-center py-12 text-red-500">
-        <p className="text-lg font-medium mb-2">Error loading cart</p>
-        <p className="text-gray-600">
-          {typeof error === "string" ? error : error.message || "Something went wrong"}
-        </p>
+   <div className=" flex items-center justify-center p-6 bg-gradient-to-br from-red-50 to-white">
+  <div className="max-w-md w-full">
+    <div className="bg-white rounded-2xl shadow-xl p-8 border border-red-100">
+      {/* Icon */}
+      <div className="flex justify-center mb-6">
+        <div className="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center">
+         <ShoppingBasket className="w-16 h-16 text-red-600"/>
+        </div>
       </div>
+
+      {/* Content */}
+      <h2 className="text-2xl font-bold text-gray-900 mb-3 text-center">
+        Your Cart Awaits
+      </h2>
+      <p className="text-gray-600 text-center mb-8 leading-relaxed">
+        Sign in to access your saved items, manage your profile, and track your orders all in one place.
+      </p>
+
+      {/* Button */}
+      <button
+        className="w-full bg-red-600 text-white px-6 py-3 rounded-lg hover:bg-red-700 transition-all duration-200 font-semibold shadow-lg shadow-red-600/30 hover:shadow-xl hover:shadow-red-600/40 hover:scale-105 transform"
+        onClick={() => router.push("/spare/login")}
+      >
+        Login to Continue
+      </button>
+
+      {/* Footer text */}
+      <p className="text-sm text-gray-500 text-center mt-6">
+        Don't have an account?{' '}
+        <button 
+          className="text-red-600 hover:text-red-700 font-medium hover:underline"
+          onClick={() => router.push("/spare/register")}
+        >
+          Sign up
+        </button>
+      </p>
     </div>
+  </div>
+</div>
   );
+}
 
 
   if (!cart || !cart.items || cart.items.length === 0)

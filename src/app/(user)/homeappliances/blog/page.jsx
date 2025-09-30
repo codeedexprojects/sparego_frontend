@@ -26,13 +26,13 @@ const page = () => {
 
   return (
     <div>
-     <Header></Header>
+        <Header></Header>
         <div className="bg-white py-12 px-6 lg:px-20">
           <h2 className="text-lg font-bold text-red-600 mb-8">SpareGo Blog</h2>
           <div className="space-y-6">
             {blogs.map((blog) => (
               <div
-                key={blog.id}
+                key={blog._id}
                 className="flex items-center justify-between bg-white border rounded-lg shadow-sm p-4"
               >
                 <div className="flex items-center gap-4">
@@ -51,7 +51,7 @@ const page = () => {
                     </p>
                   </div>
                 </div>
-                <button onClick={()=>router.push(`/homeappliances/blog-detail/${blog._id}`)}className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition-colors">
+                <button onClick={()=>router.push(`/spare/blog-detail/${blog._id}`)}className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition-colors">
                   Read More
                 </button>
               </div>
