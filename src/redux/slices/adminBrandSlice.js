@@ -8,9 +8,7 @@ export const getBrands = createAsyncThunk(
   'brand/getBrands',
   async (brandType, { rejectWithValue }) => {
     try {
-      console.log("=== GET BRANDS DEBUG ===");
-      console.log("Brand type:", brandType);
-      
+
       const token = localStorage.getItem("adminToken");
       console.log("Admin token exists:", !!token);
       if (!token) {
@@ -21,27 +19,39 @@ export const getBrands = createAsyncThunk(
       const endpoint = brandType === 'product' ? '/brands/product/' : '/brands/vehicle/';
       const url = `${BASE_URL}${endpoint}`;
       console.log("API URL:", url);
-      
+
       const response = await axios.get(url, {
         headers: {
           Authorization: `Bearer ${token}`
         }
       });
-      
-      console.log("Brands response:", response);
-      console.log("Brands response data:", response.data);
-      console.log("Brands response status:", response.status);
-      console.log("=========================");
-      
+
+
+
       return response.data;
     } catch (error) {
-      console.error("=== GET BRANDS ERROR ===");
-      console.error("Error:", error);
-      console.error("Error response:", error.response);
-      console.error("Error response data:", error.response?.data);
-      console.error("Error response status:", error.response?.status);
-      console.error("=========================");
+
       return rejectWithValue(error.response?.data?.message || 'Failed to fetch brands');
+    }
+  }
+);
+
+export const getProductBrands = createAsyncThunk(
+  'brand/getProductBrands',
+  async (_, { rejectWithValue }) => {
+    try {
+      const token = localStorage.getItem("adminToken");
+      if (!token) {
+        return rejectWithValue({ message: "No admin token found", status: 401 });
+      }
+
+      const response = await axios.get(`${BASE_URL}/brands/product/`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+
+      return response.data; 
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || 'Failed to fetch product brands');
     }
   }
 );
@@ -77,7 +87,7 @@ export const updateBrand = createAsyncThunk(
       console.log("Brand type:", brandType);
       console.log("Brand data:", brandData);
       console.log("Brand data keys:", brandData ? Object.keys(brandData) : "No keys");
-      
+
       const token = localStorage.getItem("adminToken");
       console.log("Admin token exists:", !!token);
       if (!token) {
@@ -88,19 +98,19 @@ export const updateBrand = createAsyncThunk(
       const endpoint = brandType === 'product' ? `/brands/product/${id}/` : `/brands/vehicle/${id}/`;
       const url = `${BASE_URL}${endpoint}`;
       console.log("API URL:", url);
-      
+
       // Check if brandData has files (image upload)
       const hasFiles = brandData.image && brandData.image instanceof File;
       console.log("Has files:", hasFiles);
-      
+
       let config = {
         headers: {
           Authorization: `Bearer ${token}`
         }
       };
-      
+
       let dataToSend = brandData;
-      
+
       // If there are files, use FormData
       if (hasFiles) {
         const formData = new FormData();
@@ -114,11 +124,11 @@ export const updateBrand = createAsyncThunk(
       } else {
         config.headers['Content-Type'] = 'application/json';
       }
-      
+
       console.log("Data to send:", dataToSend);
       console.log("Config:", config);
       console.log("Is FormData:", dataToSend instanceof FormData);
-      
+
       let response;
       try {
         // Try PATCH first (most common pattern)
@@ -129,7 +139,7 @@ export const updateBrand = createAsyncThunk(
       } catch (patchError) {
         console.log("PATCH failed, trying PUT...");
         console.log("PATCH error:", patchError.response?.status, patchError.response?.data);
-        
+
         // If PATCH fails with 500, try PUT
         if (patchError.response?.status === 500) {
           try {
@@ -145,9 +155,9 @@ export const updateBrand = createAsyncThunk(
           throw patchError;
         }
       }
-      
+
       console.log("==========================");
-      
+
       return response.data;
     } catch (error) {
       console.error("=== UPDATE BRAND ERROR ===");
@@ -157,7 +167,7 @@ export const updateBrand = createAsyncThunk(
       console.error("Error response status:", error.response?.status);
       console.error("Error response headers:", error.response?.headers);
       console.error("==========================");
-      
+
       // Enhanced error handling
       let errorMessage = 'Failed to update brand';
       if (error.response?.data?.message) {
@@ -167,7 +177,7 @@ export const updateBrand = createAsyncThunk(
       } else if (error.message) {
         errorMessage = error.message;
       }
-      
+
       return rejectWithValue({
         message: errorMessage,
         status: error.response?.status || 500,
@@ -203,6 +213,7 @@ const brandSlice = createSlice({
   name: 'brand',
   initialState: {
     brands: [],
+     productBrands: [],
     loading: false,
     error: null,
     success: false,
@@ -219,20 +230,27 @@ const brandSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
+
+     .addCase(getProductBrands.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(getProductBrands.fulfilled, (state, action) => {
+        state.loading = false;
+        state.productBrands = Array.isArray(action.payload) ? action.payload : [];
+      })
+      .addCase(getProductBrands.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
       // Get Brands
       .addCase(getBrands.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
       .addCase(getBrands.fulfilled, (state, action) => {
-        console.log("=== GET BRANDS FULFILLED ===");
-        console.log("Action payload:", action.payload);
-        console.log("Payload type:", typeof action.payload);
-        console.log("Is array:", Array.isArray(action.payload));
-        console.log("Payload keys:", action.payload ? Object.keys(action.payload) : "No keys");
-        console.log("=============================");
-        
+        console.log("Brands API Response:", action.payload);
         state.loading = false;
+
         // Handle different response structures
         if (Array.isArray(action.payload)) {
           state.brands = action.payload;
@@ -244,6 +262,8 @@ const brandSlice = createSlice({
           console.warn("Unexpected brands response structure:", action.payload);
           state.brands = [];
         }
+
+        console.log("Brands stored in state:", state.brands);
       })
       .addCase(getBrands.rejected, (state, action) => {
         state.loading = false;

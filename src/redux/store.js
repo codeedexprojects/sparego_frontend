@@ -28,7 +28,10 @@ import adminMainCategoryReducer from "./slices/adminMainCategorySlice";
 import adminCategoryReducer from "./slices/adminCategorySlice";
 import adminSubCategoryReducer from "./slices/adminSubCategorySlice";
 import adminSubSubCategoryReducer from "./slices/adminSubSubCategorySlice";
-
+import adminMainCarouselReducer from "./slices/adminMainCarouselSlice";
+import adminHomeCarouselReducer from "./slices/adminHomeCarouselSlice";
+import adminBottomCarouselReducer from "./slices/adminBottomCarouselSlice";
+import adminProductBrandReducer from "./slices/adminProductBrand";
 
 
 export const store = configureStore({
@@ -64,5 +67,9 @@ export const store = configureStore({
     adminCategory : adminCategoryReducer,
     adminSubCategory : adminSubCategoryReducer,
     adminSubSubCategory : adminSubSubCategoryReducer,
+    adminMainCarousel : adminMainCarouselReducer,
+    adminHomeCarousel : adminHomeCarouselReducer,
+    adminBottomCarousel : adminBottomCarouselReducer,
+    adminProductBrand : adminProductBrandReducer,
   },
 });

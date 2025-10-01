@@ -12,12 +12,17 @@ export const fetchMainCategories = createAsyncThunk(
       const res = await axios.get(`${BASE_URL}/main-categories`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      return res.data.categories;
+      console.log("Main Categories API Response:", res.data);
+      // Handle multiple possible response structures
+      return Array.isArray(res.data) 
+        ? res.data 
+        : res.data.categories || res.data.mainCategories || [];
     } catch (err) {
       return rejectWithValue(err.response?.data?.message || "Failed to fetch categories");
     }
   }
 );
+
 
 // POST - add new category
 export const addMainCategory = createAsyncThunk(
@@ -76,7 +81,6 @@ const mainCategorySlice = createSlice({
   },
   reducers: {},
   extraReducers: (builder) => {
-    // Fetch
     builder
       .addCase(fetchMainCategories.pending, (state) => {
         state.loading = true;
@@ -84,7 +88,8 @@ const mainCategorySlice = createSlice({
       })
       .addCase(fetchMainCategories.fulfilled, (state, action) => {
         state.loading = false;
-        state.mainCategories = action.payload;
+        state.mainCategories = Array.isArray(action.payload) ? action.payload : [];
+        console.log("Main Categories stored:", state.mainCategories);
       })
       .addCase(fetchMainCategories.rejected, (state, action) => {
         state.loading = false;

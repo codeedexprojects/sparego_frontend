@@ -11,7 +11,10 @@ export const fetchSubSubCategories = createAsyncThunk(
       const res = await axios.get(`${BASE_URL}/sub-sub-categories`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      return Array.isArray(res.data) ? res.data : res.data.subSubCategories || res.data;
+      console.log("Sub-Sub-Categories API Response:", res.data);
+      return Array.isArray(res.data) 
+        ? res.data 
+        : res.data.subSubCategories || [];
     } catch (err) {
       return rejectWithValue(err.response?.data?.message || "Failed to fetch sub-sub-categories");
     }

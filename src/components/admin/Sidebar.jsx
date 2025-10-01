@@ -23,7 +23,7 @@ import {
 
 const menuItems = [
   { name: "Dashboard", icon: LayoutDashboard, path: "/dashboard" },
-  { name: "Products", icon: Package, path: "/products" },
+  { name: "Products", icon: Package, path: "/product" },
   { name: "Orders", icon: ShoppingCart, path: "/orders" },
   { name: "Users", icon: Users, path: "/users" },
   { name: "Sections", icon: Section, path: "/sections" },
@@ -35,10 +35,18 @@ const menuItems = [
       { name: "Category", path: "/categories" },
       { name: "Sub Category", path: "/sub-categories" },
       { name: "Sub Sub Category", path: "/sub-sub-categories" },
+    ],
+  },
+  {
+    name: "Carousel",
+    icon: Image,
+    children: [
+      { name: "Main Carousel", path: "/main-carousel" },
+      { name: "Bottom Carousel", path: "/bottom-carousel" },
+      { name: "Home Carousel", path: "/home-carousel" },
 
     ],
   },
-  { name: "Carousel", icon: Image, path: "/carousel" },
   { name: "Deal Banner", icon: Tag, path: "/deal-banner" },
   { name: "Brand", icon: BadgeCheck, path: "/brand" },
   { name: "Home Cards", icon: LayoutGrid, path: "/home-cards" },

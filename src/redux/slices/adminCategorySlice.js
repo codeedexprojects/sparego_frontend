@@ -10,8 +10,10 @@ export const fetchCategories = createAsyncThunk(
       const res = await axios.get(`${BASE_URL}/categories`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      console.log("API Response:", res.data);
-      return Array.isArray(res.data) ? res.data : res.data.categories || res.data;
+      console.log("Categories API Response:", res.data);
+      return Array.isArray(res.data) 
+        ? res.data 
+        : res.data.categories || [];
     } catch (err) {
       console.error("Fetch error:", err);
       return rejectWithValue(err.response?.data?.message || "Failed to fetch categories");

@@ -2,25 +2,29 @@
 
 import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { addProduct, editProduct, viewProductById } from '../../../../redux/slices/adminProductSlice';
-import { fetchSections } from '../../../../redux/slices/sectionSlice';
-import { useRouter } from 'next/navigation';
-import AdditionalInfoSection from './components/AdditionalInfoSection';
+import { editProduct, viewProductById } from '../../../../../redux/slices/adminProductSlice';
+import { fetchSections } from '../../../../../redux/slices/sectionSlice';
+import { useRouter, useParams } from 'next/navigation';
+import { fetchMainCategories } from '../../../../../redux/slices/adminMainCategorySlice';
+import { fetchCategories } from '../../../../../redux/slices/adminCategorySlice';
+import { fetchSubCategories } from '../../../../../redux/slices/adminSubCategorySlice';
+import { fetchSubSubCategories } from '../../../../../redux/slices/adminSubSubCategorySlice';
 import BasicInfoSection from './components/BasicInfoSection';
 import CategorySection from './components/CategorySection';
 import DescriptionSection from './components/DescriptionSection';
 import ImagesSection from './components/ImageSection';
 import SpecificationsSection from './components/SpecificationSection';
-import { fetchBrands } from '../../../../redux/slices/adminProductBrand';
-import { fetchMainCategories } from '../../../../redux/slices/adminMainCategorySlice';
-import { fetchCategories } from '../../../../redux/slices/adminCategorySlice';
-import { fetchSubCategories } from '../../../../redux/slices/adminSubCategorySlice';
-import { fetchSubSubCategories } from '../../../../redux/slices/adminSubSubCategorySlice';
+import AdditionalInfoSection from './components/AdditionalInfoSection';
+import { fetchBrands } from '../../../../../redux/slices/adminProductBrand';
 
-const ProductForm = ({ productId, onSuccess, onCancel }) => {
+const EditProductForm = () => {
   const router = useRouter();
+  const params = useParams();
   const dispatch = useDispatch();
-  const { currentProduct, loading: productLoading } = useSelector(state => state.adminProduct);
+  
+  const productId = params.id;
+  
+  const { currentProduct, loading: productLoading, error } = useSelector(state => state.adminProduct);
   const { sections, loading: sectionsLoading } = useSelector(state => state.sections);
   const { brands: productBrands, loading: brandsLoading } = useSelector(state => state.adminProductBrand);
   const { mainCategories, loading: mainCategoriesLoading } = useSelector(state => state.adminMainCategory);
@@ -53,25 +57,108 @@ const ProductForm = ({ productId, onSuccess, onCancel }) => {
 
   const [images, setImages] = useState([]);
   const [imagePreviews, setImagePreviews] = useState([]);
+  const [existingImages, setExistingImages] = useState([]);
   const [filteredBrands, setFilteredBrands] = useState([]);
   const [filteredMainCategories, setFilteredMainCategories] = useState([]);
   const [filteredCategories, setFilteredCategories] = useState([]);
   const [filteredSubCategories, setFilteredSubCategories] = useState([]);
   const [filteredSubSubCategories, setFilteredSubSubCategories] = useState([]);
   const [submitting, setSubmitting] = useState(false);
+  const [dataLoaded, setDataLoaded] = useState(false);
 
+  // Fetch all data on component mount
   useEffect(() => {
+    if (productId) {
+      dispatch(viewProductById(productId));
+    }
     dispatch(fetchSections());
     dispatch(fetchBrands());
     dispatch(fetchMainCategories());
     dispatch(fetchCategories());
     dispatch(fetchSubCategories());
     dispatch(fetchSubSubCategories());
-
-    if (productId) {
-      dispatch(viewProductById(productId));
-    }
   }, [dispatch, productId]);
+
+  // Populate form when currentProduct is available
+  useEffect(() => {
+    if (currentProduct && productId && !dataLoaded) {
+      console.log('Populating form with product data:', currentProduct);
+      
+      // Helper function to parse array fields (handles both stringified and regular arrays)
+      const parseArrayField = (field) => {
+        if (!field || !field.length) return [''];
+        
+        try {
+          if (Array.isArray(field)) {
+            const filtered = field.filter(item => item && item.trim() !== '');
+            return filtered.length > 0 ? filtered : [''];
+          }
+          
+          if (typeof field === 'string') {
+            const parsed = JSON.parse(field);
+            if (Array.isArray(parsed)) {
+              const filtered = parsed.filter(item => item && item.trim() !== '');
+              return filtered.length > 0 ? filtered : [''];
+            }
+          }
+          
+          return [''];
+        } catch (error) {
+          console.warn('Error parsing array field:', error);
+          return [''];
+        }
+      };
+
+      // Helper function to parse technical specs
+      const parseTechnicalSpecs = (specs) => {
+        if (!specs || !specs.length) return [{ key: '', value: '' }];
+        
+        try {
+          if (Array.isArray(specs)) {
+            const filtered = specs.filter(spec => 
+              spec && (spec.key || spec.value) && (spec.key.trim() !== '' || spec.value.trim() !== '')
+            );
+            return filtered.length > 0 ? filtered : [{ key: '', value: '' }];
+          }
+          
+          return [{ key: '', value: '' }];
+        } catch (error) {
+          console.warn('Error parsing technical specs:', error);
+          return [{ key: '', value: '' }];
+        }
+      };
+
+      setFormData({
+        name: currentProduct.name || '',
+        description: currentProduct.description || '',
+        price: currentProduct.price?.toString() || '',
+        discount: currentProduct.discount?.toString() || '',
+        stock: currentProduct.stock?.toString() || '',
+        vehicleType: currentProduct.vehicleType || 'Universal',
+        overview: currentProduct.overview || '',
+        specifications: parseArrayField(currentProduct.specifications),
+        usage: parseArrayField(currentProduct.usage),
+        technicalSpecs: parseTechnicalSpecs(currentProduct.technicalSpecs),
+        warranty: currentProduct.warranty || '',
+        partNumber: currentProduct.partNumber || '',
+        isActive: currentProduct.isActive !== undefined ? currentProduct.isActive : true,
+        isPopular: currentProduct.isPopular !== undefined ? currentProduct.isPopular : false,
+        section: currentProduct.section?._id || currentProduct.section || '',
+        mainCategory: currentProduct.mainCategory?._id || currentProduct.mainCategory || '',
+        category: currentProduct.category?._id || currentProduct.category || '',
+        subCategory: currentProduct.subCategory?._id || currentProduct.subCategory || '',
+        subSubCategory: currentProduct.subSubCategory?._id || currentProduct.subSubCategory || '',
+        productBrand: currentProduct.productBrand?._id || currentProduct.productBrand || ''
+      });
+
+      // Set existing images for preview
+      if (currentProduct.images && currentProduct.images.length > 0) {
+        setExistingImages(currentProduct.images);
+      }
+
+      setDataLoaded(true);
+    }
+  }, [currentProduct, productId, dataLoaded]);
 
   // Filter brands by section
   useEffect(() => {
@@ -183,37 +270,6 @@ const ProductForm = ({ productId, onSuccess, onCancel }) => {
     }
   }, [formData.subCategory, subSubCategories]);
 
-  useEffect(() => {
-    if (currentProduct && productId) {
-      setFormData({
-        name: currentProduct.name || '',
-        description: currentProduct.description || '',
-        price: currentProduct.price || '',
-        discount: currentProduct.discount || '',
-        stock: currentProduct.stock || '',
-        vehicleType: currentProduct.vehicleType || 'Universal',
-        overview: currentProduct.overview || '',
-        specifications: currentProduct.specifications?.length ?
-          currentProduct.specifications : [''],
-        usage: currentProduct.usage?.length ?
-          currentProduct.usage : [''],
-        technicalSpecs: currentProduct.technicalSpecs?.length ?
-          currentProduct.technicalSpecs : [{ key: '', value: '' }],
-        warranty: currentProduct.warranty || '',
-        partNumber: currentProduct.partNumber || '',
-        isActive: currentProduct.isActive !== undefined ? currentProduct.isActive : true,
-        isPopular: currentProduct.isPopular !== undefined ? currentProduct.isPopular : false,
-        section: currentProduct.section?._id || currentProduct.section || '',
-        mainCategory: currentProduct.mainCategory?._id || currentProduct.mainCategory || '',
-        category: currentProduct.category?._id || currentProduct.category || '',
-        subCategory: currentProduct.subCategory?._id || currentProduct.subCategory || '',
-        subSubCategory: currentProduct.subSubCategory?._id || currentProduct.subSubCategory || '',
-        productBrand: currentProduct.productBrand?._id || currentProduct.productBrand || ''
-      });
-      setImagePreviews(currentProduct.images || []);
-    }
-  }, [currentProduct, productId]);
-
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
     setFormData(prev => ({
@@ -254,22 +310,28 @@ const ProductForm = ({ productId, onSuccess, onCancel }) => {
 
   const handleImageChange = (e) => {
     const files = Array.from(e.target.files);
-    setImages(files);
+    setImages(prev => [...prev, ...files]);
 
-    imagePreviews.forEach(preview => URL.revokeObjectURL(preview));
     const previews = files.map(file => URL.createObjectURL(file));
-    setImagePreviews(previews);
+    setImagePreviews(prev => [...prev, ...previews]);
   };
 
-  const removeImagePreview = (index) => {
-    const newPreviews = [...imagePreviews];
-    URL.revokeObjectURL(newPreviews[index]);
-    newPreviews.splice(index, 1);
-    setImagePreviews(newPreviews);
+  const removeImagePreview = (index, type = 'new') => {
+    if (type === 'new') {
+      const newPreviews = [...imagePreviews];
+      URL.revokeObjectURL(newPreviews[index]);
+      newPreviews.splice(index, 1);
+      setImagePreviews(newPreviews);
 
-    const newImages = [...images];
-    newImages.splice(index, 1);
-    setImages(newImages);
+      const newImages = [...images];
+      newImages.splice(index, 1);
+      setImages(newImages);
+    } else {
+      // Remove existing image
+      const newExistingImages = [...existingImages];
+      newExistingImages.splice(index, 1);
+      setExistingImages(newExistingImages);
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -311,44 +373,78 @@ const ProductForm = ({ productId, onSuccess, onCancel }) => {
       if (formData.subSubCategory) submitData.append("subSubCategory", formData.subSubCategory);
       if (formData.productBrand) submitData.append("productBrand", formData.productBrand);
 
-      // Arrays (stringify them)
-      submitData.append("specifications", JSON.stringify(formData.specifications.filter(i => i.trim() !== "")));
-      submitData.append("usage", JSON.stringify(formData.usage.filter(i => i.trim() !== "")));
-      formData.technicalSpecs.forEach((spec, index) => {
+      // Handle arrays
+      const cleanSpecifications = formData.specifications.filter(item => item.trim() !== "");
+      const cleanUsage = formData.usage.filter(item => item.trim() !== "");
+      
+      submitData.append("specifications", JSON.stringify(cleanSpecifications));
+      submitData.append("usage", JSON.stringify(cleanUsage));
+      
+      // Handle technical specs
+      const cleanTechnicalSpecs = formData.technicalSpecs.filter(spec => 
+        spec.key.trim() !== "" && spec.value.trim() !== ""
+      );
+      cleanTechnicalSpecs.forEach((spec, index) => {
         submitData.append(`technicalSpecs[${index}][key]`, spec.key);
         submitData.append(`technicalSpecs[${index}][value]`, spec.value);
       });
 
-      // Append multiple images
+      // Append new images
       images.forEach((file) => {
-        submitData.append("images", file);  // API must accept "images" as array of files
+        submitData.append("images", file);
       });
 
-      if (productId) {
-        await dispatch(editProduct({ id: productId, data: submitData })).unwrap();
-      } else {
-        await dispatch(addProduct(submitData)).unwrap();
-      }
+      // If existing images were removed, you might need to handle that
+      // This depends on your API - some APIs expect you to send all remaining images
+      // For now, we're only sending new images and the API should keep existing ones
 
-      if (onSuccess) {
-        onSuccess();
-      } else {
-        router.push("/product");
-      }
+      console.log('Submitting edit data for product:', productId);
+      
+      await dispatch(editProduct({ id: productId, data: submitData })).unwrap();
+      
+      alert('Product updated successfully!');
+      router.push("/product");
+      
     } catch (error) {
-      console.error("Error saving product:", error);
-      alert(`Error saving product: ${error.message || "Please check all required fields"}`);
+      console.error("Error updating product:", error);
+      alert(`Error updating product: ${error.message || "Please check all required fields"}`);
     } finally {
       setSubmitting(false);
     }
   };
 
-  if (productLoading && productId) {
+  const handleCancel = () => {
+    router.push('/product');
+  };
+
+  if (productLoading && !dataLoaded) {
     return (
-      <div className="flex items-center justify-center py-12">
+      <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto"></div>
           <p className="mt-4 text-gray-600">Loading product data...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error && !dataLoaded) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="bg-red-50 border border-red-200 rounded-lg p-6 max-w-md">
+          <div className="flex items-center mb-2">
+            <svg className="w-6 h-6 text-red-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <h3 className="text-red-800 font-semibold">Error Loading Product</h3>
+          </div>
+          <p className="text-red-600 mb-4">{error}</p>
+          <button
+            onClick={() => router.push('/product')}
+            className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+          >
+            Back to Products
+          </button>
         </div>
       </div>
     );
@@ -358,12 +454,26 @@ const ProductForm = ({ productId, onSuccess, onCancel }) => {
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">
-            {productId ? 'Edit Product' : 'Add New Product'}
-          </h1>
+          <div className="flex items-center gap-2 mb-2">
+            <button
+              onClick={handleCancel}
+              className="inline-flex items-center text-blue-600 hover:text-blue-700 transition-colors"
+            >
+              <svg className="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+              </svg>
+              Back to Products
+            </button>
+          </div>
+          <h1 className="text-3xl font-bold text-gray-900">Edit Product</h1>
           <p className="mt-2 text-sm text-gray-600">
-            {productId ? 'Update your product information' : 'Create a new product for your catalog'}
+            Update product information for: <strong>{formData.name}</strong>
           </p>
+          {currentProduct && (
+            <p className="mt-1 text-xs text-gray-500">
+              Product ID: {currentProduct._id}
+            </p>
+          )}
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
@@ -397,6 +507,7 @@ const ProductForm = ({ productId, onSuccess, onCancel }) => {
           <ImagesSection
             images={images}
             imagePreviews={imagePreviews}
+            existingImages={existingImages}
             onImageChange={handleImageChange}
             onRemoveImage={removeImagePreview}
           />
@@ -414,10 +525,10 @@ const ProductForm = ({ productId, onSuccess, onCancel }) => {
             onInputChange={handleInputChange}
           />
 
-          <div className="flex justify-end space-x-4 pt-6">
+          <div className="flex justify-end space-x-4 pt-6 border-t border-gray-200">
             <button
               type="button"
-              onClick={onCancel || (() => router.push('/product'))}
+              onClick={handleCancel}
               disabled={submitting}
               className="px-8 py-3 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors disabled:opacity-50"
             >
@@ -425,16 +536,21 @@ const ProductForm = ({ productId, onSuccess, onCancel }) => {
             </button>
             <button
               type="submit"
-              disabled={submitting || productLoading}
+              disabled={submitting}
               className="px-8 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center space-x-2"
             >
               {submitting ? (
                 <>
                   <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                  <span>Saving...</span>
+                  <span>Updating...</span>
                 </>
               ) : (
-                <span>{productId ? 'Update Product' : 'Add Product'}</span>
+                <>
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                  <span>Update Product</span>
+                </>
               )}
             </button>
           </div>
@@ -444,4 +560,4 @@ const ProductForm = ({ productId, onSuccess, onCancel }) => {
   );
 };
 
-export default ProductForm;
+export default EditProductForm;

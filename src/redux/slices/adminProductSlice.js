@@ -2,328 +2,85 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 import { BASE_URL } from "../baseUrl";
 
-// Helper function to create FormData for file uploads
-const createFormData = (data) => {
-  const formData = new FormData();
-  Object.keys(data).forEach((key) => {
-    const value = data[key];
-    if (value === null || value === undefined) return;
+const getToken = () => localStorage.getItem("adminToken");
 
-    // Special handling for images: append as repeated field name for multer
-    if (key === "images" && Array.isArray(value)) {
-      value.forEach((item) => {
-        if (item instanceof File) {
-          formData.append("images", item);
-        } else if (typeof item === "string") {
-          // In case image URL strings are provided
-          formData.append("images", item);
-        }
-      });
-      return;
-    }
-
-    // If value is a File, append directly
-    if (value instanceof File) {
-      formData.append(key, value);
-      return;
-    }
-
-    // Arrays/objects (e.g., compatibleVehicles, dimensions) → send as JSON string
-    if (Array.isArray(value) || (typeof value === "object" && !(value instanceof Blob))) {
-      formData.append(key, JSON.stringify(value));
-      return;
-    }
-
-    // Primitives
-    formData.append(key, value);
-  });
-  return formData;
-};
-
-// GET Operations
-export const getProducts = createAsyncThunk(
-  "adminProduct/getProducts",
-  async ({ search, productBrand, status, minPrice, maxPrice } = {}, { rejectWithValue }) => {
+// Fetch all products with optional pagination
+export const fetchProducts = createAsyncThunk(
+  "adminProduct/fetchProducts",
+  async ({ page = 1, limit = 10 } = {}, { rejectWithValue }) => {
     try {
-      const token = localStorage.getItem("adminToken");
-      const params = {};
-      if (search) params.search = search;
-      if (productBrand) params.productBrand = productBrand; // ← key matches backend
-      if (status) params.status = status; // backend maps "active"/"inactive" → isActive
-      if (minPrice) params.minPrice = minPrice;
-      if (maxPrice) params.maxPrice = maxPrice;
-
-      const response = await axios.get(`${BASE_URL}/products`, {
-        params,
-        headers: { Authorization: `Bearer ${token}` },
+      const res = await axios.get(`${BASE_URL}/products?page=${page}&limit=${limit}`, {
+        headers: { Authorization: `Bearer ${getToken()}` },
       });
-
-      const data = Array.isArray(response.data) ? response.data : response.data?.products || [];
-      return data;
-    } catch (error) {
-      return rejectWithValue({
-        message: error?.response?.data?.message || error.message,
-        status: error?.response?.status,
-      });
+      return res.data; // return total, page, pages, products
+    } catch (err) {
+      return rejectWithValue(err.response?.data?.message || err.message);
     }
   }
 );
 
-
-export const getProductById = createAsyncThunk(
-  "adminProduct/getProductById",
-  async (id, { rejectWithValue }) => {
+// Add new product
+export const addProduct = createAsyncThunk(
+  "adminProduct/addProduct",
+  async (formData, { rejectWithValue }) => {
     try {
-      const token = localStorage.getItem("adminToken");
-      const response = await axios.get(`${BASE_URL}/products/${id}`, {
+      const res = await axios.post(`${BASE_URL}/products`, formData, {
         headers: {
-          Authorization: `Bearer ${token}`
-        }
+          Authorization: `Bearer ${getToken()}`,
+          "Content-Type": "multipart/form-data",
+        },
       });
-      return response.data?.data || response.data;
-    } catch (error) {
-      return rejectWithValue({
-        message: error?.response?.data?.message || error.message || "Failed to fetch product",
-        status: error?.response?.status
-      });
+      return res.data; // return new product
+    } catch (err) {
+      return rejectWithValue(err.response?.data?.message || err.message);
     }
   }
 );
 
-// CREATE Operation
-export const createProduct = createAsyncThunk(
-  "adminProduct/createProduct",
-  async (productData, { rejectWithValue }) => {
+// Edit product
+export const editProduct = createAsyncThunk(
+  "adminProduct/editProduct",
+  async ({ id, data }, { rejectWithValue }) => {
     try {
-      const token = localStorage.getItem("adminToken");
-      
-      // Check if there are any File objects (for upload)
-      const hasFiles = Object.values(productData).some(value => 
-        value instanceof File || (Array.isArray(value) && value.some(item => item instanceof File))
-      );
-      
-      const config = hasFiles 
-        ? { headers: { 'Content-Type': 'multipart/form-data', Authorization: `Bearer ${token}` } }
-        : { headers: { Authorization: `Bearer ${token}` } };
-      
-      const dataToSend = hasFiles ? createFormData(productData) : productData;
-      
-      const response = await axios.post(`${BASE_URL}/products/`, dataToSend, config);
-      console.log("Create product response:", response.data);
-      return response.data?.data || response.data;
-    } catch (error) {
-      console.error("Error creating product:", error);
-      return rejectWithValue({
-        message: error?.response?.data?.message || error.message || "Failed to create product",
-        status: error?.response?.status
+      const res = await axios.patch(`${BASE_URL}/products/${id}`, data, {
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+          "Content-Type": "multipart/form-data",
+        },
       });
+      return res.data; // return updated product
+    } catch (err) {
+      return rejectWithValue(err.response?.data?.message || err.message);
     }
   }
 );
 
-// UPDATE Operation
-export const updateProduct = createAsyncThunk(
-  "adminProduct/updateProduct",
-  async ({ id, productData }, { rejectWithValue }) => {
-    try {
-      const token = localStorage.getItem("adminToken");
-      
-      if (!token) {
-        return rejectWithValue({
-          message: "No authentication token found",
-          status: 401
-        });
-      }
-      
-      // Check if there are any File objects (for upload)
-      const hasFiles = Object.values(productData).some(value => 
-        value instanceof File || (Array.isArray(value) && value.some(item => item instanceof File))
-      );
-      
-      console.log("Has files:", hasFiles);
-      console.log("Product data keys:", Object.keys(productData));
-      
-      const config = hasFiles 
-        ? { headers: { 'Content-Type': 'multipart/form-data', Authorization: `Bearer ${token}` } }
-        : { headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` } };
-      
-      const dataToSend = hasFiles ? createFormData(productData) : productData;
-      
-      // Validate required fields
-      if (!productData.name || !productData.section || !productData.mainCategory || !productData.productBrand) {
-        return rejectWithValue({
-          message: "Missing required fields: name, section, mainCategory, or productBrand",
-          status: 400
-        });
-      }
-      
-      console.log("Sending data to API:", dataToSend);
-      console.log("Request config:", config);
-      console.log("Product ID:", id);
-      console.log("BASE_URL:", BASE_URL);
-      console.log("Full URL:", `${BASE_URL}/products/${id}`);
-      console.log("Data type:", typeof dataToSend);
-      console.log("Is FormData:", dataToSend instanceof FormData);
-      
-      // Try the request
-      let response;
-      try {
-        response = await axios.patch(`${BASE_URL}/products/${id}`, dataToSend, config);
-      } catch (firstError) {
-        console.error("First attempt failed:", firstError);
-        
-        // If it's a 500 error and we're sending JSON, try as FormData
-        if (firstError?.response?.status === 500 && !hasFiles) {
-          console.log("Retrying with FormData...");
-          const formDataConfig = { 
-            headers: { 'Content-Type': 'multipart/form-data', Authorization: `Bearer ${token}` } 
-          };
-          const formDataToSend = createFormData(productData);
-          response = await axios.patch(`${BASE_URL}/products/${id}`, formDataToSend, formDataConfig);
-        } else {
-          throw firstError;
-        }
-      }
-      console.log("Update product response:", response.data);
-      console.log("Response headers:", response.headers);
-      console.log("Response status:", response.status);
-      
-      // Check if response is valid JSON
-      if (response.headers['content-type']?.includes('application/json')) {
-        try {
-          return response.data?.data || response.data;
-        } catch (parseError) {
-          console.error("JSON parsing error:", parseError);
-          console.error("Raw response:", response.data);
-          return rejectWithValue({
-            message: "Invalid JSON response from server",
-            status: response.status,
-            details: { rawResponse: response.data, parseError: parseError.message }
-          });
-        }
-      } else {
-        console.warn("Non-JSON response received:", response.data);
-        return response.data;
-      }
-    } catch (error) {
-      console.error("Error updating product:", error);
-      console.error("Error response:", error?.response?.data);
-      console.error("Error status:", error?.response?.status);
-      console.error("Error headers:", error?.response?.headers);
-      
-      // Handle different response types
-      let errorMessage = "Failed to update product";
-      let errorDetails = null;
-      
-      if (error?.response?.data) {
-        if (typeof error.response.data === 'string') {
-          errorMessage = error.response.data;
-          errorDetails = { rawResponse: error.response.data };
-        } else if (error.response.data.message) {
-          errorMessage = error.response.data.message;
-          errorDetails = error.response.data;
-        } else {
-          errorMessage = JSON.stringify(error.response.data);
-          errorDetails = error.response.data;
-        }
-      } else if (error.message) {
-        errorMessage = error.message;
-      }
-      
-      return rejectWithValue({
-        message: errorMessage,
-        status: error?.response?.status,
-        details: errorDetails
-      });
-    }
-  }
-);
-
-// DELETE Operation
+// Delete product
 export const deleteProduct = createAsyncThunk(
   "adminProduct/deleteProduct",
   async (id, { rejectWithValue }) => {
     try {
-      const token = localStorage.getItem("adminToken");
-      const response = await axios.delete(`${BASE_URL}/products/${id}`, {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
+      await axios.delete(`${BASE_URL}/products/${id}`, {
+        headers: { Authorization: `Bearer ${getToken()}` },
       });
-      return { id, data: response.data };
-    } catch (error) {
-      return rejectWithValue({
-        message: error?.response?.data?.message || error.message || "Failed to delete product",
-        status: error?.response?.status
-      });
+      return id; // return deleted product id
+    } catch (err) {
+      return rejectWithValue(err.response?.data?.message || err.message);
     }
   }
 );
 
-// TOGGLE STATUS Operation
-export const toggleProductStatus = createAsyncThunk(
-  "adminProduct/toggleProductStatus",
-  async ({ id, currentStatus }, { rejectWithValue }) => {
+// View product by ID
+export const viewProductById = createAsyncThunk(
+  "adminProduct/viewProductById",
+  async (id, { rejectWithValue }) => {
     try {
-      const token = localStorage.getItem("adminToken");
-      const response = await axios.patch(`${BASE_URL}/products/${id}`, {
-        isActive: !currentStatus
-      }, {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
+      const res = await axios.get(`${BASE_URL}/products/${id}`, {
+        headers: { Authorization: `Bearer ${getToken()}` },
       });
-      return response.data?.data || response.data;
-    } catch (error) {
-      return rejectWithValue({
-        message: error?.response?.data?.message || error.message || "Failed to toggle product status",
-        status: error?.response?.status
-      });
-    }
-  }
-);
-
-// BULK OPERATIONS
-export const bulkDeleteProducts = createAsyncThunk(
-  "adminProduct/bulkDeleteProducts",
-  async (productIds, { rejectWithValue }) => {
-    try {
-      const token = localStorage.getItem("adminToken");
-      const response = await axios.delete(`${BASE_URL}/products/bulk`, {
-        data: { ids: productIds },
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      });
-      return response.data;
-    } catch (error) {
-      return rejectWithValue({
-        message: error?.response?.data?.message || error.message || "Failed to delete products",
-        status: error?.response?.status
-      });
-    }
-  }
-);
-
-export const bulkUpdateProductStatus = createAsyncThunk(
-  "adminProduct/bulkUpdateProductStatus",
-  async ({ productIds, status }, { rejectWithValue }) => {
-    try {
-      const token = localStorage.getItem("adminToken");
-      const response = await axios.patch(`${BASE_URL}/products/bulk/status`, {
-        ids: productIds,
-        status
-      }, {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      });
-      return response.data;
-    } catch (error) {
-      return rejectWithValue({
-        message: error?.response?.data?.message || error.message || "Failed to update product status",
-        status: error?.response?.status
-      });
+      return res.data; // return product object
+    } catch (err) {
+      return rejectWithValue(err.response?.data?.message || err.message);
     }
   }
 );
@@ -332,198 +89,63 @@ const adminProductSlice = createSlice({
   name: "adminProduct",
   initialState: {
     products: [],
-    currentProduct: null,
+    total: 0,
+    page: 1,
+    pages: 1,
     loading: false,
     error: null,
-    operationSuccess: null,
-    selectedProducts: [],
+    currentProduct: null, // for viewById
   },
-  reducers: {
-    clearError: (state) => {
-      state.error = null;
-    },
-    clearOperationSuccess: (state) => {
-      state.operationSuccess = null;
-    },
-    setCurrentProduct: (state, action) => {
-      state.currentProduct = action.payload;
-    },
-    clearCurrentProduct: (state) => {
-      state.currentProduct = null;
-    },
-    setSelectedProducts: (state, action) => {
-      state.selectedProducts = action.payload;
-    },
-    toggleProductSelection: (state, action) => {
-      const productId = action.payload;
-      const index = state.selectedProducts.indexOf(productId);
-      if (index > -1) {
-        state.selectedProducts.splice(index, 1);
-      } else {
-        state.selectedProducts.push(productId);
-      }
-    },
-    clearSelectedProducts: (state) => {
-      state.selectedProducts = [];
-    },
-  },
+  reducers: {},
   extraReducers: (builder) => {
     builder
-      // Get Products
-      .addCase(getProducts.pending, (state) => {
+      // Fetch Products
+      .addCase(fetchProducts.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
-      .addCase(getProducts.fulfilled, (state, action) => {
+      .addCase(fetchProducts.fulfilled, (state, action) => {
         state.loading = false;
-        state.products = action.payload || [];
+        state.products = action.payload.products;
+        state.total = action.payload.total;
+        state.page = action.payload.page;
+        state.pages = action.payload.pages;
       })
-      .addCase(getProducts.rejected, (state, action) => {
+      .addCase(fetchProducts.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       })
-      
-      // Get Product by ID
-      .addCase(getProductById.pending, (state) => {
+      // Add Product
+      .addCase(addProduct.fulfilled, (state, action) => {
+        state.products.unshift(action.payload); // add new product at the top
+        state.total += 1;
+      })
+      // Edit Product
+      .addCase(editProduct.fulfilled, (state, action) => {
+        const index = state.products.findIndex((p) => p._id === action.payload._id);
+        if (index !== -1) state.products[index] = action.payload;
+      })
+      // Delete Product
+      .addCase(deleteProduct.fulfilled, (state, action) => {
+        state.products = state.products.filter((p) => p._id !== action.payload);
+        state.total -= 1;
+      })
+      // View Product by ID
+      .addCase(viewProductById.pending, (state) => {
         state.loading = true;
         state.error = null;
+        state.currentProduct = null;
       })
-      .addCase(getProductById.fulfilled, (state, action) => {
+      .addCase(viewProductById.fulfilled, (state, action) => {
         state.loading = false;
         state.currentProduct = action.payload;
       })
-      .addCase(getProductById.rejected, (state, action) => {
+      .addCase(viewProductById.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
-      })
-      
-      // Create Product
-      .addCase(createProduct.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-        state.operationSuccess = null;
-      })
-      .addCase(createProduct.fulfilled, (state, action) => {
-        state.loading = false;
-        state.products.push(action.payload);
-        state.operationSuccess = "Product created successfully";
-      })
-      .addCase(createProduct.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload;
-      })
-      
-      // Update Product
-      .addCase(updateProduct.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-        state.operationSuccess = null;
-      })
-      .addCase(updateProduct.fulfilled, (state, action) => {
-        state.loading = false;
-        const index = state.products.findIndex(
-          product => product._id === action.payload._id || product.id === action.payload.id
-        );
-        if (index !== -1) {
-          state.products[index] = action.payload;
-        }
-        state.operationSuccess = "Product updated successfully";
-      })
-      .addCase(updateProduct.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload;
-      })
-      
-      // Delete Product
-      .addCase(deleteProduct.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-        state.operationSuccess = null;
-      })
-      .addCase(deleteProduct.fulfilled, (state, action) => {
-        state.loading = false;
-        state.products = state.products.filter(
-          product => product._id !== action.payload.id && product.id !== action.payload.id
-        );
-        state.operationSuccess = "Product deleted successfully";
-      })
-      .addCase(deleteProduct.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload;
-      })
-      
-      // Toggle Product Status
-      .addCase(toggleProductStatus.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
-      .addCase(toggleProductStatus.fulfilled, (state, action) => {
-        state.loading = false;
-        const index = state.products.findIndex(
-          product => product._id === action.payload._id || product.id === action.payload.id
-        );
-        if (index !== -1) {
-          state.products[index] = action.payload;
-        }
-      })
-      .addCase(toggleProductStatus.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload;
-      })
-      
-      // Bulk Delete Products
-      .addCase(bulkDeleteProducts.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-        state.operationSuccess = null;
-      })
-      .addCase(bulkDeleteProducts.fulfilled, (state, action) => {
-        state.loading = false;
-        state.products = state.products.filter(
-          product => !state.selectedProducts.includes(product._id || product.id)
-        );
-        state.selectedProducts = [];
-        state.operationSuccess = "Products deleted successfully";
-      })
-      .addCase(bulkDeleteProducts.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload;
-      })
-      
-      // Bulk Update Product Status
-      .addCase(bulkUpdateProductStatus.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-        state.operationSuccess = null;
-      })
-      .addCase(bulkUpdateProductStatus.fulfilled, (state, action) => {
-        state.loading = false;
-        state.selectedProducts.forEach(productId => {
-          const index = state.products.findIndex(
-            product => (product._id || product.id) === productId
-          );
-          if (index !== -1) {
-            state.products[index].isActive = action.payload.status;
-          }
-        });
-        state.selectedProducts = [];
-        state.operationSuccess = "Product status updated successfully";
-      })
-      .addCase(bulkUpdateProductStatus.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload;
+        state.currentProduct = null;
       });
   },
 });
-
-export const { 
-  clearError, 
-  clearOperationSuccess, 
-  setCurrentProduct, 
-  clearCurrentProduct,
-  setSelectedProducts,
-  toggleProductSelection,
-  clearSelectedProducts
-} = adminProductSlice.actions;
 
 export default adminProductSlice.reducer;
