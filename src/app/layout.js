@@ -1,7 +1,7 @@
 import { Montserrat } from "next/font/google";
 import "./globals.css";
 import { ReduxProvider } from "@/redux/providers";
-// import { Toaster } from "sonner";
+import { Toaster } from "sonner";
 
 // Import Montserrat
 const montserrat = Montserrat({
@@ -21,7 +21,7 @@ export default function RootLayout({ children }) {
       <body className={`${montserrat.variable} font-sans antialiased`}>
         <ReduxProvider>
           {children}
-          {/* <Toaster position="top-right" richColors /> */}
+          <Toaster richColors position="top-right" />
         </ReduxProvider>
       </body>
     </html>

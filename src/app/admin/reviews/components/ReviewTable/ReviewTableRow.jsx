@@ -1,0 +1,65 @@
+// components/ReviewTable/ReviewTableRow.jsx
+const ReviewTableRow = ({ review, onEdit, onDelete, onToggleStatus }) => {
+  // Helper function to safely get string values
+  const getStringValue = (value) => {
+    if (typeof value === 'string') return value;
+    if (typeof value === 'object' && value !== null) {
+      return value.name || value.title || JSON.stringify(value);
+    }
+    return String(value || '');
+  };
+
+  return (
+    <tr className="hover:bg-gray-50 transition-colors">
+      <td className="px-6 py-4">
+        <div className="font-medium text-gray-900">{getStringValue(review.name)}</div>
+      </td>
+      <td className="px-6 py-4 text-gray-900">{getStringValue(review.designation)}</td>
+      <td className="px-6 py-4 text-gray-900">{getStringValue(review.title)}</td>
+      <td className="px-6 py-4 text-gray-900 max-w-xs truncate">{getStringValue(review.message)}</td>
+      <td className="px-6 py-4">
+        <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium ${
+          review.isActive 
+            ? 'bg-green-100 text-green-800' 
+            : 'bg-red-100 text-red-800'
+        }`}>
+          {review.isActive ? 'Active' : 'Inactive'}
+        </span>
+      </td>
+      <td className="px-6 py-4">
+        <div className="flex space-x-2">
+          {onEdit && (
+            <button
+              onClick={() => onEdit(review)}
+              className="px-3 py-1 bg-indigo-600 text-white text-sm rounded-lg hover:bg-indigo-700 transition-colors"
+            >
+              Edit
+            </button>
+          )}
+          {onToggleStatus && (
+            <button 
+              onClick={() => onToggleStatus(review)}
+              className={`px-3 py-1 text-sm rounded-lg transition-colors ${
+                review.isActive
+                  ? 'bg-yellow-600 text-white hover:bg-yellow-700'
+                  : 'bg-green-600 text-white hover:bg-green-700'
+              }`}
+            >
+              {review.isActive ? 'Deactivate' : 'Activate'}
+            </button>
+          )}
+          {onDelete && (
+            <button 
+              onClick={() => onDelete(review)}
+              className="px-3 py-1 bg-red-600 text-white text-sm rounded-lg hover:bg-red-700 transition-colors"
+            >
+              Delete
+            </button>
+          )}
+        </div>
+      </td>
+    </tr>
+  );
+};
+
+export default ReviewTableRow;
