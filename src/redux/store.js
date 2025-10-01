@@ -1,4 +1,6 @@
 import { configureStore } from "@reduxjs/toolkit";
+
+// User reducers
 import authReducer from "./slices/authSlice";
 import categoryReducer from "./slices/categorySlice";
 import brandReducer from "./slices/brandSlice";
@@ -10,6 +12,13 @@ import orderReducer from "./slices/orderSlice";
 import carouselReducer from "./slices/carouselSlice";
 import bannerReducer from "./slices/bannerSlice";
 import vehicleReducer from "./slices/vehicleSlice";
+import testimonialReducer from "./slices/testimonialSlice";
+import blogReducer from "./slices/blogSlice";
+import dynamicBannerReducer from "./slices/dynamicBannerSlice";
+import randomProductReducer from "./slices/randomProductSlice";
+import homeCardReducer from "./slices/homeCardSlice";
+import popularProductReducer from "./slices/popularProductSlice";
+import productsBySectionReducer from "./slices/dynamicProductsSlice";
 
 // Admin reducers
 import adminAuthReducer from "./slices/adminAuthSlice";
@@ -33,7 +42,6 @@ import adminHomeCarouselReducer from "./slices/adminHomeCarouselSlice";
 import adminBottomCarouselReducer from "./slices/adminBottomCarouselSlice";
 import adminProductBrandReducer from "./slices/adminProductBrand";
 
-
 export const store = configureStore({
   reducer: {
     // User reducers
@@ -48,12 +56,18 @@ export const store = configureStore({
     carousel: carouselReducer,
     banner: bannerReducer,
     vehicles: vehicleReducer,
+    testimonial: testimonialReducer,
+    blogs: blogReducer,
+    dynamicBanners: dynamicBannerReducer,
+    randomProducts: randomProductReducer,
+    homecards: homeCardReducer,
+    popularproduct: popularProductReducer,
+    productsBySection: productsBySectionReducer,
 
     // Admin reducers
     adminAuth: adminAuthReducer,
     adminCarousel: adminCarouselReducer,
     adminBrand: adminBrandReducer,
-   
     adminVehicle: adminVehicleReducer,
     adminOrder: adminOrderReducer,
     adminDealBanner: adminDealBannerReducer,
@@ -62,14 +76,14 @@ export const store = configureStore({
     adminUserManagement: adminUserManagementReducer,
     adminReview: adminReviewReducer,
     adminSubAdminManagement: adminSubAdminManagementReducer,
-    sections : sectionsReducer,
+    sections: sectionsReducer,
     adminMainCategory: adminMainCategoryReducer,
-    adminCategory : adminCategoryReducer,
-    adminSubCategory : adminSubCategoryReducer,
-    adminSubSubCategory : adminSubSubCategoryReducer,
-    adminMainCarousel : adminMainCarouselReducer,
-    adminHomeCarousel : adminHomeCarouselReducer,
-    adminBottomCarousel : adminBottomCarouselReducer,
-    adminProductBrand : adminProductBrandReducer,
+    adminCategory: adminCategoryReducer,
+    adminSubCategory: adminSubCategoryReducer,
+    adminSubSubCategory: adminSubSubCategoryReducer,
+    adminMainCarousel: adminMainCarouselReducer,
+    adminHomeCarousel: adminHomeCarouselReducer,
+    adminBottomCarousel: adminBottomCarouselReducer,
+    adminProductBrand: adminProductBrandReducer,
   },
 });

@@ -4,6 +4,7 @@ import { Filter } from 'lucide-react';
 import { useSelector, useDispatch } from 'react-redux';
 import { getMainCategories } from '@/redux/slices/categorySlice';
 import { useRouter } from 'next/navigation';  
+import { IMG_URL } from '@/redux/baseUrl';
 
 const AutomotivePartsCatalog = () => {
   const [activeTab, setActiveTab] = useState('Two-wheeler');
@@ -51,7 +52,7 @@ const AutomotivePartsCatalog = () => {
   }
 
   return (
-    <div className="mx-auto p-6 bg-gray-50 min-h-screen">
+    <div className="mx-auto p-6 bg-white min-h-screen">
       <div className="flex justify-between items-center mb-8">
         <div className="flex space-x-8">
           <button 
@@ -75,22 +76,18 @@ const AutomotivePartsCatalog = () => {
             FOUR WHEELER
           </button>
         </div>
-        
-        <button className="flex items-center space-x-2 px-4 py-2 text-sm text-gray-600 bg-white border border-gray-300 rounded-md hover:bg-gray-50 transition-colors">
-          <Filter className="w-4 h-4" />
-          <span>Filter</span>
-        </button>
+     
       </div>
 
       {/* Categories Grid */}
       {mappedCategories.length > 0 ? (
         <>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8 ">
             {visibleCategories.map((category, index) => (
               <div
                 key={category.id || index}
                 onClick={() => router.push(`/spare/category2/${category.id}`)}
-                className="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-lg transition-shadow cursor-pointer group"
+                className="bg-white rounded-lg border border-gray-700 p-6 hover:shadow-lg transition-shadow cursor-pointer group"
               >
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
@@ -99,12 +96,12 @@ const AutomotivePartsCatalog = () => {
                     </h3>
                   </div>
                   
-                  <div className="flex-shrink-0 ml-4">
-                    <div className={`w-12 h-12 ${category.bgColor} rounded-lg flex items-center justify-center p-2`}>
+                  <div className="flex-shrink-0 ml-4 ">
+                    <div className={`w-20 h-20 ${category.bgColor} rounded-lg flex items-center justify-center `}>
                       <img 
-                        src={category.image} 
+                        src={`${IMG_URL}/${category.image} `}
                         alt={category.title}
-                        className="w-8 h-8 object-contain"
+                        className="w-20 h-20 object-contain"
                       />
                     </div>
                   </div>

@@ -27,13 +27,14 @@ const HowToUseSection = ({ product }) => {
       </ul>
       
       {/* Additional usage notes */}
-      {product?.warranty && (
-        <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-          <h3 className="font-medium text-blue-900 mb-2">Warranty Information</h3>
-          <p className="text-blue-800">{product.warranty} warranty included</p>
-        </div>
-      )}
-      
+    {product?.warranty && (
+  <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+    <h3 className="font-medium text-blue-900 mb-2">Warranty Information</h3>
+    <p className="text-blue-800">
+      {typeof product.warranty === 'object' ? product.warranty.period : product.warranty} warranty included
+    </p>
+  </div>
+)}
       {product?.compatibleVehicles && product.compatibleVehicles.length > 0 && (
         <div className="mt-6 p-4 bg-green-50 border border-green-200 rounded-lg">
           <h3 className="font-medium text-green-900 mb-2">Compatible Vehicles</h3>

@@ -4,11 +4,16 @@ import { Heart, Truck, X, ShoppingCart, ArrowLeft, Loader } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "sonner";
 import { getWishlist, addToWishlist } from "@/redux/slices/wishlistSlice";
+import { IMG_URL } from "@/redux/baseUrl";
+import { useRouter } from "next/navigation";
 
 const WishlistPage = () => {
   const dispatch = useDispatch();
   const { wishlist, loading, error } = useSelector((state) => state.wishlist);
   const [processingItems, setProcessingItems] = useState({});
+  const router = useRouter();
+  const { user } = useSelector((state) => state.auth);
+
 
   useEffect(() => {
     dispatch(getWishlist());
@@ -53,21 +58,63 @@ const WishlistPage = () => {
     </div>
   );
   
-  if (error) return (
-    <div className="max-w-7xl mx-auto p-6">
-      <div className="text-center py-12 text-red-500">
-        <X className="inline-block h-12 w-12 mb-4" />
-        <p className="text-lg font-medium mb-2">Error loading wishlist</p>
-        <p className="text-gray-600">{error}</p>
-        <button 
-          className="mt-4 flex items-center justify-center text-red-600 hover:text-red-700 mx-auto"
-          onClick={() => dispatch(getWishlist())}
-        >
-          <ArrowLeft className="w-4 h-4 mr-1" /> Try Again
-        </button>
+
+if (!user) {
+  return (
+   <div className=" flex items-center justify-center p-6 bg-gradient-to-br from-red-50 to-white">
+  <div className="max-w-md w-full">
+    <div className="bg-white rounded-2xl shadow-xl p-8 border border-red-100">
+      {/* Icon */}
+      <div className="flex justify-center mb-6">
+        <div className="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center">
+          <svg 
+            className="w-10 h-10 text-red-600" 
+            fill="none" 
+            stroke="currentColor" 
+            viewBox="0 0 24 24"
+          >
+            <path 
+              strokeLinecap="round" 
+              strokeLinejoin="round" 
+              strokeWidth={2} 
+              d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" 
+            />
+          </svg>
+        </div>
       </div>
+
+      {/* Content */}
+      <h2 className="text-2xl font-bold text-gray-900 mb-3 text-center">
+        Your Wishlist Awaits
+      </h2>
+      <p className="text-gray-600 text-center mb-8 leading-relaxed">
+        Sign in to access your saved items, manage your profile, and track your orders all in one place.
+      </p>
+
+      {/* Button */}
+      <button
+        className="w-full bg-red-600 text-white px-6 py-3 rounded-lg hover:bg-red-700 transition-all duration-200 font-semibold shadow-lg shadow-red-600/30 hover:shadow-xl hover:shadow-red-600/40 hover:scale-105 transform"
+        onClick={() => router.push("/spare/login")}
+      >
+        Login to Continue
+      </button>
+
+      {/* Footer text */}
+      <p className="text-sm text-gray-500 text-center mt-6">
+        Don't have an account?{' '}
+        <button 
+          className="text-red-600 hover:text-red-700 font-medium hover:underline"
+          onClick={() => router.push("/spare/register")}
+        >
+          Sign up
+        </button>
+      </p>
     </div>
+  </div>
+</div>
   );
+}
+
   
   if (!wishlist.length) return (
     <div className="max-w-7xl mx-auto p-6">
@@ -82,7 +129,7 @@ const WishlistPage = () => {
         <p className="text-gray-600 mb-6">Items you save will appear here</p>
         <button 
           className="bg-red-600 text-white px-6 py-2 rounded-md hover:bg-red-700 transition-colors flex items-center mx-auto"
-          onClick={() => window.history.back()}
+          onClick={() => router.push("/spare/category1")}
         >
           <ArrowLeft className="w-4 h-4 mr-2" /> Continue Shopping
         </button>
@@ -136,7 +183,7 @@ const WishlistPage = () => {
             {/* Product Image */}
             <div className="flex justify-center mb-4 flex-grow">
               <img
-                src={product.images?.[0] || '/api/placeholder/200/200'} 
+                src={`${IMG_URL}/${product.images?.[0] || '/api/placeholder/200/200'}`} 
                 alt={product.name}
                 className="w-32 h-32 object-contain"
                 onError={(e) => {
@@ -161,25 +208,20 @@ const WishlistPage = () => {
                 </span>
               )}
             </div>
-
-            {/* Delivery Info */}
             <div className="flex items-center text-gray-600 mb-3">
               <Truck className="w-4 h-4 mr-1 flex-shrink-0" />
               <span className="text-xs">Delivery in {product.deliveryDays || 3}-{product.deliveryDays ? product.deliveryDays + 2 : 5} days</span>
             </div>
-
-            {/* Product Description */}
             <p className="text-xs text-gray-600 mb-4 leading-relaxed line-clamp-2">
               {product.overview || product.description || 'No description available'}
             </p>
-
-            {/* Action Buttons */}
             <div className="mt-auto flex space-x-2">
               <button 
                 className="flex-1 bg-red-600 text-white py-2 px-3 rounded text-sm font-medium hover:bg-red-700 transition-colors flex items-center justify-center"
                 onClick={() => handleAddToCart(product)}
               >
                 <ShoppingCart className="w-4 h-4 mr-1" /> Add to Cart
+
               </button>
             </div>
           </div>

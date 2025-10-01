@@ -18,6 +18,7 @@ export const getHomeBanners = createAsyncThunk(
     }
 )
 
+
 export const getCategoryBanners = createAsyncThunk(
     "banner/getCategoryBanners",
     async (_, { rejectWithValue }) => {
@@ -33,7 +34,7 @@ export const getCategoryBanners = createAsyncThunk(
     }
 )
 
-export const getsubCategoryBanners = createAsyncThunk(
+export const    getsubCategoryBanners = createAsyncThunk(
     "banner/getsubCategoryBanners",
     async (_, { rejectWithValue }) => {
         try {
@@ -140,6 +141,8 @@ const bannerSlice = createSlice({
     reducers: {},
     extraReducers: (builder) => {
         builder
+
+        // home
             .addCase(getHomeBanners.pending, (state) => {
                 state.loading = true;
                 state.error = null;
@@ -152,85 +155,103 @@ const bannerSlice = createSlice({
                 state.loading = false;
                 state.error = action.payload;
             })
+
+            // category
             .addCase(getCategoryBanners.pending, (state) => {
                 state.loading = true;
                 state.error = null;
             })
             .addCase(getCategoryBanners.fulfilled, (state, action) => {
                 state.loading = false;
-                state.banners = action.payload;
+                state.categoryBanners = action.payload;
             })
             .addCase(getCategoryBanners.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload;
             })
+
+            // subcategory
             .addCase(getsubCategoryBanners.pending, (state) => {
                 state.loading = true;
                 state.error = null;
             })
             .addCase(getsubCategoryBanners.fulfilled, (state, action) => {
                 state.loading = false;
-                state.banners = action.payload;
+                state.subCategoryBanners = action.payload;
             })
             .addCase(getsubCategoryBanners.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload;
             })
+
+
+            // subsubcategory
             .addCase(getsubSubCategoryBanners.pending, (state) => {
                 state.loading = true;
                 state.error = null;
             })
             .addCase(getsubSubCategoryBanners.fulfilled, (state, action) => {
                 state.loading = false;
-                state.banners = action.payload;
+                state.subSubCategoryBanners = action.payload;
             })
             .addCase(getsubSubCategoryBanners.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload;
             })
+
+
+            // products
             .addCase(getProductBanners.pending, (state) => {
                 state.loading = true;
                 state.error = null;
             })
             .addCase(getProductBanners.fulfilled, (state, action) => {
                 state.loading = false;
-                state.banners = action.payload;
+                state.productBanners = action.payload;
             })
             .addCase(getProductBanners.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload;
             })
+
+
+            // productdetails
             .addCase(getProductDetailBanners.pending, (state) => {
                 state.loading = true;
                 state.error = null;
             })
             .addCase(getProductDetailBanners.fulfilled, (state, action) => {
                 state.loading = false;
-                state.banners = action.payload;
+                state.productDetailBanners = action.payload;
             })
             .addCase(getProductDetailBanners.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload;
             })
+
+            // wishlist
             .addCase(getWishlistBanners.pending, (state) => {
                 state.loading = true;
                 state.error = null;
             })
             .addCase(getWishlistBanners.fulfilled, (state, action) => {
                 state.loading = false;
-                state.banners = action.payload;
+                state.wishlistBanners = action.payload;
             })
             .addCase(getWishlistBanners.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload;
             })
+
+
+            // brandbanners
             .addCase(getBrandBanners.pending, (state) => {
                 state.loading = true;
                 state.error = null;
             })
             .addCase(getBrandBanners.fulfilled, (state, action) => {
                 state.loading = false;
-                state.banners = action.payload;
+                state.brandBanners = action.payload;
             })
             .addCase(getBrandBanners.rejected, (state, action) => {
                 state.loading = false;

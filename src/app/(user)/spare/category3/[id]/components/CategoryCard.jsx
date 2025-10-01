@@ -3,6 +3,7 @@ import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams, useRouter } from "next/navigation";
 import { getAllSubSubById } from "@/redux/slices/categorySlice";
+import { IMG_URL } from "@/redux/baseUrl";
 
 const AutomotivePartsCatalog = () => {
   const { id } = useParams(); 
@@ -28,8 +29,8 @@ const AutomotivePartsCatalog = () => {
         {subSubById?.map((item) => (
           <div
             key={item._id}
-            onClick={() => router.push(`/spare/products/${item._id}`)} // 🔹 navigate on click
-            className="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-lg transition-shadow cursor-pointer"
+            onClick={() => router.push(`/spare/products/${item._id}`)}
+            className="bg-white rounded-lg border border-gray-600 p-6 hover:shadow-lg transition-shadow cursor-pointer"
           >
             <h3 className="font-medium text-gray-900 mb-3 text-sm">
               {item.name}
@@ -37,12 +38,12 @@ const AutomotivePartsCatalog = () => {
             <p className="text-xs text-gray-500 mb-4">
               {item.subCategory?.name}
             </p>
-            <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center">
+            <div className="w-20 h-20 bg-gray-100 rounded-lg flex items-center justify-center">
               {item.image ? (
                 <img
-                  src={item.image}
+                  src={`${IMG_URL}/${item.image}`}
                   alt={item.name}
-                  className="w-8 h-8 object-contain"
+                  className="w-20 h-20 object-contain"
                 />
               ) : (
                 <span className="text-xs text-gray-400">No Img</span>

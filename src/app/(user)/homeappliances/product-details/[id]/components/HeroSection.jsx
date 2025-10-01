@@ -1,0 +1,200 @@
+"use client";
+import React, { useState, useEffect } from 'react';
+import { Heart, MapPin, CheckCircle, Truck, ShoppingCart } from 'lucide-react';
+import { IMG_URL } from '@/redux/baseUrl';
+
+const HeroSection = ({ product }) => {
+    const [mainImage, setMainImage] = useState('');
+
+    useEffect(() => {
+        if (product?.images && product.images?.length > 0) {
+            setMainImage(`${IMG_URL}${product.images[0]}`);
+        }
+    }, [product]);
+
+    const handleImageClick = (imageName) => {
+        setMainImage(`${IMG_URL}${imageName}`);
+    };
+
+    const calculateDiscountedPrice = () => {
+        if (product?.discount) {
+            return product.price - (product.price * product.discount / 100);
+        }
+        return product?.price || 0;
+    };
+
+    const getCompatibleVehicleInfo = () => {
+        if (product?.compatibleVehicles && product.compatibleVehicles.length > 0) {
+            const vehicle = product.compatibleVehicles[0];
+            return `Fits Your ${vehicle.modelLine || 'Vehicle'} ${vehicle.year || ''}`;
+        }
+        return 'Compatible Vehicle Information';
+    };
+
+    const getCategoryName = () => {
+        if (!product?.mainCategory) {
+            // If mainCategory is not available, try category or section
+            if (product?.category) {
+                if (typeof product.category === 'string') return product.category;
+                if (product.category?.name) return product.category.name;
+            }
+            if (product?.section) {
+                if (typeof product.section === 'string') return product.section;
+                if (product.section?.name) return product.section.name;
+            }
+            return 'Category';
+        }
+        if (typeof product.mainCategory === 'string') {
+            return product.mainCategory;
+        }
+        if (product.mainCategory?.name) {
+            return product.mainCategory.name;
+        }
+        if (typeof product.mainCategory === 'object') {
+            return 'Category';
+        }
+        return 'Category';
+    };
+
+    return (
+        <div className="mx-auto p-6">
+            <div className="mb-6 text-sm text-gray-600">
+                <span>
+                    Filtered By: {getCategoryName()} - {product?.name || 'Product'}
+                </span>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <div className="space-y-6">
+                    <div className="flex justify-between items-center">
+                        <div className="flex items-center text-gray-600">
+                            <MapPin className="w-4 h-4 mr-2 text-red-500" />
+                            <span className="text-sm">Delivering To Perinthalmanna 686551</span>
+                        </div>
+                        <button
+                            className="flex items-center text-gray-500 hover:text-red-600 transition-colors"
+                        >
+                            <Heart className="w-5 h-5 mr-2" />
+                            <span className="text-sm font-medium">ADD TO WISHLIST</span>
+                        </button>
+                    </div>
+
+                    <div className="flex gap-4">
+                        <div className="flex-1">
+                            <div className="bg-white border rounded-lg p-4 flex items-center justify-center">
+                                {mainImage ? (
+                                    <img
+                                        src={mainImage}
+                                        alt={product?.name || 'Product Image'}
+                                        className="max-w-[250px] max-h-[250px] object-contain"
+                                        onError={(e) => {
+                                            e.target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjUwIiBoZWlnaHQ9IjI1MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMjUwIiBoZWlnaHQ9IjI1MCIgZmlsbD0iI2YzZjRmNSIvPjx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBkeT0iLjM1ZW0iIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZvbnQtc2l6ZT0iMTQiIGZvbnQtZmFtaWx5PSJzYW5zLXNlcmlmIiBmaWxsPSIjOTk5Ij5ObyBJbWFnZTwvdGV4dD48L3N2Zz4=';
+                                        }}
+                                    />
+                                ) : (
+                                    <div className="w-[250px] h-[250px] bg-gray-200 rounded flex items-center justify-center">
+                                        <span className="text-gray-500">No Image Available</span>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+
+                        <div className="flex flex-col gap-2 w-20">
+                            {product?.images && product.images?.slice(1, 4).map((image, index) => (
+                                <div
+                                    key={index}
+                                    className="bg-white border rounded cursor-pointer hover:border-red-500 transition-colors aspect-square"
+                                    onClick={() => handleImageClick(image)}
+                                >
+                                    <img
+                                        src={`${IMG_URL}/${image}`}
+                                        alt={`Product view ${index + 2}`}
+                                        className="w-full h-full object-contain p-2"
+                                        onError={(e) => {
+                                            e.target.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iODAiIGhlaWdodD0iODAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjgwIiBoZWlnaHQ9IjgwIiBmaWxsPSIjZjNmNGY1Ii8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGR5PSIuMzVlbSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1zaXplPSIxMiIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIGZpbGw9IiM5OTkiPk5vIEltYWdlPC90ZXh0Pjwvc3ZnPg==';
+                                        }}
+                                    />
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Action Buttons */}
+                    <div className="flex gap-4">
+                        <button className="flex-1 bg-red-600 text-white py-3 px-6 rounded font-medium hover:bg-red-700 transition-colors">
+                            BUY IT NOW
+                        </button>
+                        <button className="flex-1 border border-gray-300 text-gray-700 py-3 px-6 rounded font-medium hover:bg-gray-50 transition-colors flex items-center justify-center">
+                            <ShoppingCart className="w-4 h-4 mr-2" />
+                            ADD TO CART
+                        </button>
+                    </div>
+                </div>
+
+                <div className="space-y-6">
+                    <div className="flex justify-between items-center">
+                        <div className="flex items-center">
+                            <span className="text-lg font-semibold text-gray-800">
+                                {product?.partNumber || 'Product Code'}
+                            </span>
+                        </div>
+                        <div className="flex items-center text-gray-600">
+                            <Truck className="w-5 h-5 mr-2" />
+                            <span className="text-sm font-medium">Deliver Within 8 Days</span>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <h1 className="text-2xl font-bold text-gray-900 mb-2">
+                            {product?.name || 'Product Name'}
+                        </h1>
+                    </div>
+
+                    {/* Price */}
+                    <div className="flex items-baseline gap-2">
+                        <span className="text-3xl font-bold text-black">
+                            ₹{calculateDiscountedPrice().toLocaleString()}
+                        </span>
+                        {product?.discount && (
+                            <>
+                                <span className="text-lg text-gray-500 line-through">
+                                    ₹{product.price?.toLocaleString()}
+                                </span>
+                                <span className="text-green-600 font-medium">
+                                    ({product.discount}% Off)
+                                </span>
+                            </>
+                        )}
+                    </div>
+
+                    {/* Stock Info */}
+                    {product?.stock !== undefined && (
+                        <div className="text-sm text-gray-600">
+                            <span className={product.stock > 0 ? 'text-green-600' : 'text-red-600'}>
+                                {product.stock > 0 ? `${product.stock} in stock` : 'Out of stock'}
+                            </span>
+                        </div>
+                    )}
+
+                    {/* Compatibility */}
+                    <div className="flex items-center p-3 rounded">
+                        <CheckCircle className="w-5 h-5 text-green-600 mr-3" />
+                        <span className="text-green-700 font-medium">
+                            {getCompatibleVehicleInfo()}
+                        </span>
+                    </div>
+
+                    {/* Description */}
+                    <div>
+                        <h2 className="text-lg font-semibold text-gray-900 mb-3">Description</h2>
+                        <p className="text-gray-600 leading-relaxed">
+                            {product?.description || 'No description available'}
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+export default HeroSection;

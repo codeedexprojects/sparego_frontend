@@ -1,4 +1,3 @@
-import Header from '@/components/user/spare/Header'
 import React from 'react'
 import SpareHeroSection from './components/HeroSection'
 import FeaturesBenefitsSection from './components/FeatureSection'
@@ -10,10 +9,11 @@ import PopularBrandsSection from './components/PopularBrands'
 import TestimonialsSection from './components/Testimonilels'
 import Footer from '@/components/landing/Footer'
 import SparePartsCarousel from './components/SpareCarousal'
+import Header from '@/components/user/spare/Header'
 
 function page() {
     return (
-        <div>
+        <div className='bg-white'>
             <Header></Header>
             <SpareHeroSection></SpareHeroSection>
             <FeaturesBenefitsSection></FeaturesBenefitsSection>

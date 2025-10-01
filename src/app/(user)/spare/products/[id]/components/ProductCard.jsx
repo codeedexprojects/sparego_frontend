@@ -7,6 +7,7 @@ import { getAllProducts } from '@/redux/slices/productSlice';
 import { addToWishlist, getWishlist } from '@/redux/slices/wishlistSlice';
 import { addToCart } from '@/redux/slices/cartSlice';
 import { toast } from 'sonner';
+import { IMG_URL } from '@/redux/baseUrl';
 
 const AutomotiveProductsGrid = () => {
   const { id } = useParams();
@@ -51,7 +52,7 @@ const AutomotiveProductsGrid = () => {
     const token = localStorage.getItem('token');
     if (!token) {
       toast.error('Please login to add items to your wishlist');
-      router.push('/login'); 
+      router.push('/spare/login'); 
       return;
     }
     
@@ -85,7 +86,7 @@ const AutomotiveProductsGrid = () => {
     const token = localStorage.getItem('token');
     if (!token) {
       toast.error('Please login to add items to your cart');
-      router.push('/login'); 
+      router.push('/spare/login'); 
       return;
     }
     
@@ -168,7 +169,7 @@ const AutomotiveProductsGrid = () => {
               <div className="flex justify-center mb-4">
                 {product.images && product.images.length > 0 ? (
                   <img 
-                    src={product.images[0]} 
+                    src={`${IMG_URL}/${product.images[0]}` }
                     alt={product.name}
                     className="w-16 h-20 object-contain"
                     onError={(e) => {

@@ -12,7 +12,7 @@ import SimilarProducts from './components/SimilarProducts';
 import PromotionalBannerSection from './components/OfferSection';
 import { getProductById } from '@/redux/slices/productSlice';
 import { useParams } from 'next/navigation';
-import { Toaster } from 'sonner';
+// import { Toaster } from 'sonner';
 
 const page = () => {
   const { id } = useParams();
@@ -51,9 +51,10 @@ const page = () => {
     return (
       <div>
         <Header />
-        <div className="flex justify-center items-center min-h-screen">
-          <div className="text-lg text-red-600">Error: {error}</div>
-        </div>
+       <div className="text-lg text-red-600">
+  Error: {error?.message || error || "Something went wrong"}
+</div>
+
         <Footer />
       </div>
     );
@@ -86,11 +87,11 @@ const page = () => {
         <SpecificationsSection product={product} />
         <HowToUseSection product={product} />
         <SpecTable product={product} />
-        <SimilarProducts />
+        <SimilarProducts  />
         <PromotionalBannerSection />
       </div>
       <Footer />
-      <Toaster position="top-center" richColors closeButton />
+      {/* <Toaster position="top-center" richColors closeButton /> */}
     </div>
   );
 };

@@ -6,6 +6,7 @@ import { getCart } from '@/redux/slices/cartSlice';
 import { getAddress } from '@/redux/slices/addressSlice';
 import { createOrder } from '@/redux/slices/orderSlice'; 
 import { useRouter } from 'next/navigation';
+import { IMG_URL } from '@/redux/baseUrl';
 
 const CheckoutPage = () => {
   const dispatch = useDispatch();
@@ -40,8 +41,6 @@ const CheckoutPage = () => {
       toast.error('Please login to proceed with checkout');
     }
   }, [dispatch]);
-
-  // Set default address as selected when addresses are loaded
   useEffect(() => {
     if (addresses && addresses.length > 0 && !selectedAddressId) {
       const defaultAddress = addresses.find(addr => addr.isDefault) || addresses[0];
@@ -76,27 +75,15 @@ const CheckoutPage = () => {
     }
 
     try {
-      // Show loading toast
       const loadingToast = toast.loading('Creating your order...');
-      
-      // Prepare order data
       const orderData = {
         addressId: selectedAddressId
       };
-
-      // Dispatch createOrder action
       const result = await dispatch(createOrder(orderData)).unwrap();
-      
-      // Dismiss loading toast
       toast.dismiss(loadingToast);
-      
       if (result.success && result.whatsappUrl) {
         toast.success('Order created successfully! Redirecting to WhatsApp...');
-        
-        // Open WhatsApp URL
         window.open(result.whatsappUrl, '_blank');
-        
-        
         router.push('/spare/order-confirmed');
       } else {
         toast.error('Failed to create order. Please try again.');
@@ -106,13 +93,9 @@ const CheckoutPage = () => {
       toast.error(error || 'Failed to create order. Please try again.');
     }
   };
-
-  // Redirect to add address page instead of showing form
   const handleAddNewAddress = () => {
-    router.push('/address/add'); // Change this to your actual address page route
+    router.push('/spare/profile'); 
   };
-
-  // Show loading if cart, addresses, or order is loading
   if (loading || orderLoading) {
     return (
       <div className="min-h-screen bg-gray-100 flex items-center justify-center">
@@ -158,25 +141,16 @@ const CheckoutPage = () => {
     <div className="min-h-screen bg-gray-100">
       <div className="max-w-7xl mx-auto p-6">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          
-          {/* Left Side - Address Selection */}
           <div className="bg-white p-8 rounded-lg">
             <div className="flex justify-between items-center mb-8">
               <h2 className="text-2xl font-semibold text-gray-900">Delivery Address</h2>
-              <button className="text-blue-600 hover:text-blue-800 underline text-sm">
-                Log in
-              </button>
             </div>
-
-            {/* Address Loading */}
             {addressLoading && (
               <div className="text-center py-8">
                 <div className="inline-block animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-600 mb-2"></div>
                 <p className="text-gray-600">Loading addresses...</p>
               </div>
             )}
-
-            {/* Saved Addresses */}
             {!addressLoading && addresses && addresses.length > 0 ? (
               <div className="space-y-4 mb-6">
                 {addresses.map((address) => (
@@ -234,8 +208,6 @@ const CheckoutPage = () => {
                 <p>No addresses found. Please add an address to continue.</p>
               </div>
             )}
-
-            {/* Add New Address Button - Redirects to address page */}
             <button 
               onClick={handleAddNewAddress}
               className="w-full border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-gray-400 transition-colors mb-6"
@@ -248,14 +220,10 @@ const CheckoutPage = () => {
               </div>
             </button>
           </div>
-
-          {/* Right Side - Your Order */}
           <div className="bg-white p-8 rounded-lg h-fit">
             <h2 className="text-2xl font-semibold text-gray-900 mb-8">
               Your order ({cart.items.length} {cart.items.length === 1 ? 'item' : 'items'})
             </h2>
-
-            {/* Product Items */}
             <div className="space-y-4 mb-6">
               {cart.items.map((item) => {
                 const itemTotal = calculateItemTotal(item);
@@ -264,7 +232,7 @@ const CheckoutPage = () => {
                     <div className="relative">
                       {item.product.images && item.product.images.length > 0 ? (
                         <img 
-                          src={`/api/images/${item.product.images[0]}`}
+                          src={`${IMG_URL}/${item.product.images[0]}`}
                           alt={item.product.name}
                           className="w-16 h-20 object-contain"
                           onError={(e) => {
@@ -303,8 +271,6 @@ const CheckoutPage = () => {
                 );
               })}
             </div>
-
-            {/* Order Summary */}
             <div className="border-t border-gray-200 pt-4 space-y-3">
               <div className="flex justify-between text-gray-700">
                 <span>Subtotal</span>

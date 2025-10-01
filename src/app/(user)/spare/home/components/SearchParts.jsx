@@ -8,7 +8,7 @@ import { getVehicleHierarchy, setFilters } from '@/redux/slices/vehicleSlice';
 
 export default function SearchByVehicleSection() {
   const dispatch = useDispatch();
-  const router = useRouter(); // Initialize the router
+  const router = useRouter(); 
 
   const { brands, loading: brandsLoading, error: brandsError } = useSelector((state) => state.brand);
 
@@ -79,9 +79,9 @@ export default function SearchByVehicleSection() {
       <div className="relative">
         <button
           onClick={() => !disabled && setIsDropdownOpen({ ...isDropdownOpen, [type]: !isDropdownOpen[type] })}
-          className={`w-full px-4 py-3 text-left border rounded-lg bg-white transition-colors duration-200 flex items-center justify-between ${disabled
-              ? 'border-gray-200 text-black cursor-not-allowed'
-              : 'border-gray-300 hover:border-gray-400 cursor-pointer'
+          className={`w-full px-4 py-3 text-left border-1 rounded-lg bg-white transition-colors duration-200 flex items-center justify-between ${disabled
+              ? 'border-red-300 text-black cursor-not-allowed opacity-60'
+              : 'border-[#BE1E2D] hover:border-red-700 cursor-pointer'
             }`}
           disabled={disabled}
         >
@@ -92,7 +92,7 @@ export default function SearchByVehicleSection() {
         </button>
 
         {isDropdownOpen[type] && !disabled && (
-          <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-300 rounded-lg shadow-lg z-10 max-h-48 overflow-y-auto">
+          <div className="absolute top-full left-0 right-0 mt-1 bg-white border-1 border-gray-400 rounded-lg shadow-lg z-10 max-h-48 overflow-y-auto">
             {options.map((option) => (
               <button
                 key={option._id || option}
@@ -100,7 +100,7 @@ export default function SearchByVehicleSection() {
                   onChange(option._id || option);
                   setIsDropdownOpen({ ...isDropdownOpen, [type]: false });
                 }}
-                className="w-full px-4 py-3 text-left text-black hover:bg-gray-50 transition-colors duration-200"
+                className="w-full px-4 py-3 text-left text-black hover:bg-red-50 transition-colors duration-200"
               >
                 {option.name || option}
               </button>
@@ -124,21 +124,21 @@ export default function SearchByVehicleSection() {
   }
 
   return (
-    <section className="py-16 bg-gray-50">
-      <div className="max-w-6xl mx-auto px-6">
+    <section className="py-16">
+      <div className="max-w-8xl mx-auto px-4 md:px-15">
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h2 className="text-2xl md:text-3xl font-bold text-gray-900">
-              SEARCH BY VEHICLE
-            </h2>
-          </div>
+  <h2 className="text-2xl md:text-3xl font-medium text-gray-900 underline decoration-[#BE1E2D] underline-offset-9">
+    SEARCH BY VEHICLE
+  </h2>
+</div>
 
           <div className="flex space-x-8">
             {tabs.map((tab) => (
               <button
                 key={tab}
                 onClick={() => handleTabChange(tab)}
-                className={`pb-2 text-sm font-medium transition-colors duration-200 border-b-2 ${activeTab === tab
+                className={`pb-2 text-sm font-medium transition-colors duration-200 border-b-1 ${activeTab === tab
                     ? 'text-red-600 border-red-600'
                     : 'text-gray-400 border-transparent hover:text-gray-600'
                   }`}
@@ -149,7 +149,7 @@ export default function SearchByVehicleSection() {
           </div>
         </div>
 
-        <div className=" ">
+        <div className="">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
             <CustomDropdown
               placeholder="Select brand"

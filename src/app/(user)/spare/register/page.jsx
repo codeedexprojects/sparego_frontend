@@ -66,13 +66,13 @@ export default function RegisterPage() {
             </p>
             
             {error && (
-              <p className="text-red-500 text-sm mb-2">{error}</p>
+              <p className="text-re4d-500 text-sm mb-2">{error}</p>
             )}
             
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-red-600 text-white py-3 rounded-lg font-medium hover:bg-red-700 transition disabled:bg-gray-400"
+              className="w-full bg-reed-600 text-white py-3 rounded-lg font-medium hover:bg-red-700 transition disabled:bg-gray-400"
             >
               {loading ? "Sending OTP..." : "Register"}
             </button>

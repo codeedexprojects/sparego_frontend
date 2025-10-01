@@ -1,16 +1,13 @@
-import { Geist, Geist_Mono } from "next/font/google";
+import { Montserrat } from "next/font/google";
 import "./globals.css";
-import { ReduxProvider } from "../redux/providers";
+import { ReduxProvider } from "@/redux/providers";
 import { Toaster } from "sonner";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+// Import Montserrat
+const montserrat = Montserrat({
   subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
+  variable: "--font-montserrat", // define a CSS variable
+  display: "swap", // good for performance
 });
 
 export const metadata = {
@@ -21,13 +18,11 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
+      <body className={`${montserrat.variable} font-sans antialiased`}>
         <ReduxProvider>
           {children}
+          <Toaster richColors position="top-right" />
         </ReduxProvider>
-        <Toaster richColors position="top-right" />
       </body>
     </html>
   );
