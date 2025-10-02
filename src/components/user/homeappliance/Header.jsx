@@ -1,24 +1,44 @@
 "use client";
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { Menu, X, Heart, ShoppingCart, User } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import { getcartCount } from "@/redux/slices/cartSlice";
+import { searchProductsBySection } from "@/redux/slices/productSlice";
+
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const pathname = usePathname(); 
     const dispatch = useDispatch();
   const { count } = useSelector((state) => state.cart)
-  const id = localStorage.getItem("sectionId")
+ const [sectionId, setSectionId] = useState(null); 
+ const router = useRouter();
+
+ const [searchText, setSearchText] = useState("");
+
+const handleSearch = () => {
+  const storedSectionId = localStorage.getItem("sectionId") || "";
+  dispatch(
+    searchProductsBySection({ search: searchText, sectionId: storedSectionId })
+  );
+  router.push(`/homeappliances/search-products?q=${encodeURIComponent(searchText)}`);
+};
+
 
   useEffect(() => {
     dispatch(getcartCount());
   }, [dispatch]);
 
+    useEffect(() => {
+    const id = localStorage.getItem("sectionId");
+    setSectionId(id);
+    dispatch(getcartCount());
+  }, [dispatch]);
+
   const navItems = [
-    { name: "HOME", href: `/homeappliances/home/${id}` },
+    { name: "HOME", href: sectionId ? `/homeappliances/home/${sectionId}` : "/homeappliances/home" },
     { name: "SHOP", href: "/homeappliances/products" },
     { name: "BLOG", href: "/homeappliances/blog" },
     { name: "ABOUT US", href: "/homeappliances/aboutus" },
@@ -36,27 +56,19 @@ const Header = () => {
 
           <div className="hidden md:flex flex-1 justify-center px-6">
             <div className="flex w-full max-w-lg">
-              <input
-                type="text"
-                placeholder="Search entire store here"
-                className="w-full border text-black border-gray-300 rounded-l-md px-3 py-2 text-sm focus:outline-none"
-              />
-              <button className="bg-red-600 hover:bg-red-700 px-4 rounded-r-md flex items-center justify-center">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth={2}
-                  stroke="white"
-                  className="h-5 w-5"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M21 21l-4.35-4.35M11 19a8 8 0 100-16 8 8 0 000 16z"
-                  />
-                </svg>
-              </button>
+            <input
+  type="text"
+  value={searchText}
+  onChange={(e) => setSearchText(e.target.value)}
+  placeholder="Search entire store here"
+  className="w-full border text-black border-gray-300 rounded-l-md px-3 py-2 text-sm focus:outline-none"
+/>
+<button
+  onClick={handleSearch}
+  className="bg-red-600 hover:bg-red-700 px-4 rounded-r-md flex items-center justify-center"
+>
+  🔍
+</button>
             </div>
           </div>
 

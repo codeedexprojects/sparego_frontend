@@ -31,7 +31,9 @@ export const getAllProducts = createAsyncThunk(
       const response = await axios.get(`${BASE_URL}/products/category/${id}`);
       return response.data;
     } catch (error) {
-      return rejectWithValue(error.response?.data || "Failed to fetch products");
+      return rejectWithValue(
+        error.response?.data || "Failed to fetch products"
+      );
     }
   }
 );
@@ -44,7 +46,9 @@ export const getFullProductList = createAsyncThunk(
       const response = await axios.get(`${BASE_URL}/products/`);
       return response.data;
     } catch (error) {
-      return rejectWithValue(error.response?.data || "Failed to fetch products");
+      return rejectWithValue(
+        error.response?.data || "Failed to fetch products"
+      );
     }
   }
 );
@@ -65,14 +69,36 @@ export const getProductById = createAsyncThunk(
 // Search Products
 export const searchProducts = createAsyncThunk(
   "product/searchproducts",
-  async ({ section, search }, { rejectWithValue }) => {
+  async ({ search }, { rejectWithValue }) => {
     try {
-      const response = await axios.get(`${BASE_URL}/products`, {
-        params: { section, search: search || "" },
+      const response = await axios.get(`${BASE_URL}/products/all`, {
+        params: { search: search || "" },
       });
       return response.data;
     } catch (error) {
-      return rejectWithValue(error.response?.data || "failed to search product");
+      return rejectWithValue(
+        error.response?.data || "Failed to search product"
+      );
+    }
+  }
+);
+
+export const searchProductsBySection = createAsyncThunk(
+  "product/searchProductsBySection",
+  async ({ search, sectionId }, { rejectWithValue }) => {
+    try {
+      const response = await axios.get(`${BASE_URL}/products/all`, {
+        params: {
+                    sectionId: sectionId || "", 
+
+          search: search || "",
+        },
+      });
+      return response.data.products; 
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data || "Failed to search product"
+      );
     }
   }
 );
@@ -87,7 +113,9 @@ export const getSimilarProducts = createAsyncThunk(
       );
       return response.data?.products;
     } catch (error) {
-      return rejectWithValue(error.response?.data || "Failed to fetch products");
+      return rejectWithValue(
+        error.response?.data || "Failed to fetch products"
+      );
     }
   }
 );
@@ -98,6 +126,7 @@ const productSlice = createSlice({
     products: [],
     vehicleProducts: [],
     similarProducts: [],
+    searchResults:[],
 
     product: null,
 
@@ -119,6 +148,10 @@ const productSlice = createSlice({
     clearSimilarProducts: (state) => {
       state.similarProducts = [];
       state.similarError = null;
+    },
+    clearSearchResults: (state) => {
+      state.searchResults = [];
+      state.error = null;
     },
   },
   extraReducers: (builder) => {
@@ -158,9 +191,23 @@ const productSlice = createSlice({
       })
       .addCase(searchProducts.fulfilled, (state, action) => {
         state.loading = false;
-        state.searchResults = action.payload.products;
+        state.searchResults = action.payload.products || [];
       })
       .addCase(searchProducts.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload || "Failed to fetch products";
+      })
+
+      // SearchById
+
+      .addCase(searchProductsBySection.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(searchProductsBySection.fulfilled, (state, action) => {
+        state.loading = false;
+        state.searchResults = action.payload; 
+      })
+      .addCase(searchProductsBySection.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       })
@@ -210,5 +257,6 @@ const productSlice = createSlice({
   },
 });
 
-export const { clearVehicleProducts, clearSimilarProducts } = productSlice.actions;
+export const { clearVehicleProducts, clearSimilarProducts } =
+  productSlice.actions;
 export default productSlice.reducer;

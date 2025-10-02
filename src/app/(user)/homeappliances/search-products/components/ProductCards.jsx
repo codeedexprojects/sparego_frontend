@@ -7,14 +7,14 @@ import { addToWishlist, getWishlist } from "@/redux/slices/wishlistSlice";
 import { addToCart } from "@/redux/slices/cartSlice";
 import { toast } from "sonner";
 import { IMG_URL } from "@/redux/baseUrl";
-import { searchProducts } from "@/redux/slices/productSlice";
+import { searchProductsBySection } from "@/redux/slices/productSlice";
 
 const SearchResultsPage = () => {
   const dispatch = useDispatch();
   const router = useRouter();
   const searchParams = useSearchParams();
-
   const query = searchParams.get("q"); 
+  const sectionId = searchParams.get("sectionId");
 
   const [favorites, setFavorites] = useState(new Set());
   const [processingItems, setProcessingItems] = useState({});
@@ -33,9 +33,15 @@ const SearchResultsPage = () => {
     }
   }, [dispatch]);
 
- useEffect(() => {
-  if (query) {
-    dispatch(searchProducts({ search: query }));
+useEffect(() => {
+  const storedSectionId = localStorage.getItem("sectionId"); // get from localStorage
+  if (query || storedSectionId) {
+    dispatch(
+      searchProductsBySection({
+        search: query || "",
+        sectionId: storedSectionId || "",
+      })
+    );
   }
 }, [query, dispatch]);
 
@@ -131,7 +137,7 @@ const SearchResultsPage = () => {
             <div
               key={product._id}
               onClick={() =>
-                router.push(`/spare/product-details/${product._id}`)
+                router.push(`/homeappliances/product-details/${product._id}`)
               }
               className="bg-white rounded-lg border border-gray-200 p-4 hover:shadow-lg transition-shadow cursor-pointer relative"
             >
