@@ -298,7 +298,7 @@ if (!user) {
           </span>
         </div>
         <button
-          onClick={() => router.push("/spare/checkout")}
+          onClick={() => router.push("/homeappliances/checkout")}
           className="w-full bg-red-600 text-white px-6 py-3 rounded font-medium hover:bg-red-700 transition-colors"
         >
           Place order (₹{cart.cartTotal?.toLocaleString() || "0"})

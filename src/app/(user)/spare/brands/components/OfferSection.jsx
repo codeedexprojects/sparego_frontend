@@ -39,7 +39,6 @@ export default function PromotionalBannerSection() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 md:gap-10">
           {limitedBanners.map((promo, index) => {
             const productId = promo.productId?._id || promo.productId;
-            // Construct the product detail URL
             const productUrl = productId ? `/spare/product-details/${productId}` : `/spare/brands`;
             return(
             <div

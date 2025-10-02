@@ -52,9 +52,9 @@ const BrandSelectionSection = () => {
         </div>
         {brands.length > 0 ? (
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-            {brands.map((brand) => (
+            {brands.map((brand, index) => (
               <div
-                key={brand._id}
+                key={`${brand._id}-${index}`}
                 className="bg-white border border-gray-600 rounded-lg p-6 hover:shadow-md transition-shadow cursor-pointer"
               >
                 <div className="w-26 h-22 rounded mb-4 flex items-center justify-center mx-auto">

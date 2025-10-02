@@ -24,7 +24,6 @@ export default function PromotionalBannerSection({ page = "brand" }) {
 
   useEffect(() => {
     if (sectionId && bannersBySection[sectionId]?.[page]) {
-      // Access the nested structure correctly
       setBanners(bannersBySection[sectionId][page]);
     } else {
       setBanners([]);
@@ -57,12 +56,15 @@ export default function PromotionalBannerSection({ page = "brand" }) {
   }
 
   return (
-    <section className="py-8 md:py-16 bg-gray-50">
+    <section className="py-8 md:py-16 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
-          {limitedBanners.map((promo, index) => (
+          {limitedBanners.map((promo, index) => {
+            const productId = promo.productId?._id || promo.productId;
+           const productUrl = productId ? `/homeappliances/product-details/${productId}` : `/homeappliances/brands`;
+           return(
             <div
-              key={promo._id}
+              key={`${promo._id}-${index}`}
               className={`${
                 index === 0 ? "bg-red-600 text-white" : "bg-gray-200 text-gray-900"
               } rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300`}
@@ -81,7 +83,7 @@ export default function PromotionalBannerSection({ page = "brand" }) {
                     {promo.description}
                   </p>
                   <Link
-                    href={`/deals/${promo.section?.name || promo.section || "offer"}`}
+                    href={productUrl}
                     className={`inline-block px-4 sm:px-6 py-2 border-2 rounded font-semibold text-xs sm:text-sm transition-all duration-300 hover:scale-105 ${
                       index === 0
                         ? "border-white text-white hover:bg-white hover:text-red-600"
@@ -103,7 +105,8 @@ export default function PromotionalBannerSection({ page = "brand" }) {
                 </div>
               </div>
             </div>
-          ))}
+          )
+})}
 
           {limitedBanners.length === 0 && (
             <div className="col-span-2 text-center text-gray-500">

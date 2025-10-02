@@ -9,7 +9,7 @@ import SpecTable from './components/SpecTableSection';
 import Header from '@/components/user/homeappliance/Header';
 import Footer from '@/components/landing/Footer';
 import SimilarProducts from './components/SimilarProducts';
-// import PromotionalBannerSection from './components/OfferSection';
+import PromotionalBannerSection from './components/OfferSection';
 import { getProductById } from '@/redux/slices/productSlice';
 import { useParams } from 'next/navigation';
 import { Toaster } from 'sonner';
@@ -79,7 +79,7 @@ const page = () => {
         <HowToUseSection product={product} />
         <SpecTable product={product} />
         <SimilarProducts />
-        {/* <PromotionalBannerSection /> */}
+        <PromotionalBannerSection />
       </div>
       <Footer />
       <Toaster position="top-center" richColors closeButton />

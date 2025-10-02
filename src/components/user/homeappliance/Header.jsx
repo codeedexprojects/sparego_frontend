@@ -1,15 +1,24 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Menu, X, Heart, ShoppingCart, User } from "lucide-react";
+import { useDispatch, useSelector } from "react-redux";
+import { getcartCount } from "@/redux/slices/cartSlice";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const pathname = usePathname(); 
+    const dispatch = useDispatch();
+  const { count } = useSelector((state) => state.cart)
+  const id = localStorage.getItem("sectionId")
+
+  useEffect(() => {
+    dispatch(getcartCount());
+  }, [dispatch]);
 
   const navItems = [
-    { name: "HOME", href: "/homeappliances/home/:id" },
+    { name: "HOME", href: `/homeappliances/home/${id}` },
     { name: "SHOP", href: "/homeappliances/products" },
     { name: "BLOG", href: "/homeappliances/blog" },
     { name: "ABOUT US", href: "/homeappliances/aboutus" },
@@ -56,8 +65,13 @@ const Header = () => {
             <Link href="/homeappliances/wishlist">
               <Heart className="h-5 w-5 text-gray-700 hover:text-red-600 cursor-pointer" />
             </Link>
-            <Link href="/homeappliances/cart">
+           <Link href="/homeappliances/cart" className="relative">
               <ShoppingCart className="h-5 w-5 text-gray-700 hover:text-red-600 cursor-pointer" />
+              {count > 0 && (
+                <span className="absolute -top-2 -right-2 bg-red-600 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                  {count}
+                </span>
+              )}
             </Link>
             <Link href="/homeappliances/profile">
               <User className="h-5 w-5 text-gray-700 hover:text-red-600 cursor-pointer" />

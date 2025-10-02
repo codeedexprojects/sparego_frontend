@@ -20,10 +20,10 @@ export const getHomeBanners = createAsyncThunk(
 
 export const getProductBanners = createAsyncThunk(
   "banner/getProductBanners",
-  async (_, { rejectWithValue }) => {
+  async (sectionId, { rejectWithValue }) => {
     try {
       const response = await axios.get(
-        `${BASE_URL}/deal-banner/spare-parts/product/`
+        `${BASE_URL}/deal-banner/${sectionId}/product/`
       );
       return response.data;
     } catch (error) {
@@ -62,19 +62,19 @@ export const getdynamicWishlistBanners = createAsyncThunk(
   }
 );
 
-export const getDynamicBanners = createAsyncThunk(
-  "banner/getDynamicBanners",
-  async (sectionId, { rejectWithValue }) => {
-    try {
-      const response = await axios.get(
-        `${BASE_URL}/deal-banner/${sectionId}/wishlist/`
-      );
-      return response.data;
-    } catch (error) {
-      return rejectWithValue(error.response?.data || "Failed to fetch banners");
-    }
-  }
-);
+// export const getDynamicBanners = createAsyncThunk(
+//   "banner/getDynamicBanners",
+//   async (sectionId, { rejectWithValue }) => {
+//     try {
+//       const response = await axios.get(
+//         `${BASE_URL}/deal-banner/${sectionId}/wishlist/`
+//       );
+//       return response.data;
+//     } catch (error) {
+//       return rejectWithValue(error.response?.data || "Failed to fetch banners");
+//     }
+//   }
+// );
 
 export const getBrandBanners = createAsyncThunk(
   "banner/getBrandBanners",

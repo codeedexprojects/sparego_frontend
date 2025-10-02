@@ -94,12 +94,12 @@ export default function FourStoresSection() {
                         </span>
                       </div>
 
-                      <button
+                      {/* <button
                         id="section"
                         className="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-lg font-semibold text-sm transition-all duration-300 transform hover:scale-105 hover:shadow-lg"
                       >
                         Explore
-                      </button>
+                      </button> */}
                     </div>
 
                     <div className="mt-4 h-1 bg-gradient-to-r from-red-600 to-red-400 rounded-full transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500"></div>

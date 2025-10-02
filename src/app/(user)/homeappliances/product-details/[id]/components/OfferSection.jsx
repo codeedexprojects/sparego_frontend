@@ -4,27 +4,28 @@ import Image from "next/image";
 import Link from "next/link";
 import { useDispatch, useSelector } from "react-redux";
 import { IMG_URL } from "@/redux/baseUrl";
-import {  getProductDetailBanners } from "@/redux/slices/dynamicBannerSlice";
+import { getProductDetailBanners } from "@/redux/slices/dynamicBannerSlice";
 
-export default function PromotionalBannerSection({ page = "brand" }) {
+export default function PromotionalBannerSection({ page = "product-details" }) {
   const dispatch = useDispatch();
   const { bannersBySection, loading, error } = useSelector(
     (state) => state.dynamicBanners
   );
+
   const [sectionId, setSectionId] = useState(null);
   const [banners, setBanners] = useState([]);
 
   useEffect(() => {
-    const id = localStorage.getItem("sectionId"); 
+    const id = localStorage.getItem("sectionId");
     if (id) {
-      setSectionId(id); 
-      dispatch(getProductDetailBanners(id)); 
+      setSectionId(id);
+      // ✅ pass object, not string
+      dispatch(getProductDetailBanners({ sectionId: id }));
     }
   }, [dispatch]);
 
   useEffect(() => {
     if (sectionId && bannersBySection[sectionId]?.[page]) {
-      // Access the nested structure correctly
       setBanners(bannersBySection[sectionId][page]);
     } else {
       setBanners([]);
@@ -32,13 +33,6 @@ export default function PromotionalBannerSection({ page = "brand" }) {
   }, [bannersBySection, sectionId, page]);
 
   const limitedBanners = banners.slice(0, 2);
-
-  // Debug logs - uncomment to troubleshoot
-  // console.log('Debug Info:');
-  // console.log('sectionId:', sectionId);
-  // console.log('page:', page);
-  // console.log('bannersBySection:', bannersBySection);
-  // console.log('banners:', banners);
 
   if (loading) {
     return (
@@ -51,7 +45,9 @@ export default function PromotionalBannerSection({ page = "brand" }) {
   if (error) {
     return (
       <section className="py-8 md:py-16 bg-gray-50">
-        <div className="text-center text-red-500">Failed to load banners: {JSON.stringify(error)}</div>
+        <div className="text-center text-red-500">
+          Failed to load banners: {JSON.stringify(error)}
+        </div>
       </section>
     );
   }
@@ -64,7 +60,9 @@ export default function PromotionalBannerSection({ page = "brand" }) {
             <div
               key={promo._id}
               className={`${
-                index === 0 ? "bg-red-600 text-white" : "bg-gray-200 text-gray-900"
+                index === 0
+                  ? "bg-red-600 text-white"
+                  : "bg-gray-200 text-gray-900"
               } rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300`}
             >
               <div className="flex flex-col sm:flex-row items-center justify-between p-4 sm:p-6 md:p-8 min-h-[250px] sm:min-h-[200px]">
@@ -81,7 +79,7 @@ export default function PromotionalBannerSection({ page = "brand" }) {
                     {promo.description}
                   </p>
                   <Link
-                    href={`/deals/${promo.section?.name || promo.section || "offer"}`}
+                    href={productUrl}
                     className={`inline-block px-4 sm:px-6 py-2 border-2 rounded font-semibold text-xs sm:text-sm transition-all duration-300 hover:scale-105 ${
                       index === 0
                         ? "border-white text-white hover:bg-white hover:text-red-600"

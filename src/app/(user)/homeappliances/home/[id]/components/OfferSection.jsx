@@ -65,7 +65,10 @@ export default function PromotionalBannerSection({ page = "home" }) {
     <section className="py-8 md:py-16 bg-white">
       <div className=" px-4 sm:px-6">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
-          {limitedBanners.map((promo, index) => (
+          {limitedBanners.map((promo, index) => {
+            const productId = promo.productId?._id || promo.productId;
+           const productUrl = productId ? `/homeappliances/product-details/${productId}` : `/homeappliances/home/${sectionId}`;
+return (
             <div
               key={promo._id}
               className={`${
@@ -86,8 +89,8 @@ export default function PromotionalBannerSection({ page = "home" }) {
                     {promo.description}
                   </p>
                   <Link
-                    href={`/deals/${promo.section?.name || promo.section || "offer"}`}
-                    className={`inline-block px-4 sm:px-6 py-2 border-2 rounded font-semibold text-xs sm:text-sm transition-all duration-300 hover:scale-105 ${
+ href={productUrl}
+                     className={`inline-block px-4 sm:px-6 py-2 border-2 rounded font-semibold text-xs sm:text-sm transition-all duration-300 hover:scale-105 ${
                       index === 0
                         ? "border-white text-white hover:bg-white hover:text-red-600"
                         : "border-red-600 text-red-600 hover:bg-red-600 hover:text-white"
@@ -108,7 +111,8 @@ export default function PromotionalBannerSection({ page = "home" }) {
                 </div>
               </div>
             </div>
-          ))}
+          )
+          })}
 
           {limitedBanners.length === 0 && (
             <div className="col-span-2 text-center text-gray-500">

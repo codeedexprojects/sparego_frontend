@@ -84,7 +84,7 @@ const CheckoutPage = () => {
       if (result.success && result.whatsappUrl) {
         toast.success('Order created successfully! Redirecting to WhatsApp...');
         window.open(result.whatsappUrl, '_blank');
-        router.push('/spare/order-confirmed');
+        router.push('/homeappliances/order-confirmed');
       } else {
         toast.error('Failed to create order. Please try again.');
       }
@@ -94,7 +94,7 @@ const CheckoutPage = () => {
     }
   };
   const handleAddNewAddress = () => {
-    router.push('/spare/profile'); 
+    router.push('/homeappliances/profile'); 
   };
   if (loading || orderLoading) {
     return (
@@ -196,7 +196,7 @@ const CheckoutPage = () => {
                           <p className="text-gray-600 text-sm">Phone: {address.phone}</p>
                         </div>
                       </div>
-                      <button className="text-blue-600 hover:text-blue-800 text-sm">
+                      <button  className="text-blue-600 hover:text-blue-800 text-sm">
                         Edit
                       </button>
                     </div>

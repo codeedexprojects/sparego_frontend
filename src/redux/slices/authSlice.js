@@ -38,15 +38,19 @@ export const registerUser = createAsyncThunk(
 // Verify OTP
 export const verifyOtp = createAsyncThunk(
   "auth/verifyOtp",
-  async ({ userId, otp }, { rejectWithValue }) => {
+async ({ number, otp, sessionId }, { rejectWithValue }) => {
     try {
       const response = await axios.post(
         `${BASE_URL}/user-auth/verify-otp`,
-        { userId, otp }
+        { number, otp, sessionId }
       );
       return response.data;
     } catch (error) {
-      return rejectWithValue(error.response?.data || "OTP verification failed");
+      return rejectWithValue(
+        error.response?.data?.message || 
+        error.response?.data || 
+        "OTP verification failed"
+      );
     }
   }
 );
