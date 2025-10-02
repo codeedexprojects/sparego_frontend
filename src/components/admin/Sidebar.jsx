@@ -22,43 +22,42 @@ import {
 } from "lucide-react";
 
 const menuItems = [
-  { name: "Dashboard", icon: LayoutDashboard, path: "/dashboard" },
-  { name: "Products", icon: Package, path: "/product" },
-  { name: "Orders", icon: ShoppingCart, path: "/orders" },
-  { name: "Users", icon: Users, path: "/users" },
-  { name: "Sections", icon: Section, path: "/sections" },
+  { name: "Dashboard", icon: LayoutDashboard, path: "/admin/dashboard" },
+  { name: "Products", icon: Package, path: "/admin/product" },
+  { name: "Orders", icon: ShoppingCart, path: "/admin/orders" },
+  { name: "Users", icon: Users, path: "/admin/users" },
+  { name: "Sections", icon: Section, path: "/admin/sections" },
   {
     name: "Category",
     icon: FolderTree,
     children: [
-      { name: "Main Category", path: "/main-categories" },
-      { name: "Category", path: "/categories" },
-      { name: "Sub Category", path: "/sub-categories" },
-      { name: "Sub Sub Category", path: "/sub-sub-categories" },
+      { name: "Main Category", path: "/admin/main-categories" },
+      { name: "Category", path: "/admin/categories" },
+      { name: "Sub Category", path: "/admin/sub-categories" },
+      { name: "Sub Sub Category", path: "/admin/sub-sub-categories" },
     ],
   },
   {
     name: "Carousel",
     icon: Image,
     children: [
-      { name: "Main Carousel", path: "/main-carousel" },
-      { name: "Bottom Carousel", path: "/bottom-carousel" },
-      { name: "Home Carousel", path: "/home-carousel" },
-
+      { name: "Main Carousel", path: "/admin/main-carousel" },
+      { name: "Bottom Carousel", path: "/admin/bottom-carousel" },
+      { name: "Home Carousel", path: "/admin/home-carousel" },
     ],
   },
-  { name: "Deal Banner", icon: Tag, path: "/deal-banner" },
-  { name: "Brand", icon: BadgeCheck, path: "/brand" },
-  { name: "Home Cards", icon: LayoutGrid, path: "/home-cards" },
-  { name: "Reviews", icon: Star, path: "/reviews" },
-  { name: "Vehicles", icon: Car, path: "/vehicles" },
-  { name: "Sub Admin", icon: ShieldCheck, path: "/sub-admin" },
+  { name: "Deal Banner", icon: Tag, path: "/admin/deal-banner" },
+  { name: "Brand", icon: BadgeCheck, path: "/admin/brand" },
+  { name: "Home Cards", icon: LayoutGrid, path: "/admin/home-cards" },
+  { name: "Reviews", icon: Star, path: "/admin/reviews" },
+  { name: "Vehicles", icon: Car, path: "/admin/vehicles" },
+  { name: "Sub Admin", icon: ShieldCheck, path: "/admin/sub-admin" },
 ];
 
 export default function Sidebar() {
-  const pathname = usePathname();
   const [isHovered, setIsHovered] = useState(false);
   const [openDropdown, setOpenDropdown] = useState(null);
+  const pathname = usePathname(); // reactive, updates automatically on navigation
 
   const toggleDropdown = (name) => {
     setOpenDropdown(openDropdown === name ? null : name);
@@ -72,7 +71,7 @@ export default function Sidebar() {
       onMouseLeave={() => setIsHovered(false)}
     >
       {/* Logo */}
-      <div className="flex items-center justify-center px-6 py-6 border-gray-200">
+      <div className="flex items-center justify-center px-6 py-6 border-b border-gray-200">
         <div className="flex items-center space-x-2">
           <div className="w-8 h-8 bg-red-100 rounded-full flex items-center justify-center">
             <span className="text-red-600 font-bold">A</span>
@@ -90,7 +89,7 @@ export default function Sidebar() {
             const Icon = item.icon;
             const isActive = pathname === item.path;
 
-            // Check if item has children (dropdown)
+            // Dropdown items
             if (item.children) {
               const isOpen = openDropdown === item.name;
               return (
@@ -106,13 +105,8 @@ export default function Sidebar() {
                       {isHovered && <span>{item.name}</span>}
                     </div>
                     {isHovered &&
-                      (isOpen ? (
-                        <ChevronDown size={16} />
-                      ) : (
-                        <ChevronRight size={16} />
-                      ))}
+                      (isOpen ? <ChevronDown size={16} /> : <ChevronRight size={16} />)}
                   </button>
-                  {/* Dropdown items */}
                   {isOpen && isHovered && (
                     <div className="ml-8 mt-1 space-y-1">
                       {item.children.map((child) => (

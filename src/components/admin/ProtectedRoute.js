@@ -13,7 +13,7 @@ export default function ProtectedRoute({ children }) {
     if (typeof window === 'undefined') return;
     const token = localStorage.getItem('adminToken');
     if (!token) {
-      router.push('/login');
+      router.push('/admin/login');
       setAllowed(false);
       setChecking(false);
       return;
