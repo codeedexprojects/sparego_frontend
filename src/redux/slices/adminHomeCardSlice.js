@@ -20,8 +20,12 @@ export const getHomeCards = createAsyncThunk(
     try {
       const response = await axios.get(`${BASE_URL}/home-card/`);
       console.log("Home cards response:", response.data);
-      const data = Array.isArray(response.data) ? response.data : 
-      response.data?.homeCards || response.data?.data || [];
+
+      // Fix: get 'cards' from API response
+      const data = Array.isArray(response.data) 
+        ? response.data 
+        : response.data?.cards || [];
+
       return data;
     } catch (error) {
       console.error("Error fetching home cards:", error);
@@ -32,6 +36,7 @@ export const getHomeCards = createAsyncThunk(
     }
   }
 );
+
 
 export const getHomeCardById = createAsyncThunk(
   "adminHomeCard/getHomeCardById",

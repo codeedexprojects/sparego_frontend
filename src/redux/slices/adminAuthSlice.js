@@ -7,12 +7,8 @@ export const loginAdmin = createAsyncThunk(
   "adminAuth/loginAdmin",
   async ({ email, password }, { rejectWithValue }) => {
     try {
-      const response = await axios.post(
-        `${BASE_URL}/admin-auth/login`,
-        { email, password }
-      );
-      
-      
+      const response = await axios.post(`${BASE_URL}/admin-auth/login`, { email, password });
+      console.log("Login response:", response.data);
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response?.data?.message || "Admin login failed");
@@ -20,9 +16,6 @@ export const loginAdmin = createAsyncThunk(
   }
 );
 
-// No verify token endpoint in backend; rely on login-only and handle 401s per request
-
-// slices/adminAuthSlice.js
 const adminAuthSlice = createSlice({
   name: "adminAuth",
   initialState: {
@@ -39,6 +32,7 @@ const adminAuthSlice = createSlice({
       state.isAuthenticated = false;
       if (typeof window !== "undefined") {
         localStorage.removeItem("adminToken");
+        localStorage.removeItem("admin");
       }
     },
     clearAdminError: (state) => {
@@ -60,12 +54,14 @@ const adminAuthSlice = createSlice({
       })
       .addCase(loginAdmin.fulfilled, (state, action) => {
         state.loading = false;
-        state.admin = action.payload.admin || null;
-        state.token = action.payload.token || null;
-        state.isAuthenticated = !!action.payload.token;
-        
-        if (action.payload.token && typeof window !== "undefined") {
-          localStorage.setItem("adminToken", action.payload.token);
+        const { token, ...adminData } = action.payload;
+        state.admin = adminData;
+        state.token = token || null;
+        state.isAuthenticated = !!token;
+
+        if (token && typeof window !== "undefined") {
+          localStorage.setItem("adminToken", token);
+          localStorage.setItem("admin", JSON.stringify(adminData));
         }
       })
       .addCase(loginAdmin.rejected, (state, action) => {
@@ -78,4 +74,3 @@ const adminAuthSlice = createSlice({
 
 export const { adminLogout, clearAdminError, clearError, clearOperationSuccess } = adminAuthSlice.actions;
 export default adminAuthSlice.reducer;
-

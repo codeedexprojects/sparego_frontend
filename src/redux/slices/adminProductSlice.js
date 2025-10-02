@@ -4,14 +4,31 @@ import { BASE_URL } from "../baseUrl";
 
 const getToken = () => localStorage.getItem("adminToken");
 
-// Fetch all products with optional pagination
+// Fetch all products (with filters/sorting)
+export const getAllProducts = createAsyncThunk(
+  "adminProduct/getAllProducts",
+  async (params = {}, { rejectWithValue }) => {
+    try {
+      const query = new URLSearchParams(params).toString();
+      const res = await axios.get(`${BASE_URL}/products/all?${query}`, {
+        headers: { Authorization: `Bearer ${getToken()}` },
+      });
+      return res.data; // { total, products }
+    } catch (err) {
+      return rejectWithValue(err.response?.data?.message || err.message);
+    }
+  }
+);
+
+// Fetch products with pagination
 export const fetchProducts = createAsyncThunk(
   "adminProduct/fetchProducts",
   async ({ page = 1, limit = 10 } = {}, { rejectWithValue }) => {
     try {
-      const res = await axios.get(`${BASE_URL}/products?page=${page}&limit=${limit}`, {
-        headers: { Authorization: `Bearer ${getToken()}` },
-      });
+      const res = await axios.get(
+        `${BASE_URL}/products?page=${page}&limit=${limit}`,
+        { headers: { Authorization: `Bearer ${getToken()}` } }
+      );
       return res.data; // return total, page, pages, products
     } catch (err) {
       return rejectWithValue(err.response?.data?.message || err.message);
@@ -85,6 +102,7 @@ export const viewProductById = createAsyncThunk(
   }
 );
 
+// Slice
 const adminProductSlice = createSlice({
   name: "adminProduct",
   initialState: {
@@ -99,7 +117,7 @@ const adminProductSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
-      // Fetch Products
+      // ===== Fetch Products with Pagination =====
       .addCase(fetchProducts.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -115,22 +133,42 @@ const adminProductSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       })
-      // Add Product
+
+      // ===== Get All Products (filters, sorting) =====
+      .addCase(getAllProducts.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(getAllProducts.fulfilled, (state, action) => {
+        state.loading = false;
+        state.products = action.payload.products;
+        state.total = action.payload.total;
+        // no page/pages since it's full list
+      })
+      .addCase(getAllProducts.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+
+      // ===== Add Product =====
       .addCase(addProduct.fulfilled, (state, action) => {
         state.products.unshift(action.payload); // add new product at the top
         state.total += 1;
       })
-      // Edit Product
+
+      // ===== Edit Product =====
       .addCase(editProduct.fulfilled, (state, action) => {
         const index = state.products.findIndex((p) => p._id === action.payload._id);
         if (index !== -1) state.products[index] = action.payload;
       })
-      // Delete Product
+
+      // ===== Delete Product =====
       .addCase(deleteProduct.fulfilled, (state, action) => {
         state.products = state.products.filter((p) => p._id !== action.payload);
         state.total -= 1;
       })
-      // View Product by ID
+
+      // ===== View Product by ID =====
       .addCase(viewProductById.pending, (state) => {
         state.loading = true;
         state.error = null;

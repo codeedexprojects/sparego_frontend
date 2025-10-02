@@ -1,15 +1,10 @@
 "use client";
-import { useRouter, useSearchParams } from "next/navigation";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
-const Pagination = ({ currentPage, totalPages }) => {
-  const router = useRouter();
-  const searchParams = useSearchParams();
-
+const Pagination = ({ currentPage, totalPages, onPageChange }) => {
   const goToPage = (page) => {
-    const params = new URLSearchParams(searchParams);
-    params.set("page", page);
-    router.push(`?${params.toString()}`);
+    if (page < 1 || page > totalPages) return;
+    onPageChange(page); // Notify parent to fetch new page
   };
 
   return (

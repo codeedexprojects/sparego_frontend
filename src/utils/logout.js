@@ -63,9 +63,9 @@ export const performLogout = (router) => {
     
     // Navigate to login page
     if (router) {
-      router.push("/login");
+      router.push("/admin/login");
     } else {
-      window.location.href = "/login";
+      window.location.href = "/admin/login";
     }
     
     console.log("Logout successful");
@@ -73,7 +73,7 @@ export const performLogout = (router) => {
   } catch (error) {
     console.error("Logout error:", error);
     // Force redirect even if there's an error
-    window.location.href = "/login";
+    window.location.href = "/admin/login";
   }
 };
 
