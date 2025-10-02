@@ -1,12 +1,13 @@
 "use client";
+
 import Header from "@/components/user/spare/Header";
 import { useState, useRef, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { verifyOtp } from "@/redux/slices/authSlice";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { toast, Toaster } from "sonner";
 
-export default function VerifyOtpPage() {
+export default function VerifyOtpPage({ searchParams }) {
   const [otp, setOtp] = useState(new Array(6).fill(""));
   const [countdown, setCountdown] = useState(30);
   const [canResend, setCanResend] = useState(false);
@@ -14,17 +15,16 @@ export default function VerifyOtpPage() {
   const dispatch = useDispatch();
   const router = useRouter();
   const { loading, error } = useSelector((state) => state.auth);
-const searchParams = useSearchParams();
-  const number = searchParams.get("number");
-  const sessionId = searchParams.get("sessionId");
+
+  // ✅ get query params from Next.js automatically
+  const number = searchParams?.number;
+  const sessionId = searchParams?.sessionId;
 
   useEffect(() => {
     if (inputRefs.current[0]) {
       inputRefs.current[0].focus();
     }
   }, []);
-
-  
 
   useEffect(() => {
     let timer;
@@ -54,22 +54,21 @@ const searchParams = useSearchParams();
       inputRefs.current[index + 1]?.focus();
     }
 
-    if (newOtp.every(digit => digit !== "") && index === 5) {
+    if (newOtp.every((digit) => digit !== "") && index === 5) {
       handleVerifyOtpAutomatically(newOtp.join(""));
     }
   };
 
- const handleVerifyOtpAutomatically = (otpValue) => {
+  const handleVerifyOtpAutomatically = (otpValue) => {
     if (!number || !sessionId) {
       toast.error("Missing phone number or session ID. Please try logging in again.");
       return;
     }
 
-    // Log the data being sent for debugging
     console.log("Sending verification request:", {
       phone: number,
       otp: otpValue,
-      sessionId: sessionId
+      sessionId: sessionId,
     });
 
     dispatch(verifyOtp({ number, otp: otpValue, sessionId }))
@@ -93,25 +92,25 @@ const searchParams = useSearchParams();
   const handleVerifyOtp = (e) => {
     e.preventDefault();
     const otpValue = otp.join("");
-    
+
     if (otpValue.length !== 6) {
       toast.error("Please enter a complete 6-digit OTP");
       return;
     }
-    
+
     if (!number || !sessionId) {
       toast.error("Missing phone number or session ID. Please try logging in again.");
       return;
     }
-    
+
     handleVerifyOtpAutomatically(otpValue);
   };
 
   const handlePaste = (e) => {
     e.preventDefault();
-    const pastedData = e.clipboardData.getData('text/plain').slice(0, 6);
+    const pastedData = e.clipboardData.getData("text/plain").slice(0, 6);
     if (/^\d+$/.test(pastedData)) {
-      const newOtp = pastedData.split('').slice(0, 6);
+      const newOtp = pastedData.split("").slice(0, 6);
       setOtp([...newOtp, ...Array(6 - newOtp.length).fill("")]);
       const nextIndex = Math.min(newOtp.length, 5);
       inputRefs.current[nextIndex]?.focus();
@@ -122,7 +121,7 @@ const searchParams = useSearchParams();
     if (e.key === "Backspace" && otp[index] === "" && index > 0) {
       inputRefs.current[index - 1]?.focus();
     }
-    
+
     if (e.key === "ArrowLeft" && index > 0) {
       e.preventDefault();
       inputRefs.current[index - 1]?.focus();
@@ -135,7 +134,7 @@ const searchParams = useSearchParams();
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
-       {process.env.NODE_ENV === 'development' && (
+      {process.env.NODE_ENV === "development" && (
         <div className="fixed top-0 left-0 bg-yellow-100 text-yellow-800 text-xs p-2">
           Debug: Number: {number}, SessionId: {sessionId}
         </div>
@@ -145,8 +144,18 @@ const searchParams = useSearchParams();
           <div className="bg-white rounded-2xl shadow-lg p-6 sm:p-8 mx-auto">
             <div className="text-center mb-8">
               <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg className="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                <svg
+                  className="w-8 h-8 text-red-600"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+                  />
                 </svg>
               </div>
               <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">
@@ -181,16 +190,20 @@ const searchParams = useSearchParams();
                   />
                 ))}
               </div>
-              
+
               {error && (
                 <p className="text-red-600 text-sm text-center mt-4 bg-red-50 py-2 px-3 rounded-lg border border-red-200">
-                  {typeof error === "string" ? error : error.message || "Something went wrong"}
+                  {typeof error === "string"
+                    ? error
+                    : error.message || "Something went wrong"}
                 </p>
               )}
-              
+
               <button
                 type="submit"
-                disabled={loading || !number || !sessionId || otp.join("").length !== 6}
+                disabled={
+                  loading || !number || !sessionId || otp.join("").length !== 6
+                }
                 className="w-full bg-red-600 text-white py-4 rounded-xl font-semibold hover:bg-red-700 focus:outline-none focus:ring-4 focus:ring-red-200 disabled:bg-gray-400 disabled:cursor-not-allowed transition-all duration-200 mt-6 shadow-lg shadow-red-200"
               >
                 {loading ? (
@@ -206,7 +219,7 @@ const searchParams = useSearchParams();
           </div>
         </div>
       </div>
-      
+
       <Toaster position="top-right" richColors />
     </div>
   );
