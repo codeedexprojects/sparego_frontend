@@ -113,7 +113,7 @@ export default function SearchByVehicleSection() {
 
   if (brandsLoading) {
     return (
-      <section className="py-16 bg-gray-50">
+      <section className="py-10 bg-gray-50">
         <div className="max-w-6xl mx-auto px-6">
           <div className="flex justify-center items-center h-64">
             <p>Loading brands...</p>
@@ -124,7 +124,7 @@ export default function SearchByVehicleSection() {
   }
 
   return (
-    <section className="py-16">
+    <section className="py-10">
       <div className="max-w-8xl mx-auto px-4 md:px-15">
         <div className="flex items-center justify-between mb-8">
           <div>

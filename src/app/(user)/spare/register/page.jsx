@@ -5,11 +5,16 @@ export default function RegisterPage() {
   const [name, setName] = useState("");
   const [number, setNumber] = useState("");
   const [loading, setLoading] = useState(false);
+  const [agree, setAgree] = useState(false);
   const [error, setError] = useState("");
 
   const handleRegister = (e) => {
     e.preventDefault();
     if (!name || !number) return;
+      if (!agree) {
+      setError("You must agree to the Terms and Privacy Policy to continue.");
+      return;
+    }
     
 setLoading(true);
 dispatch(registerUser({ name, number }))
@@ -89,9 +94,16 @@ dispatch(registerUser({ name, number }))
                 </div>
               </div>
 
-              {/* Terms and Conditions */}
-              <div className="bg-gray-50 rounded-lg p-3 sm:p-4">
-                <p className="text-xs sm:text-sm text-gray-600 leading-relaxed">
+               <div className="flex items-start space-x-3 bg-gray-50 rounded-lg p-3 sm:p-4">
+                <input
+                  type="checkbox"
+                  id="agree"
+                  checked={agree}
+                  onChange={(e) => setAgree(e.target.checked)}
+                  className="mt-1 h-4 w-4 text-red-600 border-gray-300 rounded focus:ring-red-500"
+                  required
+                />
+                <label htmlFor="agree" className="text-xs sm:text-sm text-gray-600 leading-relaxed">
                   By continuing, you agree to our{" "}
                   <a href="#" className="text-red-600 hover:text-red-700 underline font-medium">
                     Terms of Use
@@ -100,7 +112,7 @@ dispatch(registerUser({ name, number }))
                   <a href="#" className="text-red-600 hover:text-red-700 underline font-medium">
                     Privacy Policy
                   </a>
-                </p>
+                </label>
               </div>
 
               {/* Error Message */}

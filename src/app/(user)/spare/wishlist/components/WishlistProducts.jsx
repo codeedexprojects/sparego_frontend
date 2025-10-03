@@ -12,7 +12,7 @@ const WishlistPage = () => {
   const { wishlist, loading, error } = useSelector((state) => state.wishlist);
   const [processingItems, setProcessingItems] = useState({});
   const router = useRouter();
-  const { user } = useSelector((state) => state.auth);
+const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
 
 
   useEffect(() => {
@@ -59,7 +59,7 @@ const WishlistPage = () => {
   );
   
 
-if (!user) {
+if (!token) {
   return (
    <div className=" flex items-center justify-center p-6 bg-gradient-to-br from-red-50 to-white">
   <div className="max-w-md w-full">

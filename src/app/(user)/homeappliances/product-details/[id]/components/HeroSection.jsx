@@ -1,10 +1,30 @@
 "use client";
 import React, { useState, useEffect } from 'react';
 import { Heart, MapPin, CheckCircle, Truck, ShoppingCart } from 'lucide-react';
+import { useDispatch, useSelector } from 'react-redux';
+import { useRouter } from 'next/navigation';
+import { toast } from 'sonner';
+import { addToWishlist, getWishlist } from '@/redux/slices/wishlistSlice';
+import { addToCart, buyNow } from '@/redux/slices/cartSlice';
 import { IMG_URL } from '@/redux/baseUrl';
 
 const HeroSection = ({ product }) => {
     const [mainImage, setMainImage] = useState('');
+    const [isAddingToWishlist, setIsAddingToWishlist] = useState(false);
+    const [isAddingToCart, setIsAddingToCart] = useState(false);
+    const [isBuyNowClick, setIsBuyNowClick] = useState(false);
+    const [isFavorite, setIsFavorite] = useState(false);
+    const dispatch = useDispatch();
+    const router = useRouter();
+
+    const { wishlist } = useSelector((state) => state.wishlist);
+
+    useEffect(() => {
+        if (product?._id && wishlist) {
+            const isInWishlist = wishlist.some(item => item._id === product._id || item.productId === product._id);
+            setIsFavorite(isInWishlist);
+        }
+    }, [product, wishlist]);
 
     useEffect(() => {
         if (product?.images && product.images?.length > 0) {
@@ -12,8 +32,124 @@ const HeroSection = ({ product }) => {
         }
     }, [product]);
 
+    useEffect(() => {
+        const token = localStorage.getItem('token');
+        if (token) {
+            dispatch(getWishlist());
+        }
+    }, [dispatch]);
+
     const handleImageClick = (imageName) => {
         setMainImage(`${IMG_URL}${imageName}`);
+    };
+
+    const handleWishlistAction = async () => {
+        const token = localStorage.getItem('token');
+        if (!token) {
+            toast.error('Please login to manage your wishlist');
+            router.push('/spare/login');
+            return;
+        }
+
+        if (!product?._id) {
+            toast.error('Product information is not available');
+            return;
+        }
+
+        setIsAddingToWishlist(true);
+        try {
+            const resultAction = await dispatch(addToWishlist({
+                productId: product._id
+            }));
+
+            if (addToWishlist.fulfilled.match(resultAction)) {
+                // Refresh wishlist to get updated data
+                await dispatch(getWishlist());
+
+                // Show appropriate message based on current state
+                if (isFavorite) {
+                    toast.success('Removed from wishlist!');
+                } else {
+                    toast.success('Added to wishlist successfully!');
+                }
+            } else {
+                const error = resultAction.payload || 'Failed to update wishlist';
+                toast.error(typeof error === 'string' ? error : 'Failed to update wishlist');
+            }
+        } catch (error) {
+            toast.error('An unexpected error occurred');
+        } finally {
+            setIsAddingToWishlist(false);
+        }
+    };
+
+    const handleAddToCart = async () => {
+        // Check if user is logged in
+        const token = localStorage.getItem('token');
+        if (!token) {
+            toast.error('Please login to add items to your cart');
+            router.push('/spare/login');
+            return;
+        }
+
+        if (!product?._id) {
+            toast.error('Product information is not available');
+            return;
+        }
+
+        setIsAddingToCart(true);
+        try {
+            const resultAction = await dispatch(addToCart({
+                productId: product._id,
+                quantity: 1
+            }));
+
+            if (addToCart.fulfilled.match(resultAction)) {
+                toast.success('Added to cart successfully!');
+            } else {
+                const error = resultAction.payload || 'Failed to add to cart';
+                toast.error(typeof error === 'string' ? error : 'Failed to add to cart');
+            }
+        } catch (error) {
+            toast.error('An unexpected error occurred');
+        } finally {
+            setIsAddingToCart(false);
+        }
+    };
+
+    const handleBuyNow = async () => {
+        // Check if user is logged in
+        const token = localStorage.getItem('token');
+        if (!token) {
+            toast.error('Please login to buy products');
+            router.push('/spare/login');
+            return;
+        }
+
+        if (!product?._id) {
+            toast.error('Product information is not available');
+            return;
+        }
+
+        setIsBuyNowClick(true);
+        try {
+            const resultAction = await dispatch(buyNow({
+                productId: product._id,
+                quantity: 1
+            }));
+
+            if (buyNow.fulfilled.match(resultAction)) {
+                toast.success('Redirecting to checkout...');
+                router.push('/homeappliances/checkout');
+            } else {
+                const error = resultAction.payload || 'Failed to buy now';
+                toast.error(typeof error === 'string' ? error : 'Failed to add to cart');
+            }
+        } catch (error) {
+            toast.error('An unexpected error occurred');
+        } finally {
+            setIsBuyNowClick(false);
+        }
     };
 
     const calculateDiscountedPrice = () => {
@@ -72,10 +208,20 @@ const HeroSection = ({ product }) => {
                             <span className="text-sm">Delivering To Perinthalmanna 686551</span>
                         </div>
                         <button
-                            className="flex items-center text-gray-500 hover:text-red-600 transition-colors"
+                            onClick={handleWishlistAction}
+                            disabled={isAddingToWishlist}
+                            className={`flex items-center hover:text-red-600 transition-colors ${isFavorite ? 'text-red-500' : 'text-gray-500'
+                                } ${isAddingToWishlist ? 'opacity-50 cursor-not-allowed' : ''}`}
                         >
-                            <Heart className="w-5 h-5 mr-2" />
-                            <span className="text-sm font-medium">ADD TO WISHLIST</span>
+                            <Heart className={`w-5 h-5 mr-2 ${isFavorite ? 'fill-current' : ''}`} />
+                            <span className="text-sm font-medium">
+                                {isAddingToWishlist
+                                    ? 'PROCESSING...'
+                                    : isFavorite
+                                        ? 'REMOVE FROM WISHLIST'
+                                        : 'ADD TO WISHLIST'
+                                }
+                            </span>
                         </button>
                     </div>
 
@@ -121,12 +267,29 @@ const HeroSection = ({ product }) => {
 
                     {/* Action Buttons */}
                     <div className="flex gap-4">
-                        <button className="flex-1 bg-red-600 text-white py-3 px-6 rounded font-medium hover:bg-red-700 transition-colors">
-                            BUY IT NOW
+                        <button 
+                            onClick={handleBuyNow}
+                            disabled={isBuyNowClick}
+                            className={`flex-1 bg-red-600 text-white py-3 px-6 rounded font-medium hover:bg-red-700 transition-colors ${isBuyNowClick ? 'opacity-50 cursor-not-allowed' : ''}`}
+                        >
+                            {isBuyNowClick ? 'ADDING...' : 'BUY IT NOW'}
                         </button>
-                        <button className="flex-1 border border-gray-300 text-gray-700 py-3 px-6 rounded font-medium hover:bg-gray-50 transition-colors flex items-center justify-center">
-                            <ShoppingCart className="w-4 h-4 mr-2" />
-                            ADD TO CART
+                        <button 
+                            onClick={handleAddToCart}
+                            disabled={isAddingToCart}
+                            className={`flex-1 border border-gray-300 text-gray-700 py-3 px-6 rounded font-medium hover:bg-gray-50 transition-colors flex items-center justify-center ${isAddingToCart ? 'opacity-50 cursor-not-allowed' : ''}`}
+                        >
+                            {isAddingToCart ? (
+                                <>
+                                    <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-red-600 mr-2"></div>
+                                    ADDING...
+                                </>
+                            ) : (
+                                <>
+                                    <ShoppingCart className="w-4 h-4 mr-2" />
+                                    ADD TO CART
+                                </>
+                            )}
                         </button>
                     </div>
                 </div>

@@ -81,7 +81,7 @@ export default function SpecialOffersCarousel() {
                         </h3>
 
                         <Link
-                          href="/shop"
+                          href="/spare/category1"
                           className="inline-flex items-center gap-2 px-6 py-3 bg-red-600 hover:bg-red-700 text-white rounded-lg font-semibold transition-all duration-300 transform hover:scale-105 shadow-lg"
                         >
                           Shop Now

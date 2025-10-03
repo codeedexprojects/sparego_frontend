@@ -4,10 +4,10 @@ import Header from "@/components/user/spare/Header";
 import { useState, useRef, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { verifyOtp } from "@/redux/slices/authSlice";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { toast, Toaster } from "sonner";
 
-export default function VerifyOtpPage({ searchParams }) {
+export default function VerifyOtpPage() {
   const [otp, setOtp] = useState(new Array(6).fill(""));
   const [countdown, setCountdown] = useState(30);
   const [canResend, setCanResend] = useState(false);
@@ -16,9 +16,9 @@ export default function VerifyOtpPage({ searchParams }) {
   const router = useRouter();
   const { loading, error } = useSelector((state) => state.auth);
 
-  // ✅ get query params from Next.js automatically
-  const number = searchParams?.number;
-  const sessionId = searchParams?.sessionId;
+ const searchParams = useSearchParams();
+  const number = searchParams.get("number");
+  const sessionId = searchParams.get("sessionId");
 
   useEffect(() => {
     if (inputRefs.current[0]) {

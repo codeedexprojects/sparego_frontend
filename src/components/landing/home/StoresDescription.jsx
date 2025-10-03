@@ -58,58 +58,50 @@ export default function FourStoresSection() {
         </div>
       </section>
 
-      <section className="py-16 bg-[#EEEEEE]">
-        <div className="px-6">
-          <div className="relative">
-            <div className="flex gap-8 overflow-x-auto pb-6 scrollbar-hide snap-x snap-mandatory">
-              {randomProducts?.products?.map((product) => (
-                <div
-                  key={product._id}
-                  className="flex-none w-80 bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 border border-gray-200 snap-start group hover:-translate-y-3 overflow-hidden"
-                >
-                  <div className="relative h-48 bg-gradient-to-br from-red-50 to-red-100 overflow-hidden flex items-center justify-center">
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent"></div>
-                    <img
-                      src={`${IMG_URL}/${product.images[0]}`}
-                      alt={product.name}
-                      className="max-w-full max-h-full object-contain transition-transform duration-500 group-hover:scale-105"
-                    />
-                  </div>
-                  <div className="p-6">
-                    <h4 className="text-xl font-bold text-gray-800 mb-3 group-hover:text-red-600 transition-colors duration-300">
-                      {product.name}
-                    </h4>
+     <section className="py-8 md:py-16 bg-[#EEEEEE]"> 
+  <div className="px-4 md:px-6"> 
+    <div className="relative"> 
+      <div className="flex gap-4 md:gap-8 overflow-x-auto pb-6 scrollbar-hide snap-x snap-mandatory -mx-4 px-4 md:mx-0 md:px-0"> 
+        {randomProducts?.products?.map((product) => ( 
+          <div 
+            key={product._id} 
+            className="flex-none w-64 md:w-80 bg-white rounded-xl md:rounded-2xl shadow-lg  border border-gray-200 snap-start group overflow-hidden" 
+          > 
+            <div className="relative h-40 md:h-48 bg-gradient-to-br from-red-50 to-red-100 overflow-hidden flex items-center justify-center"> 
+              <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent"></div> 
+              <img 
+                src={`${IMG_URL}/${product.images[0]}`} 
+                alt={product.name} 
+                className="max-w-full max-h-full object-contain transition-transform duration-500 group-hover:scale-105" 
+              /> 
+            </div> 
+            <div className="p-4 md:p-6"> 
+              <h4 className="text-lg md:text-xl font-bold text-gray-800 mb-2 md:mb-3 group-hover:text-red-600 transition-colors duration-300"> 
+                {product.name} 
+              </h4> 
 
-                    <p className="text-gray-600 text-sm leading-relaxed mb-4 line-clamp-2">
-                      {product.description}
-                    </p>
+              <p className="text-gray-600 text-xs md:text-sm leading-relaxed mb-3 md:mb-4 line-clamp-2"> 
+                {product.description} 
+              </p> 
 
-                    <div className="flex items-center justify-between">
-                      <div className="flex flex-col">
-                        <span className="text-xs text-gray-500 uppercase tracking-wide">
-                          Starting from
-                        </span>
-                        <span className="text-2xl font-bold text-red-600">
-                          {product.demoPrice}
-                        </span>
-                      </div>
-
-                      {/* <button
-                        id="section"
-                        className="bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-lg font-semibold text-sm transition-all duration-300 transform hover:scale-105 hover:shadow-lg"
-                      >
-                        Explore
-                      </button> */}
-                    </div>
-
-                    <div className="mt-4 h-1 bg-gradient-to-r from-red-600 to-red-400 rounded-full transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500"></div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
+              <div className="flex items-center justify-between"> 
+                <div className="flex flex-col"> 
+                  <span className="text-xs text-gray-500 uppercase tracking-wide"> 
+                    Starting from 
+                  </span> 
+                  <span className="text-xl md:text-2xl font-bold text-red-600"> 
+                    {product.demoPrice} 
+                  </span> 
+                </div> 
+              </div> 
+              <div className="mt-3 md:mt-4 h-1 bg-gradient-to-r from-red-600 to-red-400 rounded-full transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500"></div> 
+            </div> 
+          </div> 
+        ))} 
+      </div> 
+    </div> 
+  </div> 
+</section>
     </div>
   );
 }

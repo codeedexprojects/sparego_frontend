@@ -86,7 +86,7 @@ export default function PopularBrandsSection() {
   }
 
   return (
-    <section className="py-16 bg-white">
+    <section className="py-10 bg-white">
       <div className="max-w-8xl mx-auto px-4 md:px-15">
         <div className="flex items-center justify-between mb-12">
           <div>
@@ -124,7 +124,7 @@ export default function PopularBrandsSection() {
                       .replace(/\s+/g, "-")}`}
                     className="group relative flex flex-col items-center flex-shrink-0"
                   >
-                    <div className="relative w-20 h-20 mb-3 flex flex-col items-center justify-between bg-white rounded-lg border border-gray-400 overflow-hidden group">                     
+                    <div className="relative w-20 h-20 mb-3 flex flex-col items-center justify-between bg-white rounded-lg border overflow-hidden group">                     
                       <div className="absolute inset-0 bg-gradient-to-tr from-red-600 to-red-600 opacity-0 scale-0 group-hover:opacity-100 group-hover:scale-100 transition-all duration-500 origin-bottom-left rounded-lg"></div>                     
                       
                       <div className="w-15 h-15 relative z-10 flex-1 flex items-center justify-center p-2">
@@ -154,7 +154,7 @@ export default function PopularBrandsSection() {
                       .replace(/\s+/g, "-")}`}
                     className="group relative flex flex-col items-center"
                   >
-                    <div className="relative w-25 h-25 mb-3 flex flex-col items-center justify-between bg-white rounded-lg border border-gray-400 overflow-hidden group">                     
+                    <div className="relative w-25 h-25 mb-3 flex flex-col items-center justify-between bg-white rounded-lg border border-gray-300 overflow-hidden group">                     
                       <div className="absolute inset-0 bg-gradient-to-tr from-red-600 to-red-600 opacity-0 scale-0 group-hover:opacity-100 group-hover:scale-100 transition-all duration-500 origin-bottom-left rounded-lg"></div>                     
                       
                       <div className="w-15 h-15 relative z-10 flex-1 flex items-center justify-center">
