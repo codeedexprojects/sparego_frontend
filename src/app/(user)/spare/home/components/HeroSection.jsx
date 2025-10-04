@@ -71,7 +71,6 @@ export default function SpareHeroSection() {
         <div className="relative h-[500px] sm:h-[550px] md:h-[600px] lg:h-[500px] flex items-center">
           <div className="w-full h-full">
             {carousel.map((slide, index) => {
-              // Get the first product ID if products exist
               const productId = slide.products && slide.products.length > 0 
                 ? slide.products[0]._id 
                 : null;

@@ -16,6 +16,12 @@ function HomeApplianceHeroSection({slides}) {
       return () => clearInterval(timer);
     }
   }, [slides]);
+
+   const productId =
+    slides[currentSlide]?.products?.length > 0
+      ? slides[currentSlide].products[0]._id
+      : null;
+
   return (
 <section className="relative overflow-hidden h-[350px] sm:h-[400px] md:h-[450px] lg:h-[500px]">
   <div className="absolute inset-0">
@@ -50,13 +56,21 @@ function HomeApplianceHeroSection({slides}) {
           {slides[currentSlide]?.section?.name}
         </p>
 
-        {/* Readable Button */}
-        <Link
-          href={`/product/${slides[currentSlide]?.products?.[0]?._id || ""}`}
-          className="inline-block px-6 sm:px-8 py-3 sm:py-4 bg-[#009FFF] hover:bg-gray-50 text-white font-semibold text-base sm:text-lg rounded-lg transition-all duration-300 transform hover:scale-105 shadow-2xl hover:shadow-red-600/25"
-        >
-          SHOP NOW
-        </Link>
+        {productId ? (
+          <Link
+            href={`/homeappliances/product-details/${productId}`}
+            className="inline-block px-6 sm:px-8 py-3 bg-blue-400 hover:bg-blue-400 text-white font-medium rounded transition-all duration-300 transform hover:scale-105 shadow-lg uppercase"
+          >
+            Start Exploring
+          </Link>
+        ) : (
+          <Link
+            href="/homeappliances/products"
+            className="inline-block px-6 sm:px-8 py-3 bg-blue-400 hover:bg-blue-400 text-white font-medium rounded transition-all duration-300 transform hover:scale-105 shadow-lg uppercase"
+          >
+            Start Exploring
+          </Link>
+        )}
       </div>
     </div>
   )}

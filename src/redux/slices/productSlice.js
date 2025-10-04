@@ -12,7 +12,7 @@ export const getProductsByVehicle = createAsyncThunk(
         return rejectWithValue("All vehicle parameters are required");
       }
       const response = await axios.get(`${BASE_URL}/products/vehicle`, {
-        params: { type, brand, modelLine, year, modification },
+        params: { type,  productBrand: brand, modelLine, year, modification },
       });
       return response.data;
     } catch (error) {

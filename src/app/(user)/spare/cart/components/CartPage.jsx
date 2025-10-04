@@ -22,18 +22,22 @@ const MyCart = () => {
   const { cart, loading, error } = useSelector((state) => state.cart);
   const [updatingItems, setUpdatingItems] = useState({});
   const [removingItems, setRemovingItems] = useState({});
+  const [token, setToken] = useState(null);
+  const [isClient, setIsClient] = useState(false);
   const router = useRouter();
-const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (token) {
+    setIsClient(true);
+    const storedToken = localStorage.getItem("token");
+    setToken(storedToken);
+    
+    if (storedToken) {
       dispatch(getCart());
     } else {
       toast.error("Please login to view your cart");
     }
   }, [dispatch]);
-  
+
   const handleQuantityChange = async (productId, change) => {
     const currentItem = cart?.items?.find(
       (item) => item.product._id === productId
@@ -108,7 +112,8 @@ const token = typeof window !== "undefined" ? localStorage.getItem("token") : nu
     );
   };
 
-  if (loading)
+  // Show loading state until client-side rendering is confirmed
+  if (!isClient || loading) {
     return (
       <div className="mx-auto p-6 bg-gray-50 min-h-screen">
         <div className="text-center py-12">
@@ -117,20 +122,19 @@ const token = typeof window !== "undefined" ? localStorage.getItem("token") : nu
         </div>
       </div>
     );
+  }
 
   if (!token) {
     return (
-      <div className=" flex items-center justify-center p-6 bg-gradient-to-br from-red-50 to-white">
+      <div className="flex items-center justify-center p-6 bg-gradient-to-br from-red-50 to-white min-h-screen">
         <div className="max-w-md w-full">
           <div className="bg-white rounded-2xl shadow-xl p-8 border border-red-100">
-            {/* Icon */}
             <div className="flex justify-center mb-6">
               <div className="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center">
                 <ShoppingBasket className="w-16 h-16 text-red-600" />
               </div>
             </div>
 
-            {/* Content */}
             <h2 className="text-2xl font-bold text-gray-900 mb-3 text-center">
               Your Cart Awaits
             </h2>
@@ -139,7 +143,6 @@ const token = typeof window !== "undefined" ? localStorage.getItem("token") : nu
               your orders all in one place.
             </p>
 
-            {/* Button */}
             <button
               className="w-full bg-red-600 text-white px-6 py-3 rounded-lg hover:bg-red-700 transition-all duration-200 font-semibold shadow-lg shadow-red-600/30 hover:shadow-xl hover:shadow-red-600/40 hover:scale-105 transform"
               onClick={() => router.push("/spare/login")}
@@ -147,7 +150,6 @@ const token = typeof window !== "undefined" ? localStorage.getItem("token") : nu
               Login to Continue
             </button>
 
-            {/* Footer text */}
             <p className="text-sm text-gray-500 text-center mt-6">
               Don't have an account?{" "}
               <button
@@ -163,7 +165,7 @@ const token = typeof window !== "undefined" ? localStorage.getItem("token") : nu
     );
   }
 
-  if (!cart || !cart.items || cart.items.length === 0)
+  if (!cart || !cart.items || cart.items.length === 0) {
     return (
       <div className="mx-auto p-6 bg-gray-50 min-h-screen">
         <div className="text-center py-12">
@@ -183,6 +185,7 @@ const token = typeof window !== "undefined" ? localStorage.getItem("token") : nu
         </div>
       </div>
     );
+  }
 
   return (
     <div className="mx-auto p-6 bg-gray-50 min-h-screen">
@@ -194,12 +197,16 @@ const token = typeof window !== "undefined" ? localStorage.getItem("token") : nu
       </div>
       <div className="space-y-6">
         {cart.items.map((item, index) => {
-          const product = item.product; // shorter alias
-          if (!product) return null; // skip invalid/null products
+          const product = item.product;
+          if (!product) return null;
+
+          const discountedPrice = product.price - (product.price * (product.discount || 0)) / 100;
+          const itemTotal = calculateItemTotal(item);
+          const savings = calculateSavings(item);
 
           return (
             <div
-              key={product._id || index} // fallback to index if _id missing
+              key={product._id || index}
               className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm relative"
             >
               <button
@@ -220,7 +227,7 @@ const token = typeof window !== "undefined" ? localStorage.getItem("token") : nu
                         className="w-20 h-24 object-contain"
                         onError={(e) => {
                           e.target.src =
-                            "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iODAiIGhlaWdodD0iODAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjgwIiBoZWlnaHQ9IjgwIiBmaWxsPSIjZjNmNGY1Ii8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGR5PSIuMzVlbSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1zaXplPSIxMiIgZm9udC1mYW1pbHk9InNhbnMtc2VyaWYiIGZpbGw9IiM5OTkiPk5vIEltYWdlPC90ZXh0Pjwvc3ZnPg==";
+                            "data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iODAiIGhlaWdodD0iODAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjgwIiBoZWlnaHQ9IjgwIiBmaWxsPSIjZjNmNGY1Ii8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGR5PSIuMzVlbSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZm9udC1zaXplPSIxMiIgZm9udC-1mYW1pbHk9InNhbnMtc2VyaWYiIGZpbGw9IiM5OTkiPk5vIEltYWdlPC90ZXh0Pjwvc3ZnPg==";
                         }}
                       />
                     ) : (
@@ -233,13 +240,76 @@ const token = typeof window !== "undefined" ? localStorage.getItem("token") : nu
                   <h3 className="text-xl font-medium text-gray-900 mb-3">
                     {product.name || "Unnamed Product"}
                   </h3>
-                  {/* your price/quantity UI here */}
+                  
+                  {/* Price Display */}
+                  <div className="flex items-center gap-3 mb-4">
+                    <span className="text-2xl font-bold text-gray-900">
+                      ₹{discountedPrice.toLocaleString()}
+                    </span>
+                    {product.discount > 0 && (
+                      <>
+                        <span className="text-lg text-gray-500 line-through">
+                          ₹{product.price.toLocaleString()}
+                        </span>
+                        <span className="text-sm font-medium bg-green-100 text-green-800 px-2 py-1 rounded">
+                          {product.discount}% OFF
+                        </span>
+                      </>
+                    )}
+                  </div>
+
+                  {/* Quantity Selector */}
+                  <div className="flex items-center gap-4 mb-4">
+                    <span className="text-gray-700 font-medium">Quantity:</span>
+                    <div className="flex items-center border border-gray-300 rounded-lg">
+                      <button
+                        onClick={() => handleQuantityChange(product._id, -1)}
+                        disabled={updatingItems[product._id] || item.quantity <= 1}
+                        className="p-2 text-gray-600 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors rounded-l-lg"
+                      >
+                        <Minus className="w-4 h-4" />
+                      </button>
+                      
+                      <span className="px-4 py-2 text-gray-900 font-medium min-w-12 text-center">
+                        {updatingItems[product._id] ? (
+                          <div className="inline-block animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-red-600"></div>
+                        ) : (
+                          item.quantity
+                        )}
+                      </span>
+                      
+                      <button
+                        onClick={() => handleQuantityChange(product._id, 1)}
+                        disabled={updatingItems[product._id]}
+                        className="p-2 text-gray-600 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors rounded-r-lg"
+                      >
+                        <Plus className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Item Total */}
+                  <div className="flex items-center justify-between border-t border-gray-200 pt-4">
+                    <span className="text-gray-600">Item Total:</span>
+                    <div className="text-right">
+                      <span className="text-lg font-bold text-gray-900">
+                        ₹{itemTotal.toLocaleString()}
+                      </span>
+                      {savings > 0 && (
+                        <div className="text-sm text-green-600">
+                          You save ₹{savings.toLocaleString()}
+                        </div>
+                      )}
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
           );
         })}
       </div>
+      
+      {/* Order Summary */}
       <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm mt-8">
         <h2 className="text-xl font-semibold text-gray-900 mb-4">
           Order Summary
@@ -254,7 +324,7 @@ const token = typeof window !== "undefined" ? localStorage.getItem("token") : nu
           <div className="flex justify-between">
             <span className="text-gray-600">Discount</span>
             <span className="text-green-600">
-              -₹{cart.cartDiscount?.toLocaleString() || "0"}
+              -₹{calculateTotalSavings().toLocaleString()}
             </span>
           </div>
           <div className="flex justify-between text-lg font-semibold border-t border-gray-200 pt-3">
@@ -266,7 +336,7 @@ const token = typeof window !== "undefined" ? localStorage.getItem("token") : nu
         </div>
         <div className="flex items-center mb-6 p-4 bg-green-50 rounded-lg">
           <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center mr-3">
-            <Trash2 className="w-4 h-4 text-white" />
+            <ShoppingCart className="w-4 h-4 text-white" />
           </div>
           <span className="text-sm text-gray-600">
             You'll be redirected to WhatsApp to complete your order
@@ -274,7 +344,7 @@ const token = typeof window !== "undefined" ? localStorage.getItem("token") : nu
         </div>
         <button
           onClick={() => router.push("/spare/checkout")}
-          className="w-full bg-red-600 text-white px-6 py-3 rounded font-medium hover:bg-red-700 transition-colors"
+          className="w-full bg-red-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-red-700 transition-colors shadow-lg hover:shadow-xl"
         >
           Place order (₹{cart.cartTotal?.toLocaleString() || "0"})
         </button>

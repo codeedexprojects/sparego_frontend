@@ -24,7 +24,7 @@ export default function FullBackgroundHeroSection() {
   }, [dispatch]);
 
   const slides = carousel?.length ? carousel : carousel?.mainCarousels || [];
-const sectionName = slides[0]?.section?.name; // "Watches" or "Home Appliances"
+const sectionName = slides[0]?.section?.name; 
 
 if (sectionName?.toLowerCase() === "watches") {
   return <WatchHeroSection slides={slides} />;
