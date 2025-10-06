@@ -23,7 +23,15 @@ import {
 
 const menuItems = [
   { name: "Dashboard", icon: LayoutDashboard, path: "/admin/dashboard" },
-  { name: "Products", icon: Package, path: "/admin/product" },
+  {
+    name: "Products",
+    icon: Package,
+    children: [
+      { name: "Spare Products", path: "/admin/spare-product" },
+      { name: "Other Products", path: "/admin/product" },
+
+    ],
+  },
   { name: "Orders", icon: ShoppingCart, path: "/admin/orders" },
   { name: "Users", icon: Users, path: "/admin/users" },
   { name: "Sections", icon: Section, path: "/admin/sections" },
@@ -114,8 +122,8 @@ export default function Sidebar() {
                           key={child.name}
                           href={child.path}
                           className={`block px-4 py-2 text-sm rounded-md ${pathname === child.path
-                              ? "bg-red-500 text-white"
-                              : "text-gray-700 hover:bg-red-100"
+                            ? "bg-red-500 text-white"
+                            : "text-gray-700 hover:bg-red-100"
                             }`}
                         >
                           {child.name}
