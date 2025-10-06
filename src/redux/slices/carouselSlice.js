@@ -58,7 +58,7 @@ export const getBottomCarousel = createAsyncThunk(
   "carousel/getBottomCarousel",
   async (_, { rejectWithValue }) => {
     try {
-      const response = await axios.get(`${BASE_URL}/bottom-carousel/`);
+      const response = await axios.get(`${BASE_URL}/bottom-carousel/no-section`);
       return response.data;
     } catch (error) {
       return rejectWithValue(
@@ -66,6 +66,28 @@ export const getBottomCarousel = createAsyncThunk(
       );
     }
   }
+);
+
+export const getBottomCarouselbySection = createAsyncThunk(
+  "carousel/getBottomCarouselbySection",
+  async (sectionId, { rejectWithValue }) => {
+    try {
+      const response = await axios.get(
+        `${BASE_URL}/bottom-carousel/section/${sectionId}`,
+        {
+          headers: {
+            'Cache-Control': 'no-cache',
+            'Pragma': 'no-cache'
+          }
+        }
+      );
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data || "Failed to fetch carousel"
+      );
+    }
+      }
 );
 
 const carouselSlice = createSlice({
@@ -101,7 +123,6 @@ const carouselSlice = createSlice({
       .addCase(getHomeCarouselBySection.fulfilled, (state, action) => {
         state.loading = false;
         state.error = null;
-        // Fix: Access mainCarousels from the API response
         state.carousel = action.payload.mainCarousels || [];
       })
       .addCase(getHomeCarouselBySection.rejected, (state, action) => {
@@ -121,6 +142,19 @@ const carouselSlice = createSlice({
         state.bottomCarousel = action.payload;
       })
       .addCase(getBottomCarousel.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+// bottom carousel by section
+      .addCase(getBottomCarouselbySection.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(getBottomCarouselbySection.fulfilled, (state, action) => {
+        state.loading = false;
+        state.bottomCarousel = action.payload;
+      })
+      .addCase(getBottomCarouselbySection.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       })

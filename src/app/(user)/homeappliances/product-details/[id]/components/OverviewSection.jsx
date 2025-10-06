@@ -3,9 +3,9 @@ import React from 'react';
 const OverviewSection = ({ product }) => {
   // Safe function to get category name
   const getCategoryName = () => {
-    if (!product?.category) return 'N/A';
-    if (typeof product.category === 'string') return product.category;
-    if (product.category?.name) return product.category.name;
+    if (!product?.mainCategory) return 'N/A';
+    if (typeof product.mainCategory === 'string') return product.mainCategory;
+    if (product.mainCategory?.name) return product.mainCategory.name;
     return 'N/A';
   };
 
@@ -41,9 +41,9 @@ const OverviewSection = ({ product }) => {
           <strong>Category:</strong> {getCategoryName()}
         </p>
         
-        <p>
+        {/* <p>
           <strong>Sub Category:</strong> {getSubCategoryName()}
-        </p>
+        </p> */}
         
         {product?.section && (
           <p>

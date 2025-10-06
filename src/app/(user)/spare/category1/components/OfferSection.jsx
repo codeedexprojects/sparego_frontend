@@ -89,7 +89,8 @@ export default function PromotionalBannerSection() {
 
                   {/* Image */}
                   <div className="flex-shrink-0 order-first sm:order-last">
-                    <div className="w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 lg:w-40 lg:h-40 relative mx-auto">
+                    <div className="w-40 h-40 sm:w-48 sm:h-48 md:w-96 md:h-48 lg:w-96 lg:h-56 relative mx-auto">
+                      {" "}
                       <Image
                         src={`${IMG_URL}/${promo.image}`}
                         alt={promo.title}

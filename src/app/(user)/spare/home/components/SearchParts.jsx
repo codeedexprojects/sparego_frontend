@@ -61,12 +61,14 @@ export default function SearchByVehicleSection() {
   };
 
   const handleSearch = () => {
-    
+    // Get the selected brand name for the URL
     const selectedBrand = filteredBrands.find(b => b._id === filters.brand);
     const brandName = selectedBrand ? encodeURIComponent(selectedBrand.name) : '';
     
+    // Convert activeTab to URL-friendly format
     const vehicleType = activeTab === 'TWO WHEELER' ? 'two-wheeler' : 'four-wheeler';
     
+    // Navigate to the dynamic route with all parameters
     router.push(
       `/spare/search-products/${vehicleType}/${filters.brand}/${encodeURIComponent(filters.modelLine)}/${filters.year}/${encodeURIComponent(filters.modification)}`
     );

@@ -1,13 +1,13 @@
-import { Montserrat } from "next/font/google";
+import { Jura } from "next/font/google";
 import "./globals.css";
 import { ReduxProvider } from "@/redux/providers";
 import { Toaster } from "sonner";
 
 // Import Montserrat
-const montserrat = Montserrat({
+const jura = Jura({
   subsets: ["latin"],
-  variable: "--font-montserrat", // define a CSS variable
-  display: "swap", // good for performance
+  variable: "--font-jura", 
+  display: "swap", 
 });
 
 export const metadata = {
@@ -18,7 +18,7 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body className={`${montserrat.variable} font-sans antialiased`}>
+      <body className={`${jura.variable} font-sans antialiased`}>
         <ReduxProvider>
           {children}
           <Toaster richColors position="top-right" />

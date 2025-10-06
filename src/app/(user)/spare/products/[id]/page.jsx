@@ -3,7 +3,7 @@ import React from 'react'
 import Footer from '@/components/landing/Footer'
 import AutomotiveProductsGrid from './components/ProductCard'
 import PromotionalBannerSection from './components/OfferSection'
-import { Toaster } from 'sonner'
+// import { Toaster } from 'sonner'
 
 function page() {
     return (
@@ -12,7 +12,7 @@ function page() {
             <AutomotiveProductsGrid></AutomotiveProductsGrid>
             <PromotionalBannerSection></PromotionalBannerSection>
             <Footer></Footer>
-             <Toaster position="top-center" richColors closeButton />
+             {/* <Toaster position="top-center" richColors closeButton /> */}
         </div>
     )
 }

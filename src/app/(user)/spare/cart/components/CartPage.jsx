@@ -33,9 +33,7 @@ const MyCart = () => {
     
     if (storedToken) {
       dispatch(getCart());
-    } else {
-      toast.error("Please login to view your cart");
-    }
+    } 
   }, [dispatch]);
 
   const handleQuantityChange = async (productId, change) => {

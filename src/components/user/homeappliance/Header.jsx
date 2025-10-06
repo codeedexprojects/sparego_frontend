@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { Menu, X, Heart, ShoppingCart, User } from "lucide-react";
+import { Menu, X, Heart, ShoppingCart, User, Search } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import { getcartCount } from "@/redux/slices/cartSlice";
 import { searchProductsBySection } from "@/redux/slices/productSlice";
@@ -67,7 +67,7 @@ const handleSearch = () => {
   onClick={handleSearch}
   className="bg-red-600 hover:bg-red-700 px-4 rounded-r-md flex items-center justify-center"
 >
-  🔍
+  <Search className="h-5 w-5 text-white" />
 </button>
             </div>
           </div>

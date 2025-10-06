@@ -17,13 +17,12 @@ export const createAddress = createAsyncThunk(
           },
         }
       );
-      return response.data;
+      return response.data.address || response.data; // Ensure we return the address object
     } catch (error) {
       return rejectWithValue(error.response?.data || "Failed to add address");
     }
   }
 );
-
 
 export const getAddress = createAsyncThunk(
   "address/getAddress",
@@ -57,7 +56,7 @@ export const updateAddress = createAsyncThunk(
           },
         }
       );
-      return response.data;
+      return response.data.address || response.data; // Ensure we return the address object
     } catch (error) {
       return rejectWithValue(error.response?.data || "Failed to update address");
     }
@@ -91,20 +90,22 @@ const addressSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
+      // Create Address
       .addCase(createAddress.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
       .addCase(createAddress.fulfilled, (state, action) => {
         state.loading = false;
-        state.address.push(action.payload); 
+        // Make sure we're pushing the address object, not a wrapper object
+        state.address.push(action.payload);
       })
       .addCase(createAddress.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       })
 
-      // Get
+      // Get Address
       .addCase(getAddress.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -118,7 +119,7 @@ const addressSlice = createSlice({
         state.error = action.payload;
       })
 
-      // Update
+      // Update Address
       .addCase(updateAddress.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -126,7 +127,7 @@ const addressSlice = createSlice({
       .addCase(updateAddress.fulfilled, (state, action) => {
         state.loading = false;
         const index = state.address.findIndex(
-          (addr) => addr.id === action.payload.id
+          (addr) => addr._id === action.payload._id || addr.id === action.payload.id
         );
         if (index !== -1) {
           state.address[index] = action.payload;
@@ -137,7 +138,7 @@ const addressSlice = createSlice({
         state.error = action.payload;
       })
 
-      // Delete
+      // Delete Address
       .addCase(deleteAddress.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -145,7 +146,7 @@ const addressSlice = createSlice({
       .addCase(deleteAddress.fulfilled, (state, action) => {
         state.loading = false;
         state.address = state.address.filter(
-          (addr) => addr.id !== action.payload
+          (addr) => addr._id !== action.payload && addr.id !== action.payload
         );
       })
       .addCase(deleteAddress.rejected, (state, action) => {

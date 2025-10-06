@@ -103,12 +103,12 @@ const SpecificationsSection = ({ product }) => {
       {/* Additional product information */}
       <div className="mt-6 pt-6 border-t border-gray-200">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
-          {product?.vehicleType && (
+          {/* {product?.vehicleType && (
             <div className="text-center p-3 bg-gray-50 rounded">
               <div className="font-medium text-gray-900">Vehicle Type</div>
               <div className="text-gray-600">{product.vehicleType}</div>
             </div>
-          )}
+          )} */}
           {product?.section && (
             <div className="text-center p-3 bg-gray-50 rounded">
               <div className="font-medium text-gray-900">Section</div>

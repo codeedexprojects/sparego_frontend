@@ -64,10 +64,8 @@ const HeroSection = ({ activeTab, setActiveTab, product }) => {
             }));
 
             if (addToWishlist.fulfilled.match(resultAction)) {
-                // Refresh wishlist to get updated data
                 await dispatch(getWishlist());
 
-                // Show appropriate message based on current state
                 if (isFavorite) {
                     toast.success('Removed from wishlist!');
                 } else {
@@ -85,7 +83,6 @@ const HeroSection = ({ activeTab, setActiveTab, product }) => {
     };
 
     const handleAddToCart = async () => {
-        // Check if user is logged in
         const token = localStorage.getItem('token');
         if (!token) {
             toast.error('Please login to add items to your cart');
@@ -119,7 +116,6 @@ const HeroSection = ({ activeTab, setActiveTab, product }) => {
     };
 
     const handleBuyNow = async () => {
-        // Check if user is logged in
         const token = localStorage.getItem('token');
         if (!token) {
             toast.error('Please login to buy products');
@@ -177,18 +173,13 @@ const HeroSection = ({ activeTab, setActiveTab, product }) => {
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                {/* Left Side */}
                 <div className="space-y-6">
-                    {/* Delivery and Wishlist Row */}
-                    <div className="flex justify-between items-center">
-                        <div className="flex items-center text-gray-600">
-                            <MapPin className="w-4 h-4 mr-2 text-red-500" />
-                            <span className="text-sm">Delivering To Perinthalmanna 686551</span>
-                        </div>
+                    <div className="flex justify-end items-center">
+                       
                         <button
                             onClick={handleWishlistAction}
                             disabled={isAddingToWishlist}
-                            className={`flex items-center hover:text-red-600 transition-colors ${isFavorite ? 'text-red-500' : 'text-gray-500'
+                            className={`flex items-center text-red-600 hover:text-red-600 transition-colors ${isFavorite ? 'text-red-500' : 'text-gray-500'
                                 } ${isAddingToWishlist ? 'opacity-50 cursor-not-allowed' : ''}`}
                         >
                             <Heart className={`w-5 h-5 mr-2 ${isFavorite ? 'fill-current' : ''}`} />
@@ -295,7 +286,7 @@ const HeroSection = ({ activeTab, setActiveTab, product }) => {
 
                     {/* Product Title */}
                     <div>
-                        <h1 className="text-2xl font-bold text-gray-900 mb-2">
+                        <h1 className="text-2xl font-bold text-red-600 mb-2">
                             {product?.name || 'Product Name'}
                         </h1>
                     </div>

@@ -107,23 +107,28 @@ const AddressPage = () => {
 
   if (!token) {
     return (
-      <div className=" flex items-center justify-center p-6 ">
+      <>
+      <Header/>
+      <div className=" flex items-center justify-center p-6 bg-gradient-to-br from-red-50 to-white">
         <div className="max-w-md w-full">
           <div className="bg-white rounded-2xl shadow-xl p-8 border border-red-100">
+            {/* Icon */}
             <div className="flex justify-center mb-6">
               <div className="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center">
-                <User2Icon className="w-10 h-10 text-red-600" />
+             <User2Icon className="w-10 h-10 text-red-600" />
               </div>
             </div>
 
+            {/* Content */}
             <h2 className="text-2xl font-bold text-gray-900 mb-3 text-center">
               Your Profile Awaits
             </h2>
             <p className="text-gray-600 text-center mb-8 leading-relaxed">
-              Sign in to access your saved items, manage your profile, and
-              track your orders all in one place.
+              Sign in to access your saved items, manage your profile, and track
+              your orders all in one place.
             </p>
 
+            {/* Button */}
             <button
               className="w-full bg-red-600 text-white px-6 py-3 rounded-lg hover:bg-red-700 transition-all duration-200 font-semibold shadow-lg shadow-red-600/30 hover:shadow-xl hover:shadow-red-600/40 hover:scale-105 transform"
               onClick={() => router.push("/spare/login")}
@@ -131,6 +136,7 @@ const AddressPage = () => {
               Login to Continue
             </button>
 
+            {/* Footer text */}
             <p className="text-sm text-gray-500 text-center mt-6">
               Don't have an account?{" "}
               <button
@@ -143,6 +149,8 @@ const AddressPage = () => {
           </div>
         </div>
       </div>
+      <Footer/>
+      </>
     );
   }
 
@@ -150,7 +158,6 @@ const AddressPage = () => {
     <div>
       <Header />
       <div className="bg-white min-h-screen py-10 px-6 lg:px-20 space-y-6">
-        {/* Username & Number Section */}
         {mounted && (
           <div className="bg-gray-50 p-6 rounded-lg border border-gray-200">
             <div className="flex items-center justify-between mb-2">
@@ -165,7 +172,6 @@ const AddressPage = () => {
           </div>
         )}
 
-        {/* Address Form/List */}
         {mounted && (
           <>
             {showForm ? (

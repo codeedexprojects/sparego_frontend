@@ -33,9 +33,7 @@ const MyCart = () => {
     
     if (storedToken) {
       dispatch(getCart());
-    } else {
-      toast.error("Please login to view your cart");
-    }
+    } 
   }, [dispatch]);
 
   const handleQuantityChange = async (productId, change) => {
@@ -126,7 +124,7 @@ const MyCart = () => {
 
   if (!token) {
     return (
-      <div className="flex items-center justify-center p-6 bg-gradient-to-br from-red-50 to-white min-h-screen">
+      <div className="flex items-center justify-center p-6 bg-white min-h-screen">
         <div className="max-w-md w-full">
           <div className="bg-white rounded-2xl shadow-xl p-8 border border-red-100">
             <div className="flex justify-center mb-6">

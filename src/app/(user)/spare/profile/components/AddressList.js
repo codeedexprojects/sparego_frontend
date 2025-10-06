@@ -9,6 +9,16 @@ export const AddressList = ({
   loading = false, 
   error = null 
 }) => {
+
+   const getErrorMessage = (error) => {
+    if (!error) return "";
+    if (typeof error === "string") return error;
+    if (error.message) return error.message;
+    if (error.error) return error.error;
+    return "An error occurred";
+  };
+
+
   return (
     <div className="bg-gray-50 p-6 rounded-lg border border-gray-200 space-y-4">
       <div className="flex items-center justify-between">
@@ -26,9 +36,8 @@ export const AddressList = ({
       {error && (
         <div className="bg-red-100 text-red-800 flex items-center gap-2 p-3 rounded">
           <Info size={16} />
-          <p className="text-gray-600">
-            {typeof error === "string" ? error : error?.message}
-          </p>
+                    <p className="text-sm">{getErrorMessage(error)}</p>
+
         </div>
       )}
 

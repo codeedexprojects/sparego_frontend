@@ -3,18 +3,19 @@ import React, { useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useDispatch, useSelector } from "react-redux";
-import { getProductBanners } from "@/redux/slices/bannerSlice"; 
+import { getProductBanners } from "@/redux/slices/bannerSlice";
 import { IMG_URL } from "@/redux/baseUrl";
 
 export default function PromotionalBannerSection() {
   const dispatch = useDispatch();
-  const { productBanners, loading, error } = useSelector((state) => state.banner);
+  const { productBanners, loading, error } = useSelector(
+    (state) => state.banner
+  );
 
   useEffect(() => {
     dispatch(getProductBanners());
   }, [dispatch]);
 
-  
   const limitedBanners = productBanners?.banners?.slice(0, 2) || [];
 
   if (loading) {
@@ -41,7 +42,9 @@ export default function PromotionalBannerSection() {
             <div
               key={promo._id}
               className={`${
-                index === 0 ? "bg-red-600 text-white" : "bg-gray-200 text-gray-900"
+                index === 0
+                  ? "bg-red-600 text-white"
+                  : "bg-gray-200 text-gray-900"
               } rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300`}
             >
               <div className="flex flex-col sm:flex-row items-center justify-between p-4 sm:p-6 md:p-8 min-h-[250px] sm:min-h-[200px]">
@@ -80,7 +83,8 @@ export default function PromotionalBannerSection() {
 
                 {/* Image */}
                 <div className="flex-shrink-0 order-first sm:order-last">
-                  <div className="w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 lg:w-40 lg:h-40 relative mx-auto">
+                  <div className="w-40 h-40 sm:w-48 sm:h-48 md:w-96 md:h-48 lg:w-96 lg:h-56 relative mx-auto">
+                    {" "}
                     <Image
                       src={`${IMG_URL}/${promo.image}`}
                       alt={promo.title}

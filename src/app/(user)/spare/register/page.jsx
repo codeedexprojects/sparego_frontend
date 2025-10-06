@@ -1,5 +1,10 @@
 "use client";
+import { registerUser } from "@/redux/slices/authSlice";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { useDispatch } from "react-redux";
+import { toast, Toaster } from "sonner";
+
 
 export default function RegisterPage() {
   const [name, setName] = useState("");
@@ -7,6 +12,8 @@ export default function RegisterPage() {
   const [loading, setLoading] = useState(false);
   const [agree, setAgree] = useState(false);
   const [error, setError] = useState("");
+  const dispatch = useDispatch();
+  const router = useRouter();
 
   const handleRegister = (e) => {
     e.preventDefault();
@@ -40,12 +47,9 @@ dispatch(registerUser({ name, number }))
     <div className="min-h-screen flex flex-col">
      
 
-      {/* Main Content */}
       <main className="flex-grow flex items-center justify-center px-4 sm:px-6 lg:px-8 py-8 sm:py-12 bg-gradient-to-br from-gray-50 to-gray-100">
         <div className="w-full max-w-md">
-          {/* Card */}
           <div className="bg-white rounded-2xl shadow-xl p-6 sm:p-8 md:p-10">
-            {/* Header */}
             <div className="text-center mb-6 sm:mb-8">
               <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">
                 Create Account
@@ -54,8 +58,6 @@ dispatch(registerUser({ name, number }))
                 Join us today and get started
               </p>
             </div>
-
-            {/* Form */}
             <form onSubmit={handleRegister} className="space-y-5 sm:space-y-6">
               {/* Name Input */}
               <div>
@@ -159,7 +161,7 @@ dispatch(registerUser({ name, number }))
          
         </div>
       </main>
-
+<Toaster position="top-right" richColors/>
       {/* Footer */}
       
     </div>

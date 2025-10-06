@@ -5,7 +5,7 @@ export const AddressCard = ({ address, onEdit, onDelete, loading = false }) => {
     switch (type) {
       case "Home":
         return <Home size={16} />;
-      case "Work":
+      case "Office":
         return <Building size={16} />;
       default:
         return <MapPin size={16} />;

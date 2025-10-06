@@ -32,7 +32,6 @@ const Header = () => {
     dispatch(getcartCount());
   }, [dispatch]);
 
-  // Close menu when route changes
   useEffect(() => {
     setIsMenuOpen(false);
     setIsSearchOpen(false);
@@ -56,14 +55,13 @@ const Header = () => {
             <img src="/logo.png" alt="SpareGo Logo" className="h-8 w-auto" />
           </Link>
 
-          {/* Desktop Search Bar */}
           <div className="hidden md:flex flex-1 justify-center px-6">
             <form onSubmit={handleSearch} className="flex w-full max-w-lg">
               <input
                 type="text"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                placeholder={`Search in ${section}...`}
+                placeholder={`Search entire store here...`}
                 className="w-full border text-black border-gray-300 rounded-l-md px-3 py-2 text-sm focus:outline-none"
               />
               <button
@@ -75,7 +73,6 @@ const Header = () => {
             </form>
           </div>
 
-          {/* Desktop Icons */}
           <div className="hidden md:flex items-center space-x-4">
             <Link href="/spare/wishlist">
               <Heart className="h-5 w-5 text-gray-700 hover:text-red-600 cursor-pointer" />
@@ -93,7 +90,6 @@ const Header = () => {
             </Link>
           </div>
 
-          {/* Mobile Icons */}
           <div className="md:hidden flex items-center space-x-3">
             <button
               onClick={() => setIsSearchOpen(!isSearchOpen)}

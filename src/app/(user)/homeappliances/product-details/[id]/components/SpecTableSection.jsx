@@ -69,12 +69,12 @@ const SpecTable = ({ product }) => {
                 <div className="font-semibold text-gray-900">{product.warranty}</div>
               </div>
             )}
-            {product.vehicleType && (
+            {/* {product.vehicleType && (
               <div className="bg-gray-50 p-4 rounded">
                 <div className="text-sm text-gray-600 mb-1">Vehicle Type</div>
                 <div className="font-semibold text-gray-900">{product.vehicleType}</div>
               </div>
-            )}
+            )} */}
           </div>
         </div>
       )}

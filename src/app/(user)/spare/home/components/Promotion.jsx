@@ -39,16 +39,18 @@ export default function PromotionalBannerSection() {
       <div className="max-w-8xl mx-auto px-6 sm:px-12 lg:px-16">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 md:gap-12">
           {limitedBanners.map((promo, index) => {
-            // Get the product ID from the banner data
             const productId = promo.productId?._id || promo.productId;
-            // Construct the product detail URL
-            const productUrl = productId ? `/spare/product-details/${productId}` : `/section/spare`;
+            const productUrl = productId
+              ? `/spare/product-details/${productId}`
+              : `/spare/home`;
 
             return (
               <div
                 key={promo._id}
                 className={`${
-                  index === 0 ? "bg-red-600 text-white" : "bg-gray-200 text-gray-900"
+                  index === 0
+                    ? "bg-red-600 text-white"
+                    : "bg-gray-200 text-gray-900"
                 }  overflow-hidden shadow-lg hover:shadow-xl transition-shadow duration-300`}
               >
                 <div className="flex flex-col sm:flex-row items-center justify-between p-4 sm:p-6 md:p-8 min-h-[250px] sm:min-h-[200px]">
@@ -78,7 +80,8 @@ export default function PromotionalBannerSection() {
                     </Link>
                   </div>
                   <div className="flex-shrink-0 order-first sm:order-last">
-                    <div className="w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 lg:w-40 lg:h-40 relative mx-auto">
+                    <div className="w-40 h-40 sm:w-48 sm:h-48 md:w-96 md:h-48 lg:w-96 lg:h-56 relative mx-auto">
+                      {" "}
                       <Image
                         src={`${IMG_URL}/${promo.image}`}
                         alt={promo.title}

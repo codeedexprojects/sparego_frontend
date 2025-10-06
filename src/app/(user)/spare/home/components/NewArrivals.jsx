@@ -212,7 +212,7 @@ export default function NewArrivalsSection() {
                         {product.discount}
                       </div>
                     )}
-                    <div className="mb-4 flex justify-center flex-grow">
+                    <div className="mb-3 flex justify-center flex-grow">
                       <div className="w-40 h-40 relative">
                         <Image
                           src={product.image} 
@@ -227,6 +227,7 @@ export default function NewArrivalsSection() {
                         />
                       </div>
                     </div>
+                    <hr className="border mt-auto"/>
                     <div className="mt-auto">
                       <h3 className="text-md font-semibold text-gray-900 line-clamp-2 h-8">
                         {product.title}

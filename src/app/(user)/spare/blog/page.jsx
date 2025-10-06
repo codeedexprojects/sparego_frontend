@@ -1,6 +1,6 @@
 "use client"
 import Footer from "@/components/landing/Footer";
-import Header from "@/components/user/homeappliance/Header";
+import Header from "@/components/user/spare/Header";
 import { IMG_URL } from "@/redux/baseUrl";
 import { getBlogs } from "@/redux/slices/blogSlice";
 import { useRouter } from "next/navigation";

@@ -56,7 +56,11 @@ export default function PromotionalBannerSection({ page = "product-details" }) {
     <section className="py-8 md:py-16 bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
-          {limitedBanners.map((promo, index) => (
+          {limitedBanners.map((promo, index) => {
+           const productId = promo.productId?._id || promo.productId;
+           const productUrl = productId ? `/homeappliances/product-details/${productId}` : `/homeappliances/products`;
+           return(
+
             <div
               key={promo._id}
               className={`${
@@ -90,7 +94,7 @@ export default function PromotionalBannerSection({ page = "product-details" }) {
                   </Link>
                 </div>
                 <div className="flex-shrink-0 order-first sm:order-last">
-                  <div className="w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 lg:w-40 lg:h-40 relative mx-auto">
+                    <div className="w-40 h-40 sm:w-48 sm:h-48 md:w-96 md:h-48 lg:w-96 lg:h-56 relative mx-auto">
                     <Image
                       src={`${IMG_URL}/${promo.image}`}
                       alt={promo.title}
@@ -101,7 +105,8 @@ export default function PromotionalBannerSection({ page = "product-details" }) {
                 </div>
               </div>
             </div>
-          ))}
+          )
+})}
 
           {limitedBanners.length === 0 && (
             <div className="col-span-2 text-center text-gray-500">

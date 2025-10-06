@@ -2,32 +2,33 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import { useSelector, useDispatch } from "react-redux";
-import { getHomeCarouselBySection } from "@/redux/slices/carouselSlice";
+import { getBottomCarouselbySection } from "@/redux/slices/carouselSlice";
 import { IMG_URL } from "@/redux/baseUrl";
 
 export default function SparePartsCarousel() {
   const dispatch = useDispatch();
-  const { carousel, loading, error } = useSelector((state) => state.carousel);
+  const { bottomCarousel, loading, error } = useSelector((state) => state.carousel);
   const [currentSlide, setCurrentSlide] = useState(0);
 
   useEffect(() => {
     const sectionId = localStorage.getItem('sectionId');
     
     if (sectionId) {
-      dispatch(getHomeCarouselBySection(sectionId));
+      dispatch(getBottomCarouselbySection(sectionId));
     } else {
       console.warn('No sectionId found in localStorage');
     }
   }, [dispatch]);
 
   useEffect(() => {
-    if (carousel.length > 0) {
+    if (bottomCarousel.length > 0) {
       const timer = setInterval(() => {
-        setCurrentSlide((prev) => (prev + 1) % carousel.length);
+        setCurrentSlide((prev) => (prev + 1) % bottomCarousel.length);
       }, 6000);
       return () => clearInterval(timer);
     }
-  }, [carousel.length]);
+  }, [bottomCarousel?.length]);
+  
 
   if (loading) {
     return (
@@ -52,7 +53,7 @@ export default function SparePartsCarousel() {
   }
 
   // Show empty state if no carousel items
-  if (!carousel || carousel.length === 0) {
+  if (!bottomCarousel || bottomCarousel.length === 0) {
     return (
       <section className="relative w-full overflow-hidden h-96 bg-gray-200 rounded-lg flex items-center justify-center">
         <div className="text-center">
@@ -63,67 +64,66 @@ export default function SparePartsCarousel() {
   }
 
   return (
-    <section className="relative overflow-hidden max-w-8xl mx-auto px-4 md:px-15 bg-white ">
-      {/* Slides */}
-      {carousel.map((slide, index) => (
-        <div
-          key={slide._id}
-          className={`flex flex-col md:flex-row items-center justify-between transition-opacity duration-700 ease-in-out ${
-            index === currentSlide ? "opacity-100" : "opacity-0 absolute inset-0"
-          } bg-red-700 text-white px-6 md:px-12 lg:px-20 py-12 `}
-        >
-          {/* Left Content */}
-          <div className="max-w-xl mb-8 md:mb-0">
-            <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold leading-snug mb-4">
-              {slide.title}
-            </h2>
-            {slide.description && (
-              <p className="text-sm md:text-base text-gray-100 mb-6">
-                {slide.description}
-              </p>
-            )}
-            {slide.features && slide.features.length > 0 && (
-              <ul className="space-y-2 text-sm md:text-base">
-                {slide.features.map((feature, i) => (
-                  <li key={i} className="flex items-center gap-2">
-                    {feature}
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
+   <section className="relative overflow-hidden max-w-8xl mx-auto">
+ {bottomCarousel.map((slide, index) => (
+  <div
+    key={slide._id}
+    className={`flex flex-col md:flex-row items-center justify-between transition-opacity duration-700 ease-in-out ${
+      index === currentSlide ? "opacity-100" : "opacity-0 absolute inset-0"
+    } px-6 md:px-12 lg:px-20 py-12 relative min-h-[400px] md:min-h-[500px] lg:min-h-[450px] max-w-9xl mx-auto `}
+  >
+    {/* Background Image */}
+    {slide.image && (
+      <Image
+        src={`${IMG_URL}/${slide.image}`}
+        alt={slide.title}
+        fill
+        className="object-cover"
+        priority={index === 0}
+      />
+    )}
+    
+    {/* Dark Overlay for better text readability */}
+    <div className="absolute inset-0 bg-black/40" />
 
-          {/* Right Image */}
-          {slide.image && (
-            <div className="relative w-full md:w-1/2 h-64 md:h-80 flex justify-center">
-              <Image
-                src={`${IMG_URL}/${slide.image}`}
-                alt={slide.title}
-                fill
-                className="object-contain"
-                priority={index === 0}
-              />
-            </div>
-          )}
-        </div>
-      ))}
-
-      {/* Dot Navigation - Only show if multiple slides */}
-      {carousel.length > 1 && (
-        <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2">
-          {carousel.map((_, index) => (
-            <button
-              key={index}
-              onClick={() => setCurrentSlide(index)}
-              className={`w-3 h-3 rounded-full transition-all ${
-                index === currentSlide
-                  ? "bg-white scale-125 shadow"
-                  : "bg-white/50 hover:bg-white/75"
-              }`}
-            />
-          ))}
-        </div>
+    {/* Content - Now on top of background */}
+    <div className="relative z-10 max-w-xl mb-8 md:mb-0 text-white">
+      <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold leading-snug mb-4">
+        {slide.title}
+      </h2>
+      {slide.description && (
+        <p className="text-sm md:text-base text-gray-100 mb-6">
+          {slide.description}
+        </p>
       )}
-    </section>
+      {slide.features && slide.features.length > 0 && (
+        <ul className="space-y-2 text-sm md:text-base">
+          {slide.features.map((feature, i) => (
+            <li key={i} className="flex items-center gap-2">
+              {feature}
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  </div>
+))}
+
+  {bottomCarousel.length > 1 && (
+    <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2 z-20">
+      {bottomCarousel.map((_, index) => (
+        <button
+          key={index}
+          onClick={() => setCurrentSlide(index)}
+          className={`w-3 h-3 rounded-full transition-all ${
+            index === currentSlide
+              ? "bg-white scale-125 shadow"
+              : "bg-white/50 hover:bg-white/75"
+          }`}
+        />
+      ))}
+    </div>
+  )}
+</section>
   );
 }

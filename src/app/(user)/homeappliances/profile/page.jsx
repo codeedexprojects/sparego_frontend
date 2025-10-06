@@ -1,7 +1,6 @@
 "use client";
 import React, { useState, useEffect, useRef } from "react";
 import { Pencil, User2Icon } from "lucide-react";
-import Header from "@/components/user/homeappliance/Header";
 import Footer from "@/components/landing/Footer";
 import { useSelector, useDispatch } from "react-redux";
 import {
@@ -14,47 +13,38 @@ import { AddressForm } from "./components/AddressForm";
 import { AddressList } from "./components/AddressList";
 import { getUserProfile, logout } from "@/redux/slices/authSlice";
 import { useRouter } from "next/navigation";
+import Header from "@/components/user/homeappliance/Header";
 
-
-// Main Address Page Component
 const AddressPage = () => {
   const dispatch = useDispatch();
   const router = useRouter();
-  const {
-    address: addresses,
-    loading,
-    error,
-  } = useSelector((state) => state.address);
+  const { address: addresses, loading, error } = useSelector(
+    (state) => state.address
+  );
   const { user, loading: userLoading } = useSelector((state) => state.auth);
+
   const [showForm, setShowForm] = useState(false);
   const [editingAddress, setEditingAddress] = useState(null);
   const [formLoading, setFormLoading] = useState(false);
   const [mounted, setMounted] = useState(false);
-  
-  // Use ref to track if data has been fetched
+  const [token, setToken] = useState(null);
+
   const hasFetchedData = useRef(false);
 
   useEffect(() => {
     setMounted(true);
-  }, []);
+    if (typeof window !== "undefined") {
+      const storedToken = localStorage.getItem("token");
+      setToken(storedToken);
 
-  useEffect(() => {
-  console.log("Addresses from API:", addresses);
-}, [addresses]);
-
-  useEffect(() => {
-    // Only fetch once when user is available and hasn't been fetched yet
-    if (user && !hasFetchedData.current) {
-      hasFetchedData.current = true;
-      dispatch(getAddress());
-      dispatch(getUserProfile());
+      // If token exists, fetch profile and addresses
+      if (storedToken && !hasFetchedData.current) {
+        hasFetchedData.current = true;
+        dispatch(getUserProfile());
+        dispatch(getAddress());
+      }
     }
-    
-    // Reset the flag when user logs out
-    if (!user && hasFetchedData.current) {
-      hasFetchedData.current = false;
-    }
-  }, [dispatch, user]);
+  }, [dispatch]);
 
   const handleAddAddress = () => {
     setEditingAddress(null);
@@ -71,12 +61,8 @@ const AddressPage = () => {
       setFormLoading(true);
       dispatch(deleteAddress(id))
         .unwrap()
-        .then(() => {
-          setFormLoading(false);
-        })
-        .catch(() => {
-          setFormLoading(false);
-        });
+        .then(() => setFormLoading(false))
+        .catch(() => setFormLoading(false));
     }
   };
 
@@ -93,9 +79,7 @@ const AddressPage = () => {
           setShowForm(false);
           setEditingAddress(null);
         })
-        .catch(() => {
-          setFormLoading(false);
-        });
+        .catch(() => setFormLoading(false));
     } else {
       dispatch(createAddress(addressData))
         .unwrap()
@@ -103,9 +87,7 @@ const AddressPage = () => {
           setFormLoading(false);
           setShowForm(false);
         })
-        .catch(() => {
-          setFormLoading(false);
-        });
+        .catch(() => setFormLoading(false));
     }
   };
 
@@ -115,39 +97,84 @@ const AddressPage = () => {
   };
 
   const handleLogout = () => {
-    hasFetchedData.current = false; // Reset on logout
+    hasFetchedData.current = false;
+    localStorage.removeItem("token");
     dispatch(logout());
     router.push("/spare/login");
   };
 
-  const handleLogin = () => {
-    router.push("/spare/login");
-  };
+  if (!mounted) return null;
+
+  if (!token) {
+    return (
+      <>
+      <Header/>
+      <div className=" flex items-center justify-center p-6 bg-gradient-to-br from-red-50 to-white">
+        <div className="max-w-md w-full">
+          <div className="bg-white rounded-2xl shadow-xl p-8 border border-red-100">
+            {/* Icon */}
+            <div className="flex justify-center mb-6">
+              <div className="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center">
+             <User2Icon className="w-10 h-10 text-red-600" />
+              </div>
+            </div>
+
+            {/* Content */}
+            <h2 className="text-2xl font-bold text-gray-900 mb-3 text-center">
+              Your Profile Awaits
+            </h2>
+            <p className="text-gray-600 text-center mb-8 leading-relaxed">
+              Sign in to access your saved items, manage your profile, and track
+              your orders all in one place.
+            </p>
+
+            {/* Button */}
+            <button
+              className="w-full bg-red-600 text-white px-6 py-3 rounded-lg hover:bg-red-700 transition-all duration-200 font-semibold shadow-lg shadow-red-600/30 hover:shadow-xl hover:shadow-red-600/40 hover:scale-105 transform"
+              onClick={() => router.push("/spare/login")}
+            >
+              Login to Continue
+            </button>
+
+            {/* Footer text */}
+            <p className="text-sm text-gray-500 text-center mt-6">
+              Don't have an account?{" "}
+              <button
+                className="text-red-600 hover:text-red-700 font-medium hover:underline"
+                onClick={() => router.push("/spare/register")}
+              >
+                Sign up
+              </button>
+            </p>
+          </div>
+        </div>
+      </div>
+      <Footer/>
+      </>
+    );
+  }
 
   return (
     <div>
       <Header />
       <div className="bg-white min-h-screen py-10 px-6 lg:px-20 space-y-6">
-        {/* Name & Email */}
-        {user && (
+        {/* Username & Number Section */}
+        {mounted && (
           <div className="bg-gray-50 p-6 rounded-lg border border-gray-200">
             <div className="flex items-center justify-between mb-2">
               <h2 className="font-semibold text-gray-800">
-                {!mounted || userLoading
-                  ? "Loading..."
-                  : user?.name || "User Name"}
+                {!userLoading ? user?.name || "User Name" : "Loading..."}
               </h2>
             </div>
             <p className="text-sm text-gray-500">Number</p>
             <p className="text-gray-700">
-              {!mounted || userLoading
-                ? "Loading..."
-                : user?.number || "No Number available"}
+              {!userLoading ? user?.number || "No Number available" : "Loading..."}
             </p>
           </div>
         )}
 
-        {user ? (
+        {/* Address Form/List */}
+        {mounted && (
           <>
             {showForm ? (
               <AddressForm
@@ -174,46 +201,6 @@ const AddressPage = () => {
               Logout
             </button>
           </>
-        ) : (
-         <div className=" flex items-center justify-center p-6 ">
-  <div className="max-w-md w-full">
-    <div className="bg-white rounded-2xl shadow-xl p-8 border border-red-100">
-      {/* Icon */}
-      <div className="flex justify-center mb-6">
-        <div className="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center">
-         <User2Icon className="w-10 h-10 text-red-600"/>
-        </div>
-      </div>
-
-      {/* Content */}
-      <h2 className="text-2xl font-bold text-gray-900 mb-3 text-center">
-        Your Profile Awaits
-      </h2>
-      <p className="text-gray-600 text-center mb-8 leading-relaxed">
-        Sign in to access your saved items, manage your profile, and track your orders all in one place.
-      </p>
-
-      {/* Button */}
-      <button
-        className="w-full bg-red-600 text-white px-6 py-3 rounded-lg hover:bg-red-700 transition-all duration-200 font-semibold shadow-lg shadow-red-600/30 hover:shadow-xl hover:shadow-red-600/40 hover:scale-105 transform"
-        onClick={() => router.push("/spare/login")}
-      >
-        Login to Continue
-      </button>
-
-      {/* Footer text */}
-      <p className="text-sm text-gray-500 text-center mt-6">
-        Don't have an account?{' '}
-        <button 
-          className="text-red-600 hover:text-red-700 font-medium hover:underline"
-          onClick={() => router.push("/spare/register")}
-        >
-          Sign up
-        </button>
-      </p>
-    </div>
-  </div>
-</div>
         )}
       </div>
       <Footer />

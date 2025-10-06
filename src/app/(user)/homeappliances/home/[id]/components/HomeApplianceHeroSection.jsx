@@ -46,12 +46,10 @@ function HomeApplianceHeroSection({slides}) {
   {slides.length > 0 && (
 <div className="relative z-10 flex items-start h-full px-6 sm:px-8 md:px-12 lg:px-10 pt-10 sm:pt-16 md:pt-24 lg:pt-10">
         <div className="max-w-lvh">
-        {/* Bold Large Title */}
         <h1 className="text-[#009FFF] text-3xl sm:text-4xl md:text-7xl lg:text-5xl font-bold mb-4 sm:mb-6 drop-shadow-2xl leading-tight">
           {slides[currentSlide]?.title || "Explore"}
         </h1>
         
-        {/* Medium Description */}
         <p className="text-white text-base sm:text-lg md:text-xl mb-6 sm:mb-8 drop-shadow-lg leading-relaxed opacity-90">
           {slides[currentSlide]?.section?.name}
         </p>

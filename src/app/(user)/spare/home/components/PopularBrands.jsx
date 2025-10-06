@@ -114,7 +114,6 @@ export default function PopularBrandsSection() {
           <>
             {/* Mobile: Horizontal scroll, Desktop: Grid */}
             <div className="mb-8">
-              {/* Mobile horizontal scroll */}
               <div className="flex md:hidden overflow-x-auto scrollbar-hide gap-4 pb-4 px-2">
                 {displayedBrands.map((brand) => (
                   <Link
@@ -124,7 +123,7 @@ export default function PopularBrandsSection() {
                       .replace(/\s+/g, "-")}`}
                     className="group relative flex flex-col items-center flex-shrink-0"
                   >
-                    <div className="relative w-20 h-20 mb-3 flex flex-col items-center justify-between bg-white rounded-lg border overflow-hidden group">                     
+                    <div className="relative w-20 h-20 mb-3 flex flex-col items-center justify-between bg-white rounded-lg border overflow-hidden ">                     
                       <div className="absolute inset-0 bg-gradient-to-tr from-red-600 to-red-600 opacity-0 scale-0 group-hover:opacity-100 group-hover:scale-100 transition-all duration-500 origin-bottom-left rounded-lg"></div>                     
                       
                       <div className="w-15 h-15 relative z-10 flex-1 flex items-center justify-center p-2">
@@ -132,11 +131,11 @@ export default function PopularBrandsSection() {
                           src={getLogoUrl(brand.logo) || "/home/brand1.png"}   
                           alt={`${brand.name} logo`}   
                           fill   
-                          className="object-contain filter grayscale group-hover:grayscale-0 transition-all duration-300" 
+                          className="object-contain transition-all duration-300" 
                         />                     
                       </div>                       
                       
-                      <span className="text-xs text-gray-600 font-medium group-hover:text-red-600 transition-colors duration-300 relative z-10 pb-1 text-center px-1 truncate w-full">
+                      <span className="text-xs text-gray-600 font-medium transition-colors duration-300 relative z-10 pb-1 text-center px-1 truncate w-full">
                         {brand.name}
                       </span>
                     </div>
@@ -162,11 +161,11 @@ export default function PopularBrandsSection() {
                           src={getLogoUrl(brand.logo) || "/home/brand1.png"}   
                           alt={`${brand.name} logo`}   
                           fill   
-                          className="object-contain filter grayscale group-hover:grayscale-0 transition-all duration-300" 
+                          className="object-contain transition-all duration-300" 
                         />                     
                       </div>                       
                       
-                      <span className="text-xs text-gray-600 font-medium group-hover:text-red-600 transition-colors duration-300 relative z-10 pb-1">
+                      <span className="text-xs text-gray-600 font-medium transition-colors duration-300 relative z-10 pb-1">
                         {brand.name}
                       </span>
                     </div>
@@ -177,7 +176,9 @@ export default function PopularBrandsSection() {
 
             {filteredBrands.length > 10 && (
               <div className="flex justify-center mb-4">
-                <button className="px-6 py-2 border border-gray-300 text-gray-600 rounded-lg hover:border-red-300 hover:text-red-600 transition-colors duration-300 text-sm">
+                <button
+                onClick={()=>router.push('/spare/brands')}
+                 className="px-6 py-2 border border-gray-300 text-gray-600 rounded-lg hover:border-red-300 hover:text-red-600 transition-colors duration-300 text-sm">
                   View more
                 </button>
               </div>
@@ -188,13 +189,7 @@ export default function PopularBrandsSection() {
             <p className="text-gray-500">No brands found for {activeTab}</p>
           </div>
         )}
-        <div className="text-center">
-          <button 
-            onClick={()=>router.push('/spare/brands')}
-            className="px-8 py-2 border border-red-700 text-gray-700 font-medium text-sm hover:bg-gray-50 transition-colors rounded">
-            View more
-          </button>
-        </div>
+      
       </div>
     </section>
   );

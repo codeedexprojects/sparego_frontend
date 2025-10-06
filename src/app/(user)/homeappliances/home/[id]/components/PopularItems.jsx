@@ -18,7 +18,7 @@ export default function PopularItems() {
   const router = useRouter();
 
   const [sectionId, setSectionId] = useState(null);
-  const [processingItems, setProcessingItems] = useState({}); // track loader per item
+  const [processingItems, setProcessingItems] = useState({});
 
   useEffect(() => {
     const id = localStorage.getItem("sectionId");
@@ -28,18 +28,15 @@ export default function PopularItems() {
       dispatch(getPopularProducts({ section: id }));
     }
 
-    // Fetch wishlist on mount
     dispatch(getWishlist());
   }, [dispatch]);
 
-  // Check if product is in wishlist
   const isInWishlist = (productId) => {
     return wishlist?.some(
       (item) => item.product?._id === productId || item._id === productId
     );
   };
 
-  // Toggle wishlist (add/remove like WishlistPage)
   const handleToggleWishlist = async (productId) => {
     const token = localStorage.getItem("token");
 
@@ -59,7 +56,7 @@ export default function PopularItems() {
         } else {
           toast.success("Added to wishlist");
         }
-        dispatch(getWishlist()); // refresh wishlist
+        dispatch(getWishlist()); 
       } else {
         toast.error("Failed to update wishlist");
       }
@@ -109,7 +106,6 @@ export default function PopularItems() {
         </h2>
       </div>
 
-      {/* Desktop & Mobile Unified Grid */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6 overflow-x-auto sm:overflow-visible pb-4 scrollbar-hide">
         {products?.map((product) => (
           <div
@@ -117,7 +113,6 @@ export default function PopularItems() {
             className="bg-white border rounded-lg overflow-hidden shadow-sm hover:shadow-lg transition relative flex-none sm:flex-auto w-64 sm:w-auto"
           >
             <div className="relative w-full h-64">
-              {/* Loader overlay */}
               {processingItems[product._id] && (
                 <div className="absolute inset-0 bg-white bg-opacity-70 flex items-center justify-center z-10">
                   <Loader className="animate-spin h-6 w-6 text-red-600" />
@@ -148,7 +143,7 @@ export default function PopularItems() {
                 />
               </button>
             </div>
-
+<hr className="border" />
             <div className="p-4">
               <h3 className="text-lg font-medium text-gray-900">
                 {product.name}

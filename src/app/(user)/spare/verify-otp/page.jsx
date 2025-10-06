@@ -7,7 +7,7 @@ import { verifyOtp } from "@/redux/slices/authSlice";
 import { useRouter, useSearchParams } from "next/navigation";
 import { toast, Toaster } from "sonner";
 
-export default function VerifyOtpPage() {
+export default function page() {
   const [otp, setOtp] = useState(new Array(6).fill(""));
   const [countdown, setCountdown] = useState(30);
   const [canResend, setCanResend] = useState(false);

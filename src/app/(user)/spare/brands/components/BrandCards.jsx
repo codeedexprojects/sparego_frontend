@@ -102,7 +102,7 @@ const BrandSelectionSection = () => {
                       alt={`${brand.name} logo`}
                       width={80}
                       height={60}
-                      className="object-contain"
+                      className="object-contain w-30 h-30"
                       onError={(e) => {
                         e.target.style.display = 'none';
                         e.target.nextSibling.style.display = 'flex';
@@ -120,20 +120,13 @@ const BrandSelectionSection = () => {
                   )}
                 </div>
                 <div className="text-center mb-3">
-                  <h3 className="font-semibold text-gray-900 text-sm">
-                    {brand.name}
-                  </h3>
                   {brand.description && (
                     <p className="text-sm text-gray-900">
                       {brand.description}
                     </p>
                   )}
                 </div>
-                <div className="text-center">
-                  <span className="text-xs text-gray-500 font-medium">
-                    {brand.partsCount || '0'} Parts
-                  </span>
-                </div>
+             
               </div>
             ))}
           </div>
@@ -142,13 +135,13 @@ const BrandSelectionSection = () => {
             <p className="text-gray-500">No brands found for {activeTab}</p>
           </div>
         )}
-        {filteredBrands.length > 0 && (
+        {/* {filteredBrands.length > 0 && (
           <div className="text-center">
             <button className="px-8 py-2 border border-gray-300 text-gray-700 font-medium text-sm hover:bg-gray-50 transition-colors rounded">
               Load more
             </button>
           </div>
-        )}
+        )} */}
       </div>
     </div>
   );

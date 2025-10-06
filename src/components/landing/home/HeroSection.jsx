@@ -87,67 +87,67 @@ export default function HeroSection() {
           </p>
         </div>
 
-        <div className="grid gap-8 md:grid-cols-3 lg:gap-10">
-          {allCards.map((item) => (
-            <div key={item._id} className="group relative">
-              <div className="bg-gray-800 rounded-3xl shadow-2xl overflow-hidden hover:shadow-3xl transition-all duration-500 transform hover:-translate-y-2 border-4 border-gray-700">
-                <div className="bg-white mx-4 mt-4 rounded-2xl p-8 flex items-center justify-center min-h-[200px]">
-                  <div className="w-40 h-40 relative">
-                    <Image
-                      src={item.path ? item.image : `${IMG_URL}/${item.image}`}
-                      alt={item.title}
-                      fill
-                      className="object-contain"
-                    />
-                  </div>
-                </div>
+        <div className="grid gap-8 md:grid-cols-3 lg:gap-10 max-w-5xl mx-auto">
+  {allCards.map((item) => (
+    <div key={item._id} className="group relative h-full">
+      <div className="bg-gray-800 rounded-2xl shadow-2xl overflow-hidden hover:shadow-3xl transition-all duration-500 transform hover:-translate-y-2 border-4 border-gray-700 h-full flex flex-col">
+        <div className="bg-white mx-4 mt-4 rounded-2xl p-6 flex items-center justify-center h-[200px]">
+          <div className="w-32 h-32 relative">
+            <Image
+              src={item.path ? item.image : `${IMG_URL}/${item.image}`}
+              alt={item.title}
+              fill
+              className="object-contain"
+            />
+          </div>
+        </div>
 
-                <div className="px-6 py-6 text-white">
-                  <h3 className="text-xl font-bold mb-4 text-white group-hover:text-red-300 transition-colors">
-                    {item.title}
-                  </h3>
-                  <p className="text-gray-300 text-sm leading-relaxed mb-6 min-h-[4rem]">
-                    {item.description}
-                  </p>
-                </div>
+        <div className="px-5 py-5 text-white flex-grow">
+          <h3 className="text-2xl font-bold mb-3 text-white transition-colors">
+            {item.title}
+          </h3>
+          <p className="text-gray-300 text-sm leading-relaxed mb-6">
+            {item.description}
+          </p>
+        </div>
 
-                <div className="px-6 pb-6">
-                  <Link
-                    href={
-                      item._id === "static-1"
-                        ? "/spare/home" 
-                        : `/homeappliances/home/${item.section?._id}` 
-                    }
-                    onClick={() => {
-                      if (item._id === "static-1") {
-                        localStorage.setItem("sectionId", "spare");
-                      } else if (item.section?._id) {
-                        localStorage.setItem("sectionId", item.section._id);
-                      }
-                    }}
-                    className="w-full inline-flex items-center justify-center gap-2 px-6 py-3 bg-red-600 hover:bg-red-700 text-white rounded-xl font-semibold text-sm transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-red-500/25"
-                  >
-                    {item.buttonText}
-                    <svg
-                      className="w-4 h-4 transition-transform group-hover:translate-x-1"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M9 5l7 7-7 7"
-                      />
-                    </svg>
-                  </Link>
-                </div>
-              </div>
-            </div>
-          ))}
+        <div className="px-5 pb-5 mt-auto">
+          <Link
+            href={
+              item._id === "static-1"
+                ? "/spare/home" 
+                : `/homeappliances/home/${item.section?._id}` 
+            }
+            onClick={() => {
+              if (item._id === "static-1") {
+                localStorage.setItem("sectionId", "spare");
+              } else if (item.section?._id) {
+                localStorage.setItem("sectionId", item.section._id);
+              }
+            }}
+            className="w-full inline-flex items-center justify-center gap-2 px-5 py-3 bg-red-600 hover:bg-red-700 text-white rounded-xl font-semibold text-sm transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-red-500/25"
+          >
+            {item.buttonText}
+            <svg
+              className="w-4 h-4 transition-transform group-hover:translate-x-1"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M9 5l7 7-7 7"
+              />
+            </svg>
+          </Link>
         </div>
       </div>
-    </section>
+    </div>
+  ))}
+</div>
+</div>
+</section>
   );
 }
