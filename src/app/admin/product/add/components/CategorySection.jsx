@@ -45,35 +45,26 @@ const CategorySection = ({
     });
   };
 
-  // Helper function to handle optional selects
-  const handleOptionalSelectChange = (e) => {
-    const value = e.target.value || null; // convert empty string to null
-    onInputChange({
-      target: {
-        name: e.target.name,
-        value
-      }
-    });
-  };
-
   return (
     <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
       <h3 className="text-lg font-semibold text-gray-900 mb-4">Categorization</h3>
       <div className="space-y-4">
-        
-        {/* Section (optional) */}
+        {/* Section */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            Section
+            Section <span className="text-red-500">*</span>
           </label>
           <select
             name="section"
-            value={formData.section || ""}
-            onChange={handleOptionalSelectChange}
+            value={formData.section}
+            onChange={onInputChange}
+            required
             disabled={sectionsLoading}
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
           >
-            <option value="">Select Section (optional)</option>
+            <option value="">
+              {sectionsLoading ? 'Loading sections...' : 'Select Section'}
+            </option>
             {sections.map((section) => (
               <option key={section._id} value={section._id}>
                 {section.name}
@@ -82,111 +73,133 @@ const CategorySection = ({
           </select>
         </div>
 
-        {/* Brand (optional) */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Brand
-          </label>
-          <select
-            name="productBrand"
-            value={formData.productBrand || ""}
-            onChange={handleOptionalSelectChange}
-            disabled={brandsLoading}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
-          >
-            <option value="">Select Brand (optional)</option>
-            {brands.map((brand) => (
-              <option key={brand._id} value={brand._id}>
-                {brand.name}
+        {/* Brand */}
+        {formData.section && (
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Brand
+            </label>
+            <select
+              name="productBrand"
+              value={formData.productBrand}
+              onChange={onInputChange}
+              disabled={brandsLoading}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+            >
+              <option value="">
+                {brandsLoading ? 'Loading brands...' : brands.length === 0 ? 'No brands available for this section' : 'Select Brand'}
               </option>
-            ))}
-          </select>
-        </div>
+              {brands.map((brand) => (
+                <option key={brand._id} value={brand._id}>
+                  {brand.name}
+                </option>
+              ))}
+            </select>
+            {brands.length === 0 && !brandsLoading && formData.section && (
+              <p className="mt-1 text-sm text-amber-600">
+                No brands available for the selected section. Please add brands for this section first.
+              </p>
+            )}
+          </div>
+        )}
 
-        {/* Main Category (optional) */}
+        {/* Categories */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Main Category
-            </label>
-            <select
-              name="mainCategory"
-              value={formData.mainCategory || ""}
-              onChange={handleOptionalSelectChange}
-              disabled={mainCategoriesLoading}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
-            >
-              <option value="">Select Main Category (optional)</option>
-              {mainCategories.map((category) => (
-                <option key={category._id} value={category._id}>
-                  {category.name}
+          {formData.section && (
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Main Category
+              </label>
+              <select
+                name="mainCategory"
+                value={formData.mainCategory}
+                onChange={onInputChange}
+                disabled={mainCategoriesLoading}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+              >
+                <option value="">
+                  {mainCategoriesLoading ? 'Loading...' : mainCategories.length === 0 ? 'No main categories' : 'Select Main Category'}
                 </option>
-              ))}
-            </select>
-          </div>
+                {mainCategories.map((category) => (
+                  <option key={category._id} value={category._id}>
+                    {category.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
 
-          {/* Category */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Category
-            </label>
-            <select
-              name="category"
-              value={formData.category || ""}
-              onChange={handleOptionalSelectChange}
-              disabled={categoriesLoading}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
-            >
-              <option value="">Select Category (optional)</option>
-              {categories.map((category) => (
-                <option key={category._id} value={category._id}>
-                  {category.name}
+          {formData.mainCategory && (
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Category
+              </label>
+              <select
+                name="category"
+                value={formData.category}
+                onChange={onInputChange}
+                disabled={categoriesLoading}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+              >
+                <option value="">
+                  {categoriesLoading ? 'Loading...' : categories.length === 0 ? 'No categories' : 'Select Category'}
                 </option>
-              ))}
-            </select>
-          </div>
+                {categories.map((category) => (
+                  <option key={category._id} value={category._id}>
+                    {category.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
 
-          {/* Sub Category */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Sub Category
-            </label>
-            <select
-              name="subCategory"
-              value={formData.subCategory || ""}
-              onChange={handleOptionalSelectChange}
-              disabled={subCategoriesLoading}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
-            >
-              <option value="">Select Sub Category (optional)</option>
-              {subCategories.map((category) => (
-                <option key={category._id} value={category._id}>
-                  {category.name}
+          {formData.category && (
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Sub Category
+              </label>
+              <select
+                name="subCategory"
+                value={formData.subCategory}
+                onChange={onInputChange}
+                disabled={subCategoriesLoading}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+              >
+                <option value="">
+                  {subCategoriesLoading ? 'Loading...' : subCategories.length === 0 ? 'No sub categories' : 'Select Sub Category'}
                 </option>
-              ))}
-            </select>
-          </div>
+                {subCategories.map((category) => (
+                  <option key={category._id} value={category._id}>
+                    {category.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
 
-          {/* Sub Sub Category */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Sub Sub Category
-            </label>
-            <select
-              name="subSubCategory"
-              value={formData.subSubCategory || ""}
-              onChange={handleOptionalSelectChange}
-              disabled={subSubCategoriesLoading}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
-            >
-              <option value="">Select Sub Sub Category (optional)</option>
-              {subSubCategories.map((category) => (
-                <option key={category._id} value={category._id}>
-                  {category.name}
+          {formData.subCategory && (
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Sub Sub Category
+              </label>
+              <select
+                name="subSubCategory"
+                value={formData.subSubCategory}
+                onChange={onInputChange}
+                disabled={subSubCategoriesLoading}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+              >
+                <option value="">
+                  {subSubCategoriesLoading ? 'Loading...' : subSubCategories.length === 0 ? 'No sub sub categories' : 'Select Sub Sub Category'}
                 </option>
-              ))}
-            </select>
-          </div>
+                {subSubCategories.map((category) => (
+                  <option key={category._id} value={category._id}>
+                    {category.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
         </div>
 
         {/* Vehicle Type */}
@@ -196,7 +209,7 @@ const CategorySection = ({
           </label>
           <select
             name="vehicleType"
-            value={formData.vehicleType || "Universal"}
+            value={formData.vehicleType}
             onChange={onInputChange}
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
