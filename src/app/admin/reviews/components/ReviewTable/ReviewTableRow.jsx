@@ -1,5 +1,5 @@
 // components/ReviewTable/ReviewTableRow.jsx
-const ReviewTableRow = ({ review, onEdit, onDelete, onToggleStatus }) => {
+const ReviewTableRow = ({ review, serialNumber, onEdit, onDelete, onToggleStatus }) => {
   // Helper function to safely get string values
   const getStringValue = (value) => {
     if (typeof value === 'string') return value;
@@ -11,12 +11,24 @@ const ReviewTableRow = ({ review, onEdit, onDelete, onToggleStatus }) => {
 
   return (
     <tr className="hover:bg-gray-50 transition-colors">
+      {/* Serial Number */}
+      <td className="px-6 py-4 font-medium text-gray-900">{serialNumber}</td>
+
+      {/* Reviewer Name */}
       <td className="px-6 py-4">
         <div className="font-medium text-gray-900">{getStringValue(review.name)}</div>
       </td>
+
+      {/* Designation */}
       <td className="px-6 py-4 text-gray-900">{getStringValue(review.designation)}</td>
+
+      {/* Title */}
       <td className="px-6 py-4 text-gray-900">{getStringValue(review.title)}</td>
+
+      {/* Message */}
       <td className="px-6 py-4 text-gray-900 max-w-xs truncate">{getStringValue(review.message)}</td>
+
+      {/* Status */}
       <td className="px-6 py-4">
         <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium ${
           review.isActive 
@@ -26,6 +38,8 @@ const ReviewTableRow = ({ review, onEdit, onDelete, onToggleStatus }) => {
           {review.isActive ? 'Active' : 'Inactive'}
         </span>
       </td>
+
+      {/* Actions */}
       <td className="px-6 py-4">
         <div className="flex space-x-2">
           {onEdit && (

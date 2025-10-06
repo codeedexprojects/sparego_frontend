@@ -1,10 +1,10 @@
-// components/HomeCardTable/HomeCardTable.jsx
 "use client";
 import { useState } from "react";
 import HomeCardTableHeader from "./HomeCardTableHeader";
 import HomeCardTableRow from "./HomeCardTableRow";
 import HomeCardModal from "./HomeCardModal";
 import Pagination from "../../../../../components/shared/Pagination";
+import DeleteConfirmationModal from "../../../main-categories/components/DeleteModal";
 
 const HomeCardTable = ({ 
   homeCards = [], 
@@ -15,15 +15,19 @@ const HomeCardTable = ({
   onEditHomeCard, 
   onDeleteHomeCard,
   onToggleStatus,
-  itemsPerPage = 6
+  sections = [],
+  initialItemsPerPage = 6
 }) => {
   const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(initialItemsPerPage);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingHomeCard, setEditingHomeCard] = useState(null);
 
+  // Delete modal state
+  const [homeCardToDelete, setHomeCardToDelete] = useState(null);
+
   const totalPages = Math.ceil(homeCards.length / itemsPerPage);
 
-  // Get home cards for current page
   const paginatedHomeCards = homeCards.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
@@ -40,8 +44,13 @@ const HomeCardTable = ({
   };
 
   const handleDelete = (homeCard) => {
-    if (window.confirm(`Are you sure you want to delete the "${homeCard.title}" home card?`)) {
-      onDeleteHomeCard && onDeleteHomeCard(homeCard);
+    setHomeCardToDelete(homeCard);
+  };
+
+  const confirmDelete = () => {
+    if (homeCardToDelete) {
+      onDeleteHomeCard && onDeleteHomeCard(homeCardToDelete);
+      setHomeCardToDelete(null);
     }
   };
 
@@ -60,10 +69,7 @@ const HomeCardTable = ({
 
   return (
     <div className="p-6 bg-white min-h-screen">
-      <HomeCardTableHeader 
-        title="Home Card Management" 
-        onAddHomeCard={handleAdd} 
-      />
+      <HomeCardTableHeader title="Home Card Management" onAddHomeCard={handleAdd} />
       
       {/* Error Message */}
       {error && (
@@ -110,41 +116,39 @@ const HomeCardTable = ({
           <span className="ml-3 text-gray-600">Loading home cards...</span>
         </div>
       ) : (
-        <>
-          {/* Home Cards Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
-            {paginatedHomeCards.length > 0 ? (
-              paginatedHomeCards.map((homeCard) => (
-                <HomeCardTableRow
-                  key={homeCard._id || homeCard.id}
-                  homeCard={homeCard}
-                  onEdit={handleEdit}
-                  onDelete={handleDelete}
-                  onToggleStatus={handleToggleStatus}
-                />
-              ))
-            ) : (
-              <div className="col-span-full bg-gray-50 rounded-lg p-8 text-center">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 mx-auto text-gray-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                </svg>
-                <h3 className="text-lg font-medium text-gray-900 mb-1">No home cards found</h3>
-                <p className="text-gray-500">Get started by adding a new home card.</p>
-              </div>
-            )}
-          </div>
-        </>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
+          {paginatedHomeCards.length > 0 ? (
+            paginatedHomeCards.map((homeCard) => (
+              <HomeCardTableRow
+                key={homeCard._id || homeCard.id}
+                homeCard={homeCard}
+                onEdit={handleEdit}
+                onDelete={handleDelete}
+                onToggleStatus={handleToggleStatus}
+              />
+            ))
+          ) : (
+            <div className="col-span-full bg-gray-50 rounded-lg p-8 text-center">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 mx-auto text-gray-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
+              <h3 className="text-lg font-medium text-gray-900 mb-1">No home cards found</h3>
+              <p className="text-gray-500">Get started by adding a new home card.</p>
+            </div>
+          )}
+        </div>
       )}
 
       {/* Pagination Component */}
       {homeCards.length > 0 && (
-        <div className="mt-6">
-          <Pagination
-            currentPage={currentPage}
-            totalPages={totalPages}
-            onPageChange={setCurrentPage}
-          />
-        </div>
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={setCurrentPage}
+          itemsPerPage={itemsPerPage}
+          setItemsPerPage={setItemsPerPage}
+          totalItems={homeCards.length}
+        />
       )}
 
       {/* Home Card Modal */}
@@ -153,6 +157,17 @@ const HomeCardTable = ({
         onClose={() => setIsModalOpen(false)}
         onSubmit={handleSubmit}
         homeCard={editingHomeCard}
+        sections={sections}
+
+      />
+
+      {/* Delete Confirmation Modal */}
+      <DeleteConfirmationModal
+        item={homeCardToDelete}
+        onClose={() => setHomeCardToDelete(null)}
+        onConfirm={confirmDelete}
+        title="Delete Home Card"
+        description={`Are you sure you want to delete the "${homeCardToDelete?.title}" home card?`}
       />
     </div>
   );

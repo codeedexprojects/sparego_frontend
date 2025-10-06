@@ -53,13 +53,9 @@ const ProductForm = ({ productId, onSuccess, onCancel }) => {
 
   const [images, setImages] = useState([]);
   const [imagePreviews, setImagePreviews] = useState([]);
-  const [filteredBrands, setFilteredBrands] = useState([]);
-  const [filteredMainCategories, setFilteredMainCategories] = useState([]);
-  const [filteredCategories, setFilteredCategories] = useState([]);
-  const [filteredSubCategories, setFilteredSubCategories] = useState([]);
-  const [filteredSubSubCategories, setFilteredSubSubCategories] = useState([]);
   const [submitting, setSubmitting] = useState(false);
 
+  // Initial fetch
   useEffect(() => {
     dispatch(fetchSections());
     dispatch(fetchBrands());
@@ -73,116 +69,7 @@ const ProductForm = ({ productId, onSuccess, onCancel }) => {
     }
   }, [dispatch, productId]);
 
-  // Filter brands by section
-  useEffect(() => {
-    if (formData.section && productBrands?.length > 0) {
-      const filtered = productBrands.filter(brand =>
-        brand.section && brand.section._id === formData.section
-      );
-      setFilteredBrands(filtered);
-
-      if (formData.productBrand) {
-        const currentBrandExists = filtered.some(brand => brand._id === formData.productBrand);
-        if (!currentBrandExists) {
-          setFormData(prev => ({ ...prev, productBrand: '' }));
-        }
-      }
-    } else {
-      setFilteredBrands([]);
-    }
-  }, [formData.section, productBrands]);
-
-  // Filter main categories by section
-  useEffect(() => {
-    if (formData.section && mainCategories?.length > 0) {
-      const filtered = mainCategories.filter(cat =>
-        cat.section && cat.section._id === formData.section
-      );
-      setFilteredMainCategories(filtered);
-
-      if (formData.mainCategory) {
-        const exists = filtered.some(cat => cat._id === formData.mainCategory);
-        if (!exists) {
-          setFormData(prev => ({
-            ...prev,
-            mainCategory: '',
-            category: '',
-            subCategory: '',
-            subSubCategory: ''
-          }));
-        }
-      }
-    } else {
-      setFilteredMainCategories([]);
-    }
-  }, [formData.section, mainCategories]);
-
-  // Filter categories by main category
-  useEffect(() => {
-    if (formData.mainCategory && categories?.length > 0) {
-      const filtered = categories.filter(cat =>
-        cat.mainCategory && cat.mainCategory._id === formData.mainCategory
-      );
-      setFilteredCategories(filtered);
-
-      if (formData.category) {
-        const exists = filtered.some(cat => cat._id === formData.category);
-        if (!exists) {
-          setFormData(prev => ({
-            ...prev,
-            category: '',
-            subCategory: '',
-            subSubCategory: ''
-          }));
-        }
-      }
-    } else {
-      setFilteredCategories([]);
-    }
-  }, [formData.mainCategory, categories]);
-
-  // Filter sub categories by category
-  useEffect(() => {
-    if (formData.category && subCategories?.length > 0) {
-      const filtered = subCategories.filter(cat =>
-        cat.category && cat.category._id === formData.category
-      );
-      setFilteredSubCategories(filtered);
-
-      if (formData.subCategory) {
-        const exists = filtered.some(cat => cat._id === formData.subCategory);
-        if (!exists) {
-          setFormData(prev => ({
-            ...prev,
-            subCategory: '',
-            subSubCategory: ''
-          }));
-        }
-      }
-    } else {
-      setFilteredSubCategories([]);
-    }
-  }, [formData.category, subCategories]);
-
-  // Filter sub sub categories by sub category
-  useEffect(() => {
-    if (formData.subCategory && subSubCategories?.length > 0) {
-      const filtered = subSubCategories.filter(cat =>
-        cat.subCategory && cat.subCategory._id === formData.subCategory
-      );
-      setFilteredSubSubCategories(filtered);
-
-      if (formData.subSubCategory) {
-        const exists = filtered.some(cat => cat._id === formData.subSubCategory);
-        if (!exists) {
-          setFormData(prev => ({ ...prev, subSubCategory: '' }));
-        }
-      }
-    } else {
-      setFilteredSubSubCategories([]);
-    }
-  }, [formData.subCategory, subSubCategories]);
-
+  // Populate when editing
   useEffect(() => {
     if (currentProduct && productId) {
       setFormData({
@@ -193,12 +80,9 @@ const ProductForm = ({ productId, onSuccess, onCancel }) => {
         stock: currentProduct.stock || '',
         vehicleType: currentProduct.vehicleType || 'Universal',
         overview: currentProduct.overview || '',
-        specifications: currentProduct.specifications?.length ?
-          currentProduct.specifications : [''],
-        usage: currentProduct.usage?.length ?
-          currentProduct.usage : [''],
-        technicalSpecs: currentProduct.technicalSpecs?.length ?
-          currentProduct.technicalSpecs : [{ key: '', value: '' }],
+        specifications: currentProduct.specifications?.length ? currentProduct.specifications : [''],
+        usage: currentProduct.usage?.length ? currentProduct.usage : [''],
+        technicalSpecs: currentProduct.technicalSpecs?.length ? currentProduct.technicalSpecs : [{ key: '', value: '' }],
         warranty: currentProduct.warranty || '',
         partNumber: currentProduct.partNumber || '',
         isActive: currentProduct.isActive !== undefined ? currentProduct.isActive : true,
@@ -214,6 +98,7 @@ const ProductForm = ({ productId, onSuccess, onCancel }) => {
     }
   }, [currentProduct, productId]);
 
+  // Handlers
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
     setFormData(prev => ({
@@ -272,15 +157,10 @@ const ProductForm = ({ productId, onSuccess, onCancel }) => {
     setImages(newImages);
   };
 
+  // Submit
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSubmitting(true);
-
-    if (!formData.section) {
-      alert('Section is required');
-      setSubmitting(false);
-      return;
-    }
 
     if (!formData.name || !formData.price) {
       alert('Product name and price are required');
@@ -291,7 +171,6 @@ const ProductForm = ({ productId, onSuccess, onCancel }) => {
     try {
       const submitData = new FormData();
 
-      // Append simple fields
       submitData.append("name", formData.name);
       submitData.append("description", formData.description);
       submitData.append("price", parseFloat(formData.price));
@@ -303,25 +182,25 @@ const ProductForm = ({ productId, onSuccess, onCancel }) => {
       submitData.append("partNumber", formData.partNumber);
       submitData.append("isActive", formData.isActive);
       submitData.append("isPopular", formData.isPopular);
-      submitData.append("section", formData.section);
 
+      // Only append optional ObjectId fields if they are not empty
+      if (formData.section) submitData.append("section", formData.section);
       if (formData.mainCategory) submitData.append("mainCategory", formData.mainCategory);
       if (formData.category) submitData.append("category", formData.category);
       if (formData.subCategory) submitData.append("subCategory", formData.subCategory);
       if (formData.subSubCategory) submitData.append("subSubCategory", formData.subSubCategory);
       if (formData.productBrand) submitData.append("productBrand", formData.productBrand);
 
-      // Arrays (stringify them)
       submitData.append("specifications", JSON.stringify(formData.specifications.filter(i => i.trim() !== "")));
       submitData.append("usage", JSON.stringify(formData.usage.filter(i => i.trim() !== "")));
+      
       formData.technicalSpecs.forEach((spec, index) => {
         submitData.append(`technicalSpecs[${index}][key]`, spec.key);
         submitData.append(`technicalSpecs[${index}][value]`, spec.value);
       });
 
-      // Append multiple images
       images.forEach((file) => {
-        submitData.append("images", file);  // API must accept "images" as array of files
+        submitData.append("images", file);
       });
 
       if (productId) {
@@ -377,15 +256,15 @@ const ProductForm = ({ productId, onSuccess, onCancel }) => {
             onInputChange={handleInputChange}
             sections={sections}
             sectionsLoading={sectionsLoading}
-            brands={filteredBrands}
+            brands={productBrands}
             brandsLoading={brandsLoading}
-            mainCategories={filteredMainCategories}
+            mainCategories={mainCategories}
             mainCategoriesLoading={mainCategoriesLoading}
-            categories={filteredCategories}
+            categories={categories}
             categoriesLoading={categoriesLoading}
-            subCategories={filteredSubCategories}
+            subCategories={subCategories}
             subCategoriesLoading={subCategoriesLoading}
-            subSubCategories={filteredSubSubCategories}
+            subSubCategories={subSubCategories}
             subSubCategoriesLoading={subSubCategoriesLoading}
           />
 

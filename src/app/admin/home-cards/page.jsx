@@ -13,16 +13,25 @@ import {
   clearOperationSuccess 
 } from "../../../redux/slices/adminHomeCardSlice";
 
+import { fetchSections } from "../../../redux/slices/sectionSlice"; 
+
 const HomeCardsPage = () => {
   const dispatch = useDispatch();
+  
   const { homeCards, loading, error, operationSuccess } = useSelector((state) => state.adminHomeCard);
+  const { sections, loading: sectionsLoading, error: sectionsError } = useSelector((state) => state.sections);
 
-  // Fetch home cards on component mount
+  // Fetch home cards on mount
   useEffect(() => {
     dispatch(getHomeCards());
   }, [dispatch]);
 
-  // Handle errors
+  // Fetch sections on mount
+  useEffect(() => {
+    dispatch(fetchSections());
+  }, [dispatch]);
+
+  // Handle home card errors
   useEffect(() => {
     if (error) {
       console.error("Home card error:", error?.message || error);
@@ -40,6 +49,7 @@ const HomeCardsPage = () => {
     }
   }, [operationSuccess, dispatch]);
 
+  // Handle home card actions
   const handleAddHomeCard = async (homeCardData) => {
     try {
       await dispatch(createHomeCard(homeCardData)).unwrap();
@@ -82,13 +92,14 @@ const HomeCardsPage = () => {
     <ProtectedRoute>
       <HomeCardTable
         homeCards={homeCards}
-        loading={loading}
-        error={error}
+        loading={loading || sectionsLoading}
+        error={error || sectionsError}
         operationSuccess={operationSuccess}
         onAddHomeCard={handleAddHomeCard}
         onEditHomeCard={handleEditHomeCard}
         onDeleteHomeCard={handleDeleteHomeCard}
         onToggleStatus={handleToggleStatus}
+        sections={sections} 
         itemsPerPage={6}
       />
     </ProtectedRoute>

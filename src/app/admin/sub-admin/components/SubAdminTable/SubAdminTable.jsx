@@ -1,4 +1,3 @@
-// components/SubadminTable/SubadminTable.jsx
 "use client";
 import { useState } from "react";
 import SubadminTableHeader from "./SubAdminTableHeader";
@@ -18,15 +17,15 @@ const SubadminTable = ({
   onUpdatePermissions,
   onBulkDelete,
   onBulkUpdatePermissions,
-  itemsPerPage = 6
+  defaultItemsPerPage = 6
 }) => {
   const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(defaultItemsPerPage);
   const [searchTerm, setSearchTerm] = useState("");
   const [roleFilter, setRoleFilter] = useState("all");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingSubadmin, setEditingSubadmin] = useState(null);
 
-  // Helper function to safely get string values
   const getStringValue = (value) => {
     if (typeof value === 'string') return value;
     if (typeof value === 'object' && value !== null) {
@@ -35,7 +34,7 @@ const SubadminTable = ({
     return String(value || '');
   };
 
-  // Filter subadmins based on search and filters
+  // Filter subadmins based on search and role
   const filteredSubadmins = subadmins.filter(subadmin => {
     const name = getStringValue(subadmin.name);
     const email = getStringValue(subadmin.email);
@@ -86,7 +85,7 @@ const SubadminTable = ({
         title="Subadmin Management" 
         onAddSubadmin={handleAdd} 
       />
-      
+
       {/* Error Message */}
       {error && (
         <div className="mb-6 bg-red-50 border border-red-200 rounded-lg p-4">
@@ -134,7 +133,7 @@ const SubadminTable = ({
           </div>
         </div>
       )}
-      
+
       {/* Filters */}
       <div className="bg-gray-50 p-4 rounded-lg mb-6 shadow-sm">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -176,6 +175,7 @@ const SubadminTable = ({
         <table className="min-w-full bg-white divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr className="text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-6 py-3">#</th>
               <th className="px-6 py-3">Admin</th>
               <th className="px-6 py-3">Email</th>
               <th className="px-6 py-3">Role</th>
@@ -185,19 +185,23 @@ const SubadminTable = ({
           </thead>
           <tbody className="divide-y divide-gray-200">
             {paginatedSubadmins.length > 0 ? (
-              paginatedSubadmins.map((subadmin, index) => (
-                <SubadminTableRow
-                  key={subadmin._id || subadmin.id || `subadmin-${index}`}
-                  subadmin={subadmin}
-                  onEdit={handleEdit}
-                  onDelete={handleDelete}
-                  onToggleStatus={onToggleStatus}
-                  onUpdatePermissions={onUpdatePermissions}
-                />
-              ))
+              paginatedSubadmins.map((subadmin, index) => {
+                const serialNumber = filteredSubadmins.length - ((currentPage - 1) * itemsPerPage + index);
+                return (
+                  <SubadminTableRow
+                    key={subadmin._id || subadmin.id || `subadmin-${index}`}
+                    subadmin={subadmin}
+                    serialNumber={serialNumber}
+                    onEdit={handleEdit}
+                    onDelete={handleDelete}
+                    onToggleStatus={onToggleStatus}
+                    onUpdatePermissions={onUpdatePermissions}
+                  />
+                );
+              })
             ) : (
               <tr>
-                <td colSpan="5" className="px-6 py-8 text-center text-gray-500">
+                <td colSpan="6" className="px-6 py-8 text-center text-gray-500">
                   <div className="flex flex-col items-center">
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 text-gray-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
@@ -214,13 +218,14 @@ const SubadminTable = ({
 
       {/* Pagination Component */}
       {filteredSubadmins.length > 0 && (
-        <div className="mt-6">
-          <Pagination
-            currentPage={currentPage}
-            totalPages={totalPages}
-            onPageChange={setCurrentPage}
-          />
-        </div>
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={setCurrentPage}
+          itemsPerPage={itemsPerPage}
+          setItemsPerPage={setItemsPerPage}
+          totalItems={filteredSubadmins.length}
+        />
       )}
 
       {/* Subadmin Modal */}

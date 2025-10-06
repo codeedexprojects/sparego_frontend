@@ -1,15 +1,15 @@
-import React from 'react';
+import React from "react";
 
-const CategoryModal = ({ 
-  isOpen, 
-  onClose, 
-  onSubmit, 
-  formData, 
-  onChange, 
-  preview, 
-  onRemoveImage, 
-  mainCategories, 
-  editingCategory 
+const CategoryModal = ({
+  isOpen,
+  onClose,
+  onSubmit,
+  formData,
+  onChange,
+  preview,
+  onRemoveImage,
+  mainCategories,
+  editingCategory,
 }) => {
   if (!isOpen) return null;
 
@@ -28,7 +28,6 @@ const CategoryModal = ({
               <FormInput
                 label="Name *"
                 name="name"
-                type="text"
                 value={formData.name}
                 onChange={onChange}
                 placeholder="Enter category name"
@@ -50,12 +49,12 @@ const CategoryModal = ({
                 ))}
               </FormSelect>
 
+              {/* Type is now optional */}
               <FormSelect
-                label="Type *"
+                label="Type (Optional)"
                 name="type"
-                value={formData.type}
+                value={formData.type || ""}
                 onChange={onChange}
-                required
               >
                 <option value="">Select Type</option>
                 <option value="Two-wheeler">Two Wheeler</option>
@@ -73,19 +72,19 @@ const CategoryModal = ({
             </div>
           </div>
 
-          {/* Description - Full Width */}
+          {/* Description */}
           <div className="mt-4">
             <FormTextarea
               label="Description"
               name="description"
-              value={formData.description}
+              value={formData.description || ""}
               onChange={onChange}
               placeholder="Enter category description"
               rows={3}
             />
           </div>
 
-          {/* Modal Actions */}
+          {/* Actions */}
           <div className="flex justify-end space-x-3 pt-6 mt-6 border-t border-gray-200">
             <button
               type="button"
@@ -107,46 +106,47 @@ const CategoryModal = ({
   );
 };
 
-const FormInput = ({ label, name, type = "text", value, onChange, placeholder, required = false }) => (
+// Reusable form components
+const FormInput = ({ label, name, value, onChange, placeholder, required }) => (
   <div>
     <label className="block text-sm font-medium text-gray-700 mb-2">{label}</label>
     <input
-      type={type}
+      type="text"
       name={name}
-      value={value}
+      value={value || ""}
       onChange={onChange}
-      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200"
       placeholder={placeholder}
       required={required}
+      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200"
     />
   </div>
 );
 
-const FormSelect = ({ label, name, value, onChange, children, required = false }) => (
+const FormSelect = ({ label, name, value, onChange, children, required }) => (
   <div>
     <label className="block text-sm font-medium text-gray-700 mb-2">{label}</label>
     <select
       name={name}
-      value={value}
+      value={value || ""}
       onChange={onChange}
-      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200"
       required={required}
+      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200"
     >
       {children}
     </select>
   </div>
 );
 
-const FormTextarea = ({ label, name, value, onChange, placeholder, rows = 3 }) => (
+const FormTextarea = ({ label, name, value, onChange, placeholder, rows }) => (
   <div>
     <label className="block text-sm font-medium text-gray-700 mb-2">{label}</label>
     <textarea
       name={name}
-      value={value}
+      value={value || ""}
       onChange={onChange}
       rows={rows}
-      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200"
       placeholder={placeholder}
+      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200"
     />
   </div>
 );
@@ -157,9 +157,9 @@ const ImageUpload = ({ preview, onChange, onRemove }) => (
     <div className="flex items-center justify-center w-full">
       {preview ? (
         <div className="relative w-full">
-          <img 
-            src={preview} 
-            alt="Preview" 
+          <img
+            src={preview}
+            alt="Preview"
             className="w-full h-48 object-cover rounded-lg border-2 border-gray-300"
           />
           <button
@@ -167,29 +167,16 @@ const ImageUpload = ({ preview, onChange, onRemove }) => (
             onClick={onRemove}
             className="absolute top-2 right-2 bg-red-600 text-white p-1 rounded-full hover:bg-red-700 transition-colors duration-200"
           >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            </svg>
+            ✕
           </button>
         </div>
       ) : (
         <label className="flex flex-col items-center justify-center w-full h-48 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100 transition-colors duration-200">
           <div className="flex flex-col items-center justify-center pt-5 pb-6">
-            <svg className="w-8 h-8 mb-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-            </svg>
-            <p className="mb-2 text-sm text-gray-500">
-              <span className="font-semibold">Click to upload</span>
-            </p>
+            <p className="text-sm text-gray-500 font-semibold">Click to upload</p>
             <p className="text-xs text-gray-500">PNG, JPG, GIF up to 10MB</p>
           </div>
-          <input
-            type="file"
-            name="image"
-            accept="image/*"
-            onChange={onChange}
-            className="hidden"
-          />
+          <input type="file" name="image" accept="image/*" onChange={onChange} className="hidden" />
         </label>
       )}
     </div>

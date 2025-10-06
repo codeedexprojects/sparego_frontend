@@ -1,8 +1,8 @@
-// pages/orders/components/OrderTable.jsx
 "use client";
 import { useState } from "react";
+import Pagination from "../../../../../components/shared/Pagination";
 
-const OrderTable = ({ orders, onViewOrder }) => {
+const OrderTable = ({ orders = [], onViewOrder }) => {
   const [itemsPerPage, setItemsPerPage] = useState(5);
   const [currentPage, setCurrentPage] = useState(1);
 
@@ -11,37 +11,29 @@ const OrderTable = ({ orders, onViewOrder }) => {
   const startIndex = (currentPage - 1) * itemsPerPage;
   const paginatedOrders = orders.slice(startIndex, startIndex + itemsPerPage);
 
+  // Descending serial number
+  const getSerialNumber = (index) => orders.length - (startIndex + index);
 
-  const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString("en-US", {
+  const formatDate = (dateString) =>
+    new Date(dateString).toLocaleDateString("en-US", {
       year: "numeric",
       month: "short",
       day: "numeric",
     });
-  };
 
   const getStatusColor = (status) => {
     switch (status) {
-      case "pending":
-        return "bg-yellow-100 text-yellow-800";
-      case "confirmed":
-        return "bg-blue-100 text-blue-800";
-      case "shipped":
-        return "bg-indigo-100 text-indigo-800";
-      case "delivered":
-        return "bg-green-100 text-green-800";
-      case "cancelled":
-        return "bg-red-100 text-red-800";
-      default:
-        return "bg-gray-100 text-gray-800";
+      case "pending": return "bg-yellow-100 text-yellow-800";
+      case "confirmed": return "bg-blue-100 text-blue-800";
+      case "shipped": return "bg-indigo-100 text-indigo-800";
+      case "delivered": return "bg-green-100 text-green-800";
+      case "cancelled": return "bg-red-100 text-red-800";
+      default: return "bg-gray-100 text-gray-800";
     }
   };
 
-  const getPaymentStatusColor = (status) => {
-    return status === "paid" 
-      ? "bg-green-100 text-green-800" 
-      : "bg-red-100 text-red-800";
-  };
+  const getPaymentStatusColor = (status) =>
+    status === "paid" ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800";
 
   return (
     <div className="overflow-x-auto">
@@ -49,7 +41,7 @@ const OrderTable = ({ orders, onViewOrder }) => {
         <thead className="bg-gray-50 border-b border-gray-200">
           <tr>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Order ID
+              #
             </th>
             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
               Customer
@@ -73,10 +65,10 @@ const OrderTable = ({ orders, onViewOrder }) => {
         </thead>
         <tbody className="divide-y divide-gray-200">
           {paginatedOrders.length > 0 ? (
-            paginatedOrders.map((order) => (
-              <tr key={order._id} className="hover:bg-gray-50">
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="text-sm font-medium text-gray-900">#{order._id}</div>
+            paginatedOrders.map((order, index) => (
+              <tr key={order._id || index} className="hover:bg-gray-50">
+                <td className="px-6 py-4 whitespace-nowrap font-mono text-gray-700">
+                  {getSerialNumber(index)}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div className="text-sm text-gray-900">{order.user.name}</div>
@@ -122,68 +114,16 @@ const OrderTable = ({ orders, onViewOrder }) => {
         </tbody>
       </table>
 
-      {/* Pagination */}
+      {/* Use Global Pagination */}
       {orders.length > 0 && (
-        <div className="flex items-center justify-between mt-4 px-6 py-3 bg-gray-50 border-t border-gray-200">
-          <div className="flex-1 flex items-center justify-between">
-            <div>
-              <p className="text-sm text-gray-700">
-                Showing <span className="font-medium">{startIndex + 1}</span> to{" "}
-                <span className="font-medium">
-                  {Math.min(startIndex + itemsPerPage, orders.length)}
-                </span>{" "}
-                of <span className="font-medium">{orders.length}</span> results
-              </p>
-            </div>
-            <div className="flex items-center space-x-2">
-              <span className="text-sm text-gray-700">Show:</span>
-              <select
-                className="p-1 border border-gray-300 rounded-md text-sm"
-                value={itemsPerPage}
-                onChange={(e) => {
-                  setItemsPerPage(Number(e.target.value));
-                  setCurrentPage(1);
-                }}
-              >
-                <option value="5">5</option>
-                <option value="10">10</option>
-                <option value="20">20</option>
-                <option value="50">50</option>
-              </select>
-            </div>
-            <div>
-              <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
-                <button
-                  onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
-                  disabled={currentPage === 1}
-                  className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50"
-                >
-                  Previous
-                </button>
-                {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
-                  <button
-                    key={page}
-                    onClick={() => setCurrentPage(page)}
-                    className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${
-                      currentPage === page
-                        ? "z-10 bg-indigo-50 border-indigo-500 text-indigo-600"
-                        : "bg-white border-gray-300 text-gray-500 hover:bg-gray-50"
-                    }`}
-                  >
-                    {page}
-                  </button>
-                ))}
-                <button
-                  onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
-                  disabled={currentPage === totalPages}
-                  className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50"
-                >
-                  Next
-                </button>
-              </nav>
-            </div>
-          </div>
-        </div>
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={setCurrentPage}
+          itemsPerPage={itemsPerPage}
+          setItemsPerPage={setItemsPerPage}
+          totalItems={orders.length}
+        />
       )}
     </div>
   );

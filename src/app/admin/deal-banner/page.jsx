@@ -3,23 +3,35 @@ import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "sonner";
 import { fetchSections } from "../../../redux/slices/sectionSlice";
-import { 
-  fetchDealBanners, 
-  addDealBanner, 
-  editDealBanner, 
-  deleteDealBanner 
+import {
+  fetchDealBanners,
+  addDealBanner,
+  editDealBanner,
+  deleteDealBanner,
 } from "../../../redux/slices/adminDealBannerSlice";
 import DeleteConfirmationModal from "../main-categories/components/DeleteModal";
 import DealBannerHeader from "./components/DealBannerHeader";
 import DealBannerList from "./components/DealBannerList";
 import DealBannerModal from "./components/DealBannerModel";
+import Pagination from "../../../components/shared/Pagination";
 import ProtectedRoute from "../../../components/admin/ProtectedRoute";
 
 const DealBannerManager = () => {
   const dispatch = useDispatch();
-  const { banners, loading, error } = useSelector((s) => s.adminDealBanner);
+  const { banners, loading, error, totalPages, currentPage, totalItems } =
+    useSelector((s) => s.adminDealBanner);
   const { sections } = useSelector((s) => s.sections);
 
+  // 🔹 Filters & pagination
+  const [filters, setFilters] = useState({
+    section: "",
+    currentPage: 1,
+    limit: 10, // number of banners per page
+  });
+
+  const [itemsPerPage, setItemsPerPage] = useState(10);
+
+  // 🔹 Modal states
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState(null);
   const [formData, setFormData] = useState({
@@ -42,27 +54,47 @@ const DealBannerManager = () => {
     { value: "checkout", label: "Checkout Page" },
   ];
 
+  // ✅ Fetch banners & sections
   useEffect(() => {
-    dispatch(fetchDealBanners());
+    dispatch(fetchDealBanners(filters));
     dispatch(fetchSections());
-  }, [dispatch]);
+  }, [dispatch, filters]);
 
-  // Open add modal
+  // 🔹 Filter handler
+  const handleFilterChange = (key, value) => {
+    setFilters((prev) => ({ ...prev, [key]: value, currentPage: 1 }));
+  };
+
+  // 🔹 Pagination handler
+  const handlePageChange = (page) => {
+    setFilters((prev) => ({ ...prev, currentPage: page }));
+  };
+
+  // 🔹 Items per page change
+  const handleItemsPerPageChange = (value) => {
+    setItemsPerPage(value);
+    setFilters((prev) => ({
+      ...prev,
+      limit: value,
+      currentPage: 1, // reset to first page
+    }));
+  };
+
+  // 🔹 Modal handlers
   const openAddModal = () => {
-    setFormData({ 
-      title: "", 
-      description: "", 
-      discountText: "", 
-      section: "", 
-      page: "", 
-      image: null 
+    setFormData({
+      title: "",
+      description: "",
+      discountText: "",
+      section: "",
+      page: "",
+      image: null,
     });
     setPreview(null);
     setEditingBanner(null);
     setIsModalOpen(true);
   };
 
-  // Open edit modal
   const openEditModal = (banner) => {
     setFormData({
       title: banner.title,
@@ -79,13 +111,13 @@ const DealBannerManager = () => {
 
   const closeModal = () => {
     setIsModalOpen(false);
-    setFormData({ 
-      title: "", 
-      description: "", 
-      discountText: "", 
-      section: "", 
-      page: "", 
-      image: null 
+    setFormData({
+      title: "",
+      description: "",
+      discountText: "",
+      section: "",
+      page: "",
+      image: null,
     });
     setEditingBanner(null);
     setPreview(null);
@@ -101,6 +133,7 @@ const DealBannerManager = () => {
     }
   };
 
+  // 🔹 Submit add/edit
   const handleSubmit = async (e) => {
     e.preventDefault();
     const form = new FormData();
@@ -113,26 +146,29 @@ const DealBannerManager = () => {
 
     try {
       if (editingBanner) {
-        await dispatch(editDealBanner({ id: editingBanner._id, data: form })).unwrap();
+        await dispatch(
+          editDealBanner({ id: editingBanner._id, data: form })
+        ).unwrap();
         toast.success("Deal banner updated successfully");
       } else {
         await dispatch(addDealBanner(form)).unwrap();
         toast.success("Deal banner added successfully");
       }
       closeModal();
-      dispatch(fetchDealBanners());
+      dispatch(fetchDealBanners(filters));
     } catch (err) {
       toast.error(err?.message || "Error saving deal banner");
     }
   };
 
+  // 🔹 Confirm delete
   const confirmDelete = async () => {
     if (!deleteConfirm) return;
     try {
       await dispatch(deleteDealBanner(deleteConfirm._id)).unwrap();
       toast.success("Deal banner deleted successfully");
       setDeleteConfirm(null);
-      dispatch(fetchDealBanners());
+      dispatch(fetchDealBanners(filters));
     } catch (err) {
       toast.error("Failed to delete deal banner");
     }
@@ -142,13 +178,16 @@ const DealBannerManager = () => {
     <ProtectedRoute>
       <div className="min-h-screen">
         <div className="mx-auto">
-          {/* Header */}
+          {/* Header with filters */}
           <DealBannerHeader
             bannerCount={banners.length}
             onAddBanner={openAddModal}
+            sections={sections}
+            selectedSection={filters.section}
+            onFilterChange={handleFilterChange}
           />
 
-          {/* Banners List */}
+          {/* Banner list */}
           <DealBannerList
             banners={banners}
             loading={loading}
@@ -158,6 +197,18 @@ const DealBannerManager = () => {
             onAddBanner={openAddModal}
             pageOptions={pageOptions}
           />
+
+          {/* Pagination */}
+          {totalPages > 1 && (
+            <Pagination
+              currentPage={filters.currentPage}
+              totalPages={totalPages}
+              onPageChange={handlePageChange}
+              itemsPerPage={itemsPerPage}
+              setItemsPerPage={handleItemsPerPageChange}
+              totalItems={totalItems || banners.length}
+            />
+          )}
 
           {/* Add/Edit Modal */}
           {isModalOpen && (
@@ -170,7 +221,7 @@ const DealBannerManager = () => {
               preview={preview}
               onRemoveImage={() => {
                 setPreview(null);
-                setFormData({...formData, image: null});
+                setFormData({ ...formData, image: null });
               }}
               sections={sections}
               pageOptions={pageOptions}

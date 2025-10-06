@@ -47,14 +47,11 @@ const SubCategoryModal = ({
                 ))}
               </FormSelect>
 
-
-
               <FormSelect
-                label="Type *"
+                label="Type (Optional)"
                 name="type"
-                value={formData.type}
+                value={formData.type || ""}
                 onChange={onChange}
-                required
               >
                 <option value="">Select Type</option>
                 <option value="Two-wheeler">Two Wheeler</option>

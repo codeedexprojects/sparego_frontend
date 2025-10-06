@@ -51,7 +51,7 @@ const menuItems = [
   { name: "Home Cards", icon: LayoutGrid, path: "/admin/home-cards" },
   { name: "Reviews", icon: Star, path: "/admin/reviews" },
   { name: "Vehicles", icon: Car, path: "/admin/vehicles" },
-  { name: "Sub Admin", icon: ShieldCheck, path: "/admin/sub-admin" },
+  // { name: "Sub Admin", icon: ShieldCheck, path: "/admin/sub-admin" },
 ];
 
 export default function Sidebar() {

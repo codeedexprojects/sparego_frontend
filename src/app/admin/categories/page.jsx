@@ -2,17 +2,25 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "sonner";
-import { fetchCategories, addCategory, editCategory, deleteCategory } from "../../../redux/slices/adminCategorySlice";
+import {
+  fetchCategories,
+  addCategory,
+  editCategory,
+  deleteCategory,
+} from "../../../redux/slices/adminCategorySlice";
 import { fetchMainCategories } from "../../../redux/slices/adminMainCategorySlice";
 import DeleteConfirmationModal from "../main-categories/components/DeleteModal";
 import CategoryHeader from "./components/CategoryHeader";
 import CategoryList from "./components/CategoryList";
 import CategoryModal from "./components/CategoryModal";
 import ProtectedRoute from "../../../components/admin/ProtectedRoute";
+import Pagination from "../../../components/shared/Pagination";
 
 const CategoryManager = () => {
   const dispatch = useDispatch();
-const { categories = [], loading, error } = useSelector((s) => s.adminCategory);
+  const { categories = [], loading, error } = useSelector(
+    (s) => s.adminCategory
+  );
   const { mainCategories } = useSelector((s) => s.adminMainCategory);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -26,6 +34,16 @@ const { categories = [], loading, error } = useSelector((s) => s.adminCategory);
   });
   const [editingCategory, setEditingCategory] = useState(null);
   const [preview, setPreview] = useState(null);
+
+  // Pagination states
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
+
+  // Paginate categories
+  const indexOfLast = currentPage * itemsPerPage;
+  const indexOfFirst = indexOfLast - itemsPerPage;
+  const currentCategories = categories.slice(indexOfFirst, indexOfLast);
+  const totalPages = Math.ceil(categories.length / itemsPerPage);
 
   useEffect(() => {
     dispatch(fetchCategories());
@@ -42,10 +60,10 @@ const { categories = [], loading, error } = useSelector((s) => s.adminCategory);
 
   const openEditModal = (cat) => {
     setFormData({
-      name: cat.name,
-      description: cat.description,
+      name: cat.name || "",
+      description: cat.description || "",
       mainCategory: cat.mainCategory?._id || "",
-      type: cat.type,
+      type: cat.type || "",
       image: null,
     });
     setPreview(cat.image || null);
@@ -63,7 +81,7 @@ const { categories = [], loading, error } = useSelector((s) => s.adminCategory);
   // Form handlers
   const handleChange = (e) => {
     const { name, value, files } = e.target;
-    if (name === "image" && files[0]) {
+    if (name === "image" && files?.[0]) {
       setFormData({ ...formData, image: files[0] });
       setPreview(URL.createObjectURL(files[0]));
     } else {
@@ -77,7 +95,8 @@ const { categories = [], loading, error } = useSelector((s) => s.adminCategory);
     form.append("name", formData.name);
     form.append("description", formData.description);
     form.append("mainCategory", formData.mainCategory);
-    form.append("type", formData.type);
+
+    if (formData.type) form.append("type", formData.type); // type is optional
     if (formData.image) form.append("image", formData.image);
 
     try {
@@ -111,13 +130,12 @@ const { categories = [], loading, error } = useSelector((s) => s.adminCategory);
     <ProtectedRoute>
       <div className="min-h-screen">
         <div className="max-w-7xl mx-auto">
-          <CategoryHeader
-            categoryCount={categories.length}
-            onAddCategory={openAddModal}
-          />
+          {/* Header */}
+          <CategoryHeader categoryCount={categories.length} onAddCategory={openAddModal} />
 
+          {/* Categories List */}
           <CategoryList
-            categories={categories}
+            categories={currentCategories}
             loading={loading}
             error={error}
             onEdit={openEditModal}
@@ -125,6 +143,21 @@ const { categories = [], loading, error } = useSelector((s) => s.adminCategory);
             onAddCategory={openAddModal}
           />
 
+          {/* Pagination */}
+          {categories.length > 0 && (
+            <div className="mt-6 flex justify-center">
+              <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={setCurrentPage}
+                itemsPerPage={itemsPerPage}
+                setItemsPerPage={setItemsPerPage}
+                totalItems={categories.length}
+              />
+            </div>
+          )}
+
+          {/* Add/Edit Modal */}
           {isModalOpen && (
             <CategoryModal
               isOpen={isModalOpen}
@@ -135,13 +168,14 @@ const { categories = [], loading, error } = useSelector((s) => s.adminCategory);
               preview={preview}
               onRemoveImage={() => {
                 setPreview(null);
-                setFormData({...formData, image: null});
+                setFormData({ ...formData, image: null });
               }}
               mainCategories={mainCategories}
               editingCategory={editingCategory}
             />
           )}
 
+          {/* Delete Confirmation Modal */}
           {deleteConfirm && (
             <DeleteConfirmationModal
               item={deleteConfirm}

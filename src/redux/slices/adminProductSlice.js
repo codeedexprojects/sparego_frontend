@@ -4,6 +4,8 @@ import { BASE_URL } from "../baseUrl";
 
 const getToken = () => localStorage.getItem("adminToken");
 
+// ===== Async Thunks =====
+
 // Fetch all products (with filters/sorting)
 export const getAllProducts = createAsyncThunk(
   "adminProduct/getAllProducts",
@@ -13,7 +15,7 @@ export const getAllProducts = createAsyncThunk(
       const res = await axios.get(`${BASE_URL}/products/all?${query}`, {
         headers: { Authorization: `Bearer ${getToken()}` },
       });
-      return res.data; // { total, products }
+      return res.data;
     } catch (err) {
       return rejectWithValue(err.response?.data?.message || err.message);
     }
@@ -29,7 +31,7 @@ export const fetchProducts = createAsyncThunk(
         `${BASE_URL}/products?page=${page}&limit=${limit}`,
         { headers: { Authorization: `Bearer ${getToken()}` } }
       );
-      return res.data; // return total, page, pages, products
+      return res.data;
     } catch (err) {
       return rejectWithValue(err.response?.data?.message || err.message);
     }
@@ -47,7 +49,7 @@ export const addProduct = createAsyncThunk(
           "Content-Type": "multipart/form-data",
         },
       });
-      return res.data; // return new product
+      return res.data;
     } catch (err) {
       return rejectWithValue(err.response?.data?.message || err.message);
     }
@@ -65,22 +67,7 @@ export const editProduct = createAsyncThunk(
           "Content-Type": "multipart/form-data",
         },
       });
-      return res.data; // return updated product
-    } catch (err) {
-      return rejectWithValue(err.response?.data?.message || err.message);
-    }
-  }
-);
-
-// Delete product
-export const deleteProduct = createAsyncThunk(
-  "adminProduct/deleteProduct",
-  async (id, { rejectWithValue }) => {
-    try {
-      await axios.delete(`${BASE_URL}/products/${id}`, {
-        headers: { Authorization: `Bearer ${getToken()}` },
-      });
-      return id; // return deleted product id
+      return res.data;
     } catch (err) {
       return rejectWithValue(err.response?.data?.message || err.message);
     }
@@ -95,14 +82,31 @@ export const viewProductById = createAsyncThunk(
       const res = await axios.get(`${BASE_URL}/products/${id}`, {
         headers: { Authorization: `Bearer ${getToken()}` },
       });
-      return res.data; // return product object
+      return res.data;
     } catch (err) {
       return rejectWithValue(err.response?.data?.message || err.message);
     }
   }
 );
 
-// Slice
+// Toggle product active/inactive
+export const toggleProductStatus = createAsyncThunk(
+  "adminProduct/toggleProductStatus",
+  async ({ id, isActive }, { rejectWithValue }) => {
+    try {
+      const res = await axios.patch(
+        `${BASE_URL}/products/${id}`,
+        { isActive },
+        { headers: { Authorization: `Bearer ${getToken()}` } }
+      );
+      return res.data;
+    } catch (err) {
+      return rejectWithValue(err.response?.data?.message || err.message);
+    }
+  }
+);
+
+// ===== Slice =====
 const adminProductSlice = createSlice({
   name: "adminProduct",
   initialState: {
@@ -112,12 +116,12 @@ const adminProductSlice = createSlice({
     pages: 1,
     loading: false,
     error: null,
-    currentProduct: null, // for viewById
+    currentProduct: null,
   },
   reducers: {},
   extraReducers: (builder) => {
     builder
-      // ===== Fetch Products with Pagination =====
+      // Fetch products
       .addCase(fetchProducts.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -134,7 +138,7 @@ const adminProductSlice = createSlice({
         state.error = action.payload;
       })
 
-      // ===== Get All Products (filters, sorting) =====
+      // Get all products (filters/sorting)
       .addCase(getAllProducts.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -143,32 +147,25 @@ const adminProductSlice = createSlice({
         state.loading = false;
         state.products = action.payload.products;
         state.total = action.payload.total;
-        // no page/pages since it's full list
       })
       .addCase(getAllProducts.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       })
 
-      // ===== Add Product =====
+      // Add product
       .addCase(addProduct.fulfilled, (state, action) => {
-        state.products.unshift(action.payload); // add new product at the top
+        state.products.unshift(action.payload);
         state.total += 1;
       })
 
-      // ===== Edit Product =====
+      // Edit product
       .addCase(editProduct.fulfilled, (state, action) => {
         const index = state.products.findIndex((p) => p._id === action.payload._id);
         if (index !== -1) state.products[index] = action.payload;
       })
 
-      // ===== Delete Product =====
-      .addCase(deleteProduct.fulfilled, (state, action) => {
-        state.products = state.products.filter((p) => p._id !== action.payload);
-        state.total -= 1;
-      })
-
-      // ===== View Product by ID =====
+      // View product by ID
       .addCase(viewProductById.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -182,6 +179,12 @@ const adminProductSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
         state.currentProduct = null;
+      })
+
+      // Toggle product status
+      .addCase(toggleProductStatus.fulfilled, (state, action) => {
+        const index = state.products.findIndex((p) => p._id === action.payload._id);
+        if (index !== -1) state.products[index] = action.payload;
       });
   },
 });

@@ -8,19 +8,20 @@ import {
   editSubCategory,
   deleteSubCategory,
 } from "../../../redux/slices/adminSubCategorySlice";
-import { fetchCategories } from "../../../redux/slices/adminCategorySlice"; // fetch main categories from categories slice
+import { fetchCategories } from "../../../redux/slices/adminCategorySlice";
 import DeleteConfirmationModal from "../main-categories/components/DeleteModal";
 import SubCategoryHeader from "./components/SubCategoryHeader";
 import SubCategoryList from "./components/SubCategoryList";
 import SubCategoryModal from "./components/SubCategoryModal";
 import ProtectedRoute from "../../../components/admin/ProtectedRoute";
+import Pagination from "../../../components/shared/Pagination";
 
 const SubCategoryManager = () => {
   const dispatch = useDispatch();
   const { subCategories = [], loading, error } = useSelector(
     (s) => s.adminSubCategory
   );
-  const { categories: mainCategories } = useSelector((s) => s.adminCategory); // use categories as main categories
+  const { categories: mainCategories } = useSelector((s) => s.adminCategory);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState(null);
@@ -34,9 +35,19 @@ const SubCategoryManager = () => {
   const [editingSubCategory, setEditingSubCategory] = useState(null);
   const [preview, setPreview] = useState(null);
 
+  // Pagination states
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
+
+  // Paginate sub-categories
+  const indexOfLast = currentPage * itemsPerPage;
+  const indexOfFirst = indexOfLast - itemsPerPage;
+  const currentSubCategories = subCategories.slice(indexOfFirst, indexOfLast);
+  const totalPages = Math.ceil(subCategories.length / itemsPerPage);
+
   useEffect(() => {
     dispatch(fetchSubCategories());
-    dispatch(fetchCategories()); // fetch categories to use as main categories
+    dispatch(fetchCategories());
   }, [dispatch]);
 
   // Modal handlers
@@ -49,10 +60,10 @@ const SubCategoryManager = () => {
 
   const openEditModal = (subCat) => {
     setFormData({
-      name: subCat.name,
-      description: subCat.description,
+      name: subCat.name || "",
+      description: subCat.description || "",
       category: subCat.category?._id || "",
-      type: subCat.type,
+      type: subCat.type || "", // type is optional
       image: null,
     });
     setPreview(subCat.image || null);
@@ -70,7 +81,7 @@ const SubCategoryManager = () => {
   // Form handlers
   const handleChange = (e) => {
     const { name, value, files } = e.target;
-    if (name === "image" && files[0]) {
+    if (name === "image" && files?.[0]) {
       setFormData({ ...formData, image: files[0] });
       setPreview(URL.createObjectURL(files[0]));
     } else {
@@ -84,7 +95,8 @@ const SubCategoryManager = () => {
     form.append("name", formData.name);
     form.append("description", formData.description);
     form.append("category", formData.category);
-    form.append("type", formData.type);
+    
+    if (formData.type) form.append("type", formData.type); // type is optional
     if (formData.image) form.append("image", formData.image);
 
     try {
@@ -128,13 +140,27 @@ const SubCategoryManager = () => {
 
           {/* Sub-categories List */}
           <SubCategoryList
-            categories={subCategories}
+            categories={currentSubCategories}
             loading={loading}
             error={error}
             onEdit={openEditModal}
             onDelete={setDeleteConfirm}
             onAddCategory={openAddModal}
           />
+
+          {/* Pagination */}
+          {subCategories.length > 0 && (
+            <div className="mt-6 flex justify-center">
+              <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={setCurrentPage}
+                itemsPerPage={itemsPerPage}
+                setItemsPerPage={setItemsPerPage}
+                totalItems={subCategories.length}
+              />
+            </div>
+          )}
 
           {/* Add/Edit Modal */}
           {isModalOpen && (
@@ -149,7 +175,7 @@ const SubCategoryManager = () => {
                 setPreview(null);
                 setFormData({ ...formData, image: null });
               }}
-              mainCategories={mainCategories} // categories from adminCategorySlice
+              mainCategories={mainCategories}
               editingCategory={editingSubCategory}
             />
           )}

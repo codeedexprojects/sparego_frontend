@@ -3,12 +3,18 @@ import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "sonner";
 import { fetchSections } from "../../../redux/slices/sectionSlice";
-import { fetchMainCategories, addMainCategory, editMainCategory, deleteMainCategory } from "../../../redux/slices/adminMainCategorySlice";
+import {
+  fetchMainCategories,
+  addMainCategory,
+  editMainCategory,
+  deleteMainCategory,
+} from "../../../redux/slices/adminMainCategorySlice";
 import MainCategoryHeader from "./components/MainCategoryHeader";
 import MainCategoryList from "./components/MainCategoryList";
 import MainCategoryModal from "./components/MainCategoryModal";
 import DeleteConfirmationModal from "./components/DeleteModal";
 import ProtectedRoute from "../../../components/admin/ProtectedRoute";
+import Pagination from "../../../components/shared/Pagination";
 
 const MainCategoryManager = () => {
   const dispatch = useDispatch();
@@ -20,12 +26,21 @@ const MainCategoryManager = () => {
   const [formData, setFormData] = useState({
     name: "",
     description: "",
-    section: "",
-    type: "",
+    section: undefined,
+    type: undefined,
     image: null,
   });
   const [editingCategory, setEditingCategory] = useState(null);
   const [preview, setPreview] = useState(null);
+
+  // Pagination states
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
+
+  const indexOfLast = currentPage * itemsPerPage;
+  const indexOfFirst = indexOfLast - itemsPerPage;
+  const currentCategories = mainCategories.slice(indexOfFirst, indexOfLast);
+  const totalPages = Math.ceil(mainCategories.length / itemsPerPage);
 
   useEffect(() => {
     dispatch(fetchMainCategories());
@@ -34,7 +49,7 @@ const MainCategoryManager = () => {
 
   // Modal handlers
   const openAddModal = () => {
-    setFormData({ name: "", description: "", section: "", type: "", image: null });
+    setFormData({ name: "", description: "", section: undefined, type: undefined, image: null });
     setPreview(null);
     setEditingCategory(null);
     setIsModalOpen(true);
@@ -44,7 +59,7 @@ const MainCategoryManager = () => {
     setFormData({
       name: cat.name,
       description: cat.description,
-      section: cat.section?._id || "",
+      section: cat.section?._id,
       type: cat.type,
       image: null,
     });
@@ -54,10 +69,10 @@ const MainCategoryManager = () => {
   };
 
   const closeModal = () => {
-    setIsModalOpen(false);
-    setFormData({ name: "", description: "", section: "", type: "", image: null });
-    setEditingCategory(null);
+    setFormData({ name: "", description: "", section: undefined, type: undefined, image: null });
     setPreview(null);
+    setEditingCategory(null);
+    setIsModalOpen(false);
   };
 
   // Form handlers
@@ -67,7 +82,7 @@ const MainCategoryManager = () => {
       setFormData({ ...formData, image: files[0] });
       setPreview(URL.createObjectURL(files[0]));
     } else {
-      setFormData({ ...formData, [name]: value });
+      setFormData({ ...formData, [name]: value === "" ? undefined : value });
     }
   };
 
@@ -75,9 +90,9 @@ const MainCategoryManager = () => {
     e.preventDefault();
     const form = new FormData();
     form.append("name", formData.name);
-    form.append("description", formData.description);
-    form.append("section", formData.section);
-    form.append("type", formData.type);
+    if (formData.description) form.append("description", formData.description);
+    if (formData.section) form.append("section", formData.section);
+    if (formData.type) form.append("type", formData.type);
     if (formData.image) form.append("image", formData.image);
 
     try {
@@ -112,20 +127,34 @@ const MainCategoryManager = () => {
       <div className="min-h-screen">
         <div className="max-w-7xl mx-auto">
           {/* Header */}
-          <MainCategoryHeader 
+          <MainCategoryHeader
             categoryCount={mainCategories.length}
             onAddCategory={openAddModal}
           />
 
           {/* Categories List */}
           <MainCategoryList
-            categories={mainCategories}
+            categories={currentCategories}
             loading={loading}
             error={error}
             onEdit={openEditModal}
             onDelete={setDeleteConfirm}
             onAddCategory={openAddModal}
           />
+
+          {/* Pagination */}
+          {mainCategories.length > 0 && (
+            <div className="mt-6 flex justify-center">
+              <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={setCurrentPage}
+                itemsPerPage={itemsPerPage}
+                setItemsPerPage={setItemsPerPage}
+                totalItems={mainCategories.length}
+              />
+            </div>
+          )}
 
           {/* Add/Edit Modal */}
           {isModalOpen && (
@@ -138,7 +167,7 @@ const MainCategoryManager = () => {
               preview={preview}
               onRemoveImage={() => {
                 setPreview(null);
-                setFormData({...formData, image: null});
+                setFormData({ ...formData, image: null });
               }}
               sections={sections}
               editingCategory={editingCategory}

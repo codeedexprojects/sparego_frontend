@@ -1,7 +1,9 @@
-// components/VehicleTable/VehicleTableRow.jsx
-const VehicleTableRow = ({ vehicle, onEdit, onDelete }) => {
+const VehicleTableRow = ({ vehicle, serialNumber, onEdit, onDelete }) => {
   return (
     <tr className="hover:bg-gray-50 transition-colors">
+      {/* Serial Number */}
+      <td className="px-6 py-4 font-medium text-gray-900">{serialNumber}</td>
+
       <td className="px-6 py-4">
         <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium ${
           vehicle.type === "Two-Wheeler" 

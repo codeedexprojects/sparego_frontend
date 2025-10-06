@@ -1,8 +1,8 @@
 import { IMG_URL } from '../../../../../../redux/baseUrl';
 
 const ImagesSection = ({ 
-  images, 
-  imagePreviews, 
+  images = [], 
+  imagePreviews = [], 
   existingImages = [], 
   onImageChange, 
   onRemoveImage 

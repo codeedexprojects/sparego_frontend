@@ -6,7 +6,8 @@ const HomeCardModal = ({
   isOpen, 
   onClose, 
   onSubmit, 
-  homeCard 
+  homeCard, 
+  sections = [] 
 }) => {
   const [formData, setFormData] = useState({
     title: "",
@@ -14,7 +15,8 @@ const HomeCardModal = ({
     image: null,
     imagePreview: null,
     buttonText: "Shop Now",
-    isActive: true
+    isActive: true,
+    section: "" // Added section field
   });
 
   const [errors, setErrors] = useState({});
@@ -27,7 +29,8 @@ const HomeCardModal = ({
         image: null,
         imagePreview: homeCard.image || null,
         buttonText: homeCard.buttonText || "Shop Now",
-        isActive: homeCard.isActive !== undefined ? homeCard.isActive : true
+        isActive: homeCard.isActive !== undefined ? homeCard.isActive : true,
+        section: homeCard.section?._id || "" // Prefill section
       });
     } else {
       setFormData({
@@ -36,7 +39,8 @@ const HomeCardModal = ({
         image: null,
         imagePreview: null,
         buttonText: "Shop Now",
-        isActive: true
+        isActive: true,
+        section: ""
       });
     }
     setErrors({});
@@ -59,8 +63,7 @@ const HomeCardModal = ({
     } else {
       setFormData(prev => ({ ...prev, [name]: value }));
     }
-    
-    // Clear error when field is updated
+
     if (errors[name]) {
       setErrors(prev => ({ ...prev, [name]: "" }));
     }
@@ -68,20 +71,18 @@ const HomeCardModal = ({
 
   const validateForm = () => {
     const newErrors = {};
-    
     if (!formData.title.trim()) newErrors.title = "Title is required";
     if (!formData.description.trim()) newErrors.description = "Description is required";
     if (!formData.image && !formData.imagePreview) newErrors.image = "Image is required";
-    
+    if (!formData.section) newErrors.section = "Section is required"; // Section validation
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    
     if (!validateForm()) return;
-    
     onSubmit(formData);
   };
 
@@ -105,6 +106,7 @@ const HomeCardModal = ({
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
+          {/* Title */}
           <div>
             <label className="block text-sm font-medium mb-2 text-gray-700">Title</label>
             <input
@@ -121,6 +123,7 @@ const HomeCardModal = ({
             {errors.title && <p className="mt-1 text-sm text-red-600">{errors.title}</p>}
           </div>
 
+          {/* Description */}
           <div>
             <label className="block text-sm font-medium mb-2 text-gray-700">Description</label>
             <textarea
@@ -137,6 +140,7 @@ const HomeCardModal = ({
             {errors.description && <p className="mt-1 text-sm text-red-600">{errors.description}</p>}
           </div>
 
+          {/* Button Text */}
           <div>
             <label className="block text-sm font-medium mb-2 text-gray-700">Button Text</label>
             <input
@@ -149,7 +153,26 @@ const HomeCardModal = ({
             />
           </div>
 
+          {/* Section */}
+          <div>
+            <label className="block text-sm font-medium mb-2 text-gray-700">Section</label>
+            <select
+              name="section"
+              value={formData.section}
+              onChange={handleChange}
+              className={`w-full p-3 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition ${
+                errors.section ? 'border-red-500' : 'border-gray-300'
+              }`}
+            >
+              <option value="">Select Section</option>
+              {sections.map(sec => (
+                <option key={sec._id} value={sec._id}>{sec.name}</option>
+              ))}
+            </select>
+            {errors.section && <p className="mt-1 text-sm text-red-600">{errors.section}</p>}
+          </div>
 
+          {/* Image */}
           <div>
             <label className="block text-sm font-medium mb-2 text-gray-700">Image</label>
             <div className="flex items-center justify-center w-full">
@@ -182,6 +205,7 @@ const HomeCardModal = ({
             {errors.image && <p className="mt-1 text-sm text-red-600">{errors.image}</p>}
           </div>
 
+          {/* Active checkbox */}
           <div>
             <label className="inline-flex items-center">
               <input
