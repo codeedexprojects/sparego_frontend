@@ -4,7 +4,7 @@ import { useState } from 'react';
 export default function ContentBlockEditor({ contentBlocks, setContentBlocks, disabled = false }) {
   const addContentBlock = (type) => {
     const newBlock = {
-      id: Date.now() + Math.random(), // More unique ID
+      id: `temp-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`, // More robust temporary ID
       type: type,
       text: '',
       count: contentBlocks.length + 1
@@ -41,6 +41,15 @@ export default function ContentBlockEditor({ contentBlocks, setContentBlocks, di
     }
   };
 
+  // Add a fallback key to be extra safe
+  const getBlockKey = (block, index) => {
+    if (block.id) {
+      return `content-block-${block.id}`;
+    }
+    // Fallback: use index and some unique properties
+    return `content-block-fallback-${index}-${block.type}-${block.count}`;
+  };
+
   return (
     <div>
       <div className="flex justify-between items-center mb-3">
@@ -72,7 +81,8 @@ export default function ContentBlockEditor({ contentBlocks, setContentBlocks, di
           </div>
         ) : (
           contentBlocks.map((block, index) => (
-            <div key={`content-block-${block.id}`} className="bg-white border border-gray-300 rounded-lg p-4">
+            <div key={getBlockKey(block, index)} className="bg-white border border-gray-300 rounded-lg p-4">
+              {/* Rest of your JSX remains the same */}
               <div className="flex justify-between items-start mb-2">
                 <div className="flex items-center gap-2">
                   <span className={`px-2 py-1 text-xs font-semibold rounded ${
