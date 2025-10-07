@@ -7,9 +7,11 @@ import { searchProducts } from "@/redux/slices/productSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { getcartCount } from "@/redux/slices/cartSlice";
 
+
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+    const [isLoggedIn, setIsLoggedIn] = useState(false)
   const [query, setQuery] = useState("");
   const pathname = usePathname();
   const router = useRouter();
@@ -29,8 +31,15 @@ const Header = () => {
   };
 
   useEffect(() => {
-    dispatch(getcartCount());
+    const token = localStorage.getItem("token");
+    if (token) {
+      setIsLoggedIn(true);
+      dispatch(getcartCount()); 
+    } else {
+      setIsLoggedIn(false);
+    }
   }, [dispatch]);
+
 
   useEffect(() => {
     setIsMenuOpen(false);

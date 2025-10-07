@@ -13,7 +13,8 @@ const Header = () => {
   const pathname = usePathname(); 
     const dispatch = useDispatch();
   const { count } = useSelector((state) => state.cart)
- const [sectionId, setSectionId] = useState(null); 
+ const [sectionId, setSectionId] = useState(null);
+   const [isLoggedIn, setIsLoggedIn] = useState(false) 
  const router = useRouter();
 
  const [searchText, setSearchText] = useState("");
@@ -28,13 +29,16 @@ const handleSearch = () => {
 
 
   useEffect(() => {
-    dispatch(getcartCount());
-  }, [dispatch]);
+    const token = localStorage.getItem("userToken");
+    if (token) {
+      setIsLoggedIn(true);
+      dispatch(getcartCount());
+    } else {
+      setIsLoggedIn(false);
+    }
 
-    useEffect(() => {
     const id = localStorage.getItem("sectionId");
     setSectionId(id);
-    dispatch(getcartCount());
   }, [dispatch]);
 
   const navItems = [

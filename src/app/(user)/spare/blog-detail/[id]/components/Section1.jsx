@@ -34,7 +34,7 @@ const BlogDetail = () => {
   <img
     src={`${IMG_URL}/${blog.image}`}
     alt={blog.title}
-    className="w-full h-80 object-contain bg-black" 
+    className="w-full h-80 object-cover bg-black" 
   />
   <h1 className="absolute bottom-4 left-4 text-white text-2xl md:text-3xl font-bold bg-black/50 px-4 py-2 rounded">
     {blog.title}

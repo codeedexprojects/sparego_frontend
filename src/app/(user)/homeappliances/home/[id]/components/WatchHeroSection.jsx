@@ -44,9 +44,9 @@ function WatchHeroSection({ slides }) {
       {/* Text + Button */}
       <div className="relative z-10 flex flex-col items-center justify-end h-full text-center pb-8 sm:pb-12 md:pb-16 px-4 bg-black/30">
         {/* Title */}
-        <h2 className="text-white font-bold text-2xl sm:text-4xl md:text-3xl mb-6 drop-shadow-lg">
+        {/* <h2 className="text-white font-bold text-2xl sm:text-4xl md:text-3xl mb-6 drop-shadow-lg">
           {slides[currentSlide]?.title || "Explore Watches"}
-        </h2>
+        </h2> */}
 
         {/* Button */}
         {productId ? (

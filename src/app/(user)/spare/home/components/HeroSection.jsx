@@ -85,9 +85,9 @@ export default function SpareHeroSection() {
                   <div className="flex flex-col lg:flex-row items-center h-full px-4 sm:px-6 lg:px-12 py-8 lg:py-0">
                     {/* Text Content */}
                     <div className="w-full lg:flex-1 text-center lg:text-left mb-8 lg:mb-0 lg:pr-8">
-                      <h1 className="text-4xl sm:text-4xl md:text-5xl lg:text-6xl font-light text-gray-800 leading-tight mb-4 md:mb-6">
+                      {/* <h1 className="text-4xl sm:text-4xl md:text-5xl lg:text-6xl font-light text-gray-800 leading-tight mb-4 md:mb-6">
                         {slide.title}
-                      </h1>
+                      </h1> */}
 
                       {productId ? (
                         <Link
