@@ -11,7 +11,8 @@ const DealBannerModal = ({
   onRemoveImage, 
   sections, 
   pageOptions,
-  editingBanner 
+  editingBanner,
+  products = [] // Ensure products has a default value
 }) => {
   if (!isOpen) return null;
 
@@ -76,8 +77,36 @@ const DealBannerModal = ({
               </FormSelect>
             </div>
 
-            {/* Right Column */}
+            {/* Right Column - FIXED: Ensure all fields are visible */}
             <div className="space-y-4">
+              {/* PRODUCT ID FIELD - This was missing */}
+              <FormSelect
+                label="Link to Product"
+                name="productId"
+                value={formData.productId}
+                onChange={onChange}
+              >
+                <option value="">No Product Link</option>
+                {products && products.length > 0 ? (
+                  products.map((product) => (
+                    <option key={product._id} value={product._id}>
+                      {product.name}
+                    </option>
+                  ))
+                ) : (
+                  <option value="" disabled>Loading products...</option>
+                )}
+              </FormSelect>
+
+              {/* ACTIVE CHECKBOX */}
+              <FormCheckbox
+                label="Active Banner"
+                name="isActive"
+                checked={formData.isActive}
+                onChange={onChange}
+              />
+
+              {/* IMAGE UPLOAD */}
               <ImageUpload
                 preview={preview}
                 onChange={onChange}
@@ -150,6 +179,19 @@ const FormSelect = ({ label, name, value, onChange, children, required = false }
     >
       {children}
     </select>
+  </div>
+);
+
+const FormCheckbox = ({ label, name, checked, onChange }) => (
+  <div className="flex items-center">
+    <input
+      type="checkbox"
+      name={name}
+      checked={checked}
+      onChange={onChange}
+      className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
+    />
+    <label className="ml-2 text-sm font-medium text-gray-700">{label}</label>
   </div>
 );
 

@@ -3,7 +3,6 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
 import { BASE_URL } from '../baseUrl';
 
-// Helper: Prepare FormData if logo file exists
 const prepareFormData = (brandData) => {
   const hasFile = brandData.logo && brandData.logo instanceof File;
   if (hasFile) {
@@ -15,7 +14,7 @@ const prepareFormData = (brandData) => {
     });
     return formData;
   }
-  return brandData; // JSON if no file
+  return brandData; 
 };
 
 // GET BRANDS

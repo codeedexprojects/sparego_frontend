@@ -46,7 +46,7 @@ const DealBannerList = ({
     );
   }
 
-  if (banners.length === 0) {
+  if (!banners || banners.length === 0) {
     return (
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
         <div className="text-center py-12">
@@ -69,9 +69,9 @@ const DealBannerList = ({
   return (
     <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-6">
-        {banners.map((banner) => (
+        {banners.map((banner, index) => (
           <DealBannerCard 
-            key={banner._id} 
+            key={banner._id || `banner-${index}`}
             banner={banner} 
             onEdit={onEdit} 
             onDelete={onDelete}
@@ -93,6 +93,9 @@ const DealBannerCard = ({ banner, onEdit, onDelete, getPageLabel }) => (
           src={`${IMG_URL}/${banner.image}`} 
           alt={banner.title}
           className="w-full h-48 object-cover"
+          onError={(e) => {
+            e.target.src = 'https://via.placeholder.com/400x200?text=Banner+Image';
+          }}
         />
       ) : (
         <div className="w-full h-48 bg-gray-100 flex items-center justify-center">
@@ -127,21 +130,46 @@ const DealBannerCard = ({ banner, onEdit, onDelete, getPageLabel }) => (
       )}
 
       <p className="text-gray-600 text-sm mb-3 line-clamp-2">
-        {banner.description || 'No description'}
+        {banner.description || 'No description provided'}
       </p>
 
-      <div className="space-y-1 text-sm text-gray-500">
+      <div className="space-y-2 text-sm text-gray-500">
+        {/* Section */}
         <div className="flex items-center">
-          <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="w-4 h-4 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
           </svg>
-          Section: {banner.section?.name || "All Sections"}
+          <span className="truncate">Section: {banner.section?.name || "All Sections"}</span>
         </div>
+
+        {/* Page */}
         <div className="flex items-center">
-          <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="w-4 h-4 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
           </svg>
-          Page: {getPageLabel(banner.page)}
+          <span className="truncate">Page: {getPageLabel(banner.page)}</span>
+        </div>
+
+        {/* Product Link - NEW */}
+        {banner.productId && (
+          <div className="flex items-center">
+            <svg className="w-4 h-4 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+            </svg>
+            <span className="truncate">
+              Product: {banner.productId?.name || 'Linked Product'}
+            </span>
+          </div>
+        )}
+
+        {/* Created Date */}
+        <div className="flex items-center">
+          <svg className="w-4 h-4 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+          </svg>
+          <span className="truncate">
+            Created: {banner.createdAt ? new Date(banner.createdAt).toLocaleDateString() : 'N/A'}
+          </span>
         </div>
       </div>
 
@@ -149,14 +177,20 @@ const DealBannerCard = ({ banner, onEdit, onDelete, getPageLabel }) => (
       <div className="flex justify-end space-x-2 mt-4 pt-3 border-t border-gray-200">
         <button
           onClick={() => onEdit(banner)}
-          className="text-blue-600 hover:text-blue-800 disabled:text-blue-400 font-medium py-1 px-3 rounded-md transition-colors duration-200 text-sm"
+          className="inline-flex items-center text-blue-600 hover:text-blue-800 font-medium py-1 px-3 rounded-md transition-colors duration-200 text-sm"
         >
+          <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+          </svg>
           Edit
         </button>
         <button
           onClick={() => onDelete(banner)}
-          className="text-red-600 hover:text-red-800 disabled:text-red-400 font-medium py-1 px-3 rounded-md transition-colors duration-200 text-sm"
+          className="inline-flex items-center text-red-600 hover:text-red-800 font-medium py-1 px-3 rounded-md transition-colors duration-200 text-sm"
         >
+          <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+          </svg>
           Delete
         </button>
       </div>

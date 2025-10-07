@@ -1,4 +1,3 @@
-// components/ReviewTable/ReviewTable.jsx
 "use client";
 import { useState } from "react";
 import ReviewTableHeader from "./ReviewTableHeader";
@@ -6,6 +5,7 @@ import ReviewTableRow from "./ReviewTableRow";
 import ReviewTableFilters from "./ReviewTableFilters";
 import ReviewModal from "./ReviewModal";
 import Pagination from "../../../../../components/shared/Pagination";
+import DeleteConfirmationModal from "../../../main-categories/components/DeleteModal";
 
 const ReviewTable = ({ 
   reviews = [], 
@@ -18,16 +18,19 @@ const ReviewTable = ({
   onToggleStatus,
   onBulkDelete,
   onBulkToggleStatus,
-  itemsPerPage = 6,
+  itemsPerPageDefault = 6,
   showFilters = true
 }) => {
   const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(itemsPerPageDefault);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingReview, setEditingReview] = useState(null);
 
-  // Helper function to safely get string values
+  // For Delete Modal
+  const [reviewToDelete, setReviewToDelete] = useState(null);
+
   const getStringValue = (value) => {
     if (typeof value === 'string') return value;
     if (typeof value === 'object' && value !== null) {
@@ -36,7 +39,6 @@ const ReviewTable = ({
     return String(value || '');
   };
 
-  // Filter reviews based on search and filters
   const filteredReviews = reviews.filter(review => {
     const title = getStringValue(review.title);
     const message = getStringValue(review.message);
@@ -55,8 +57,6 @@ const ReviewTable = ({
   });
 
   const totalPages = Math.ceil(filteredReviews.length / itemsPerPage);
-
-  // Get reviews for current page
   const paginatedReviews = filteredReviews.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
@@ -73,8 +73,13 @@ const ReviewTable = ({
   };
 
   const handleDelete = (review) => {
-    if (window.confirm(`Are you sure you want to delete the review by ${review.name}?`)) {
-      onDeleteReview && onDeleteReview(review);
+    setReviewToDelete(review); // Open the delete modal
+  };
+
+  const confirmDelete = () => {
+    if (reviewToDelete) {
+      onDeleteReview && onDeleteReview(reviewToDelete);
+      setReviewToDelete(null);
     }
   };
 
@@ -93,12 +98,8 @@ const ReviewTable = ({
 
   return (
     <div className="p-6 bg-white min-h-screen">
-      <ReviewTableHeader 
-        title="Review Management" 
-        onAddReview={handleAdd} 
-      />
+      <ReviewTableHeader title="Review Management" onAddReview={handleAdd} />
       
-      {/* Error Message */}
       {error && (
         <div className="mb-6 bg-red-50 border border-red-200 rounded-lg p-4">
           <div className="flex">
@@ -117,7 +118,6 @@ const ReviewTable = ({
         </div>
       )}
 
-      {/* Success Message */}
       {operationSuccess && (
         <div className="mb-6 bg-green-50 border border-green-200 rounded-lg p-4">
           <div className="flex">
@@ -136,7 +136,6 @@ const ReviewTable = ({
         </div>
       )}
 
-      {/* Loading State */}
       {loading && (
         <div className="mb-6 flex items-center justify-center py-8">
           <div className="flex items-center">
@@ -155,11 +154,12 @@ const ReviewTable = ({
         />
       )}
 
-      {/* Reviews Table */}
       <div className="overflow-x-auto rounded-lg shadow-md border border-gray-200 mb-6">
         <table className="min-w-full bg-white divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr className="text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-6 py-3">S/N</th>
+              <th className="px-6 py-3">Image</th>
               <th className="px-6 py-3">Reviewer</th>
               <th className="px-6 py-3">Designation</th>
               <th className="px-6 py-3">Title</th>
@@ -170,18 +170,22 @@ const ReviewTable = ({
           </thead>
           <tbody className="divide-y divide-gray-200">
             {paginatedReviews.length > 0 ? (
-              paginatedReviews.map((review, index) => (
-                <ReviewTableRow
-                  key={review._id || review.id || `review-${index}`}
-                  review={review}
-                  onEdit={handleEdit}
-                  onDelete={handleDelete}
-                  onToggleStatus={handleToggleStatus}
-                />
-              ))
+              paginatedReviews.map((review, index) => {
+                const serialNumber = filteredReviews.length - ((currentPage - 1) * itemsPerPage + index);
+                return (
+                  <ReviewTableRow
+                    key={review._id || review.id || `review-${index}`}
+                    review={review}
+                    serialNumber={serialNumber}
+                    onEdit={handleEdit}
+                    onDelete={handleDelete}
+                    onToggleStatus={handleToggleStatus}
+                  />
+                );
+              })
             ) : (
               <tr>
-                <td colSpan="6" className="px-6 py-8 text-center text-gray-500">
+                <td colSpan="8" className="px-6 py-8 text-center text-gray-500">
                   <div className="flex flex-col items-center">
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 text-gray-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z" />
@@ -196,23 +200,32 @@ const ReviewTable = ({
         </table>
       </div>
 
-      {/* Pagination Component */}
       {filteredReviews.length > 0 && (
         <div className="mt-6">
           <Pagination
             currentPage={currentPage}
             totalPages={totalPages}
             onPageChange={setCurrentPage}
+            itemsPerPage={itemsPerPage}
+            setItemsPerPage={setItemsPerPage}
+            totalItems={filteredReviews.length}
           />
         </div>
       )}
 
-      {/* Review Modal */}
       <ReviewModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onSubmit={handleSubmit}
         review={editingReview}
+      />
+
+      <DeleteConfirmationModal
+        item={reviewToDelete}
+        onClose={() => setReviewToDelete(null)}
+        onConfirm={confirmDelete}
+        title="Delete Review"
+        description={`Are you sure you want to delete the review by ${reviewToDelete?.name}?`}
       />
     </div>
   );

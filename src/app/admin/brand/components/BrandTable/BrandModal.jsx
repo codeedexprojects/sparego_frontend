@@ -16,7 +16,7 @@ const BrandModal = ({
     logo: null,
     logoPreview: null,
     vehicleType: "Two-wheeler",
-    section: "", // ObjectId of section
+    section: "", // ObjectId of section, can be empty
   });
 
   useEffect(() => {
@@ -28,7 +28,7 @@ const BrandModal = ({
         logo: null,
         logoPreview: brand.logo || brand.image || null,
         vehicleType: brand.vehicleType || "Two-wheeler",
-        section: brand.section?._id || brand.section || (sections[0]?._id || ""),
+        section: brand.section?._id || brand.section || "", // Keep empty string for optional
       });
     } else {
       setFormData({
@@ -38,7 +38,7 @@ const BrandModal = ({
         logo: null,
         logoPreview: null,
         vehicleType: "Two-wheeler",
-        section: sections[0]?._id || "", // default to first section
+        section: "", // optional
       });
     }
   }, [brand, brandType, sections, isOpen]);
@@ -64,7 +64,14 @@ const BrandModal = ({
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onSubmit(formData);
+
+    // Convert empty section to null for optional
+    const dataToSubmit = {
+      ...formData,
+      section: formData.section || null,
+    };
+
+    onSubmit(dataToSubmit);
   };
 
   if (!isOpen) return null;
@@ -124,17 +131,17 @@ const BrandModal = ({
             </div>
           )}
 
-          {/* Product Section */}
+          {/* Product Section (optional) */}
           {brandType === "product" && (
             <div>
-              <label className="block text-sm font-medium mb-2">Product Section</label>
+              <label className="block text-sm font-medium mb-2">Product Section (optional)</label>
               <select
                 name="section"
                 value={formData.section}
                 onChange={handleChange}
-                required
                 className="w-full p-3 border rounded-lg focus:ring-indigo-500"
               >
+                <option value="">-- No Section --</option>
                 {sections.map((s) => (
                   <option key={s._id} value={s._id}>
                     {s.name}

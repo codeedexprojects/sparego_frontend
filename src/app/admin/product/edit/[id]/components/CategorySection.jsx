@@ -18,21 +18,20 @@ const CategorySection = ({
     <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
       <h3 className="text-lg font-semibold text-gray-900 mb-4">Categorization</h3>
       <div className="space-y-4">
-        {/* Section */}
+        {/* Section - Made optional */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            Section <span className="text-red-500">*</span>
+            Section
           </label>
           <select
             name="section"
             value={formData.section}
             onChange={onInputChange}
-            required
             disabled={sectionsLoading}
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
           >
             <option value="">
-              {sectionsLoading ? 'Loading sections...' : 'Select Section'}
+              {sectionsLoading ? 'Loading sections...' : 'Select Section (Optional)'}
             </option>
             {sections.map((section) => (
               <option key={section._id} value={section._id}>

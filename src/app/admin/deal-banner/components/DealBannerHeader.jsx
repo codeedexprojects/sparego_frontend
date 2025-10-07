@@ -1,28 +1,33 @@
-// components/DealBannerHeader.jsx
-import React from 'react';
-
-const DealBannerHeader = ({ bannerCount, onAddBanner }) => {
+export default function DealBannerHeader({
+  bannerCount,
+  onAddBanner,
+  sections,
+  selectedSection,
+  onFilterChange,
+}) {
   return (
-    <div className="mb-8">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">Deal Banners</h1>
-          <p className="text-gray-600 mt-2">
-            Manage promotional deal banners ({bannerCount} banners)
-          </p>
-        </div>
-        <button
-          onClick={onAddBanner}
-          className="mt-4 sm:mt-0 bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-6 rounded-lg transition-colors duration-200 flex items-center shadow-sm"
+    <div className="flex items-center justify-between mb-4">
+      <div className="flex items-center gap-4">
+        <span className="font-medium">Total: {bannerCount}</span>
+        <select
+          value={selectedSection}
+          onChange={(e) => onFilterChange("section", e.target.value)}
+          className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-blue-500 focus:border-blue-500"
         >
-          <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-          </svg>
-          Add Banner
-        </button>
+          <option value="">All Sections</option>
+          {sections?.map((sec) => (
+            <option key={sec._id} value={sec._id}>
+              {sec.name}
+            </option>
+          ))}
+        </select>
       </div>
+      <button
+        onClick={onAddBanner}
+        className="px-4 py-2 bg-blue-600 text-white rounded-lg"
+      >
+        Add Banner
+      </button>
     </div>
   );
-};
-
-export default DealBannerHeader;
+}

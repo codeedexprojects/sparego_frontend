@@ -1,7 +1,8 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import BrandTableRow from "./BrandTableRow";
 import BrandModal from "./BrandModal";
+import DeleteConfirmationModal from "../../../main-categories/components/DeleteModal";
 
 const BrandTable = ({
   brands,
@@ -13,6 +14,9 @@ const BrandTable = ({
 }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedBrand, setSelectedBrand] = useState(null);
+
+  // State for delete modal
+  const [brandToDelete, setBrandToDelete] = useState(null);
 
   const openAddModal = () => {
     setSelectedBrand(null);
@@ -38,6 +42,17 @@ const BrandTable = ({
     handleCloseModal();
   };
 
+  const handleDelete = (brand) => {
+    setBrandToDelete(brand);
+  };
+
+  const confirmDelete = async () => {
+    if (brandToDelete) {
+      await onDeleteBrand(brandToDelete);
+      setBrandToDelete(null);
+    }
+  };
+
   return (
     <div className="space-y-6">
       {/* Add Brand Button */}
@@ -58,7 +73,7 @@ const BrandTable = ({
               key={brand._id || index}
               brand={brand}
               onEdit={openEditModal}
-              onDelete={onDeleteBrand}
+              onDelete={handleDelete}
               brandType={brandType}
               sections={brandType === "product" ? sections : []} // Only product brands get sections
             />
@@ -75,7 +90,16 @@ const BrandTable = ({
         onSubmit={handleSubmit}
         brand={selectedBrand}
         brandType={brandType}
-        sections={brandType === "product" ? sections : []} // Only pass sections for products
+        sections={brandType === "product" ? sections : []}
+      />
+
+      {/* Delete Confirmation Modal */}
+      <DeleteConfirmationModal
+        item={brandToDelete}
+        onClose={() => setBrandToDelete(null)}
+        onConfirm={confirmDelete}
+        title={`Delete ${brandType === "product" ? "Product" : "Vehicle"} Brand`}
+        description={`Are you sure you want to delete the brand "${brandToDelete?.name}"?`}
       />
     </div>
   );

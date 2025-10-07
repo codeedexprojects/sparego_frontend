@@ -10,7 +10,6 @@ const HomeCarouselList = ({
   onAddCarousel 
 }) => {
   
-  // Add debug log
   console.log("HomeCarouselList received:", { carousels, loading, error });
 
   if (loading) {
@@ -74,7 +73,7 @@ const HomeCarouselList = ({
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-6">
         {carousels.map((carousel) => (
           <HomeCarouselCard 
-            key={carousel._id} 
+            key={carousel._id || `carousel-${Math.random()}`} // fallback key if _id missing
             carousel={carousel} 
             onEdit={onEdit} 
             onDelete={onDelete}
@@ -141,7 +140,10 @@ const HomeCarouselCard = ({ carousel, onEdit, onDelete }) => {
             <p className="text-xs font-medium text-gray-700 mb-1">Featured Products:</p>
             <div className="flex flex-wrap gap-1">
               {carousel.products.slice(0, 3).map((product, index) => (
-                <span key={product._id} className="inline-flex items-center px-2 py-1 rounded text-xs bg-blue-100 text-blue-800">
+                <span
+                  key={product._id || `product-${index}`} // fallback key
+                  className="inline-flex items-center px-2 py-1 rounded text-xs bg-blue-100 text-blue-800"
+                >
                   {product.name}
                   {index === 2 && carousel.products.length > 3 && ` +${carousel.products.length - 3}`}
                 </span>

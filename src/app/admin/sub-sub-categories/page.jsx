@@ -8,35 +8,46 @@ import {
   editSubSubCategory,
   deleteSubSubCategory,
 } from "../../../redux/slices/adminSubSubCategorySlice";
-import { fetchSubCategories } from "../../../redux/slices/adminSubCategorySlice"; // fetch sub-categories
+import { fetchSubCategories } from "../../../redux/slices/adminSubCategorySlice";
 import DeleteConfirmationModal from "../main-categories/components/DeleteModal";
 import SubSubCategoryHeader from "./components/SubSubCategoryHeader";
 import SubSubCategoryList from "./components/SubSubCategoryList";
 import SubSubCategoryModal from "./components/SubSubCategoryModal";
 import ProtectedRoute from "../../../components/admin/ProtectedRoute";
+import Pagination from "../../../components/shared/Pagination";
 
 const SubSubCategoryManager = () => {
   const dispatch = useDispatch();
   const { subSubCategories = [], loading, error } = useSelector(
     (s) => s.adminSubSubCategory
   );
-  const { subCategories = [] } = useSelector((s) => s.adminSubCategory); // use sub-categories
+  const { subCategories = [] } = useSelector((s) => s.adminSubCategory);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState(null);
   const [formData, setFormData] = useState({
     name: "",
     description: "",
-    subCategory: "", // this will hold subCategory _id
+    subCategory: "",
     type: "",
     image: null,
   });
   const [editingSubSubCategory, setEditingSubSubCategory] = useState(null);
   const [preview, setPreview] = useState(null);
 
+  // Pagination states
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
+
+  // Paginate sub-sub-categories
+  const indexOfLast = currentPage * itemsPerPage;
+  const indexOfFirst = indexOfLast - itemsPerPage;
+  const currentSubSubCategories = subSubCategories.slice(indexOfFirst, indexOfLast);
+  const totalPages = Math.ceil(subSubCategories.length / itemsPerPage);
+
   useEffect(() => {
     dispatch(fetchSubSubCategories());
-    dispatch(fetchSubCategories()); // fetch sub-categories for selection
+    dispatch(fetchSubCategories());
   }, [dispatch]);
 
   // Modal handlers
@@ -83,7 +94,7 @@ const SubSubCategoryManager = () => {
     const form = new FormData();
     form.append("name", formData.name);
     form.append("description", formData.description);
-    form.append("subCategory", formData.subCategory); // subCategory instead of category
+    form.append("subCategory", formData.subCategory);
     form.append("type", formData.type);
     if (formData.image) form.append("image", formData.image);
 
@@ -128,13 +139,27 @@ const SubSubCategoryManager = () => {
 
           {/* Sub-sub-categories List */}
           <SubSubCategoryList
-            categories={subSubCategories}
+            categories={currentSubSubCategories}
             loading={loading}
             error={error}
             onEdit={openEditModal}
             onDelete={setDeleteConfirm}
             onAddCategory={openAddModal}
           />
+
+          {/* Pagination */}
+          {subSubCategories.length > 0 && (
+            <div className="mt-6 flex justify-center">
+              <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={setCurrentPage}
+                itemsPerPage={itemsPerPage}
+                setItemsPerPage={setItemsPerPage}
+                totalItems={subSubCategories.length}
+              />
+            </div>
+          )}
 
           {/* Add/Edit Modal */}
           {isModalOpen && (
@@ -149,7 +174,7 @@ const SubSubCategoryManager = () => {
                 setPreview(null);
                 setFormData({ ...formData, image: null });
               }}
-              subCategories={subCategories} // sub-categories list for selection
+              subCategories={subCategories}
               editingCategory={editingSubSubCategory}
             />
           )}

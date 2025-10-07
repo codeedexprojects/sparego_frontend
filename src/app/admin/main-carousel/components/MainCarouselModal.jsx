@@ -1,4 +1,6 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
+import { BASE_URL } from '../../../../redux/baseUrl';
 
 const MainCarouselModal = ({
     isOpen,
@@ -9,14 +11,63 @@ const MainCarouselModal = ({
     preview,
     onRemoveImage,
     sections,
-    products,
-    productSearch,
-    onProductSearch,
-    onProductSelect,
-    onRemoveProduct,
     selectedProducts,
     editingCarousel
 }) => {
+    const [products, setProducts] = useState([]);
+    const [productSearch, setProductSearch] = useState('');
+    const [loading, setLoading] = useState(false);
+
+    const getToken = () => localStorage.getItem("adminToken");
+
+    // Fetch products filtered by section and search
+    const fetchProducts = async (sectionId = '', search = '') => {
+        try {
+            setLoading(true);
+            const params = {};
+            if (sectionId) params.section = sectionId;
+            if (search) params.search = search;
+
+            const query = new URLSearchParams(params).toString();
+
+            const res = await axios.get(`${BASE_URL}/products/all?${query}`, {
+                headers: { Authorization: `Bearer ${getToken()}` },
+            });
+
+            setProducts(res.data.products);
+        } catch (err) {
+            console.error(err);
+            setProducts([]);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // Fetch products when section changes
+    useEffect(() => {
+        fetchProducts(formData.section);
+    }, [formData.section]);
+
+    // Handle search input
+    const handleProductSearch = (e) => {
+        setProductSearch(e.target.value);
+        fetchProducts(formData.section, e.target.value);
+    };
+
+    // Handle product selection/removal
+    const handleProductSelect = (productId) => {
+        const selected = formData.products.includes(productId)
+            ? formData.products.filter((id) => id !== productId)
+            : [...formData.products, productId];
+
+        onChange({ target: { name: "products", value: selected } });
+    };
+
+    const handleRemoveProduct = (productId) => {
+        const updated = formData.products.filter((id) => id !== productId);
+        onChange({ target: { name: "products", value: updated } });
+    };
+
     if (!isOpen) return null;
 
     return (
@@ -34,7 +85,6 @@ const MainCarouselModal = ({
                             <FormInput
                                 label="Title *"
                                 name="title"
-                                type="text"
                                 value={formData.title}
                                 onChange={onChange}
                                 placeholder="Enter carousel title"
@@ -46,7 +96,6 @@ const MainCarouselModal = ({
                                 name="section"
                                 value={formData.section}
                                 onChange={onChange}
-                                required={false}  
                             >
                                 <option value="">Select Section</option>
                                 {sections.map((s) => (
@@ -55,7 +104,6 @@ const MainCarouselModal = ({
                                     </option>
                                 ))}
                             </FormSelect>
-
 
                             <ImageUpload
                                 preview={preview}
@@ -68,106 +116,106 @@ const MainCarouselModal = ({
 
                         {/* Right Column - Products Selection */}
                         <div className="space-y-4">
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    Select Products *
-                                </label>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                                Select Products *
+                            </label>
 
-                                {/* Product Search */}
+                            {/* Product Search */}
+                            <input
+                                type="text"
+                                value={productSearch}
+                                onChange={handleProductSearch}
+                                placeholder="Search products..."
+                                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200 mb-3"
+                            />
+
+                            {/* Selected Products */}
+                            {selectedProducts.length > 0 && (
                                 <div className="mb-3">
-                                    <input
-                                        type="text"
-                                        value={productSearch}
-                                        onChange={onProductSearch}
-                                        placeholder="Search products..."
-                                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200"
-                                    />
-                                </div>
-
-                                {/* Selected Products */}
-                                {selectedProducts.length > 0 && (
-                                    <div className="mb-3">
-                                        <p className="text-sm font-medium text-gray-700 mb-2">Selected Products:</p>
-                                        <div className="flex flex-wrap gap-2">
-                                            {selectedProducts.map((product) => (
+                                    <p className="text-sm font-medium text-gray-700 mb-2">Selected Products:</p>
+                                    <div className="flex flex-wrap gap-2">
+                                        {selectedProducts.map((product) => {
+                                            const prod = products.find(p => p._id === product) || { _id: product, name: 'Product' };
+                                            return (
                                                 <span
-                                                    key={product._id}
+                                                    key={product}
                                                     className="inline-flex items-center px-3 py-1 rounded-full text-xs bg-blue-100 text-blue-800"
                                                 >
-                                                    {product.name}
+                                                    {prod.name}
                                                     <button
                                                         type="button"
-                                                        onClick={() => onRemoveProduct(product._id)}
+                                                        onClick={() => handleRemoveProduct(product)}
                                                         className="ml-2 text-blue-600 hover:text-blue-800"
                                                     >
                                                         ×
                                                     </button>
                                                 </span>
-                                            ))}
-                                        </div>
+                                            )
+                                        })}
                                     </div>
-                                )}
+                                </div>
+                            )}
 
-                                {/* Products List */}
-                                <div className="border border-gray-300 rounded-lg max-h-48 overflow-y-auto">
-                                    {products.length === 0 ? (
-                                        <div className="p-4 text-center text-gray-500">
-                                            No products found
-                                        </div>
-                                    ) : (
-                                        <div className="divide-y divide-gray-200">
-                                            {products.map((product) => (
-                                                <div
-                                                    key={product._id}
-                                                    className={`p-3 cursor-pointer hover:bg-gray-50 transition-colors duration-200 ${formData.products.includes(product._id) ? 'bg-blue-50' : ''
-                                                        }`}
-                                                    onClick={() => onProductSelect(product._id)}
-                                                >
-                                                    <div className="flex items-center justify-between">
-                                                        <div className="flex items-center space-x-3">
-                                                            {product.images && product.images.length > 0 ? (
-                                                                <img
-                                                                    src={product.images[0]}
-                                                                    alt={product.name}
-                                                                    className="w-10 h-10 object-cover rounded"
-                                                                />
-                                                            ) : (
-                                                                <div className="w-10 h-10 bg-gray-200 rounded flex items-center justify-center">
-                                                                    <svg className="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-                                                                    </svg>
-                                                                </div>
-                                                            )}
-                                                            <div>
-                                                                <p className="text-sm font-medium text-gray-900">{product.name}</p>
-                                                                <p className="text-xs text-gray-500">
-                                                                    {product.productBrand?.name} • ₹{product.price}
-                                                                    {product.discount > 0 && (
-                                                                        <span className="text-red-600 ml-1">({product.discount}% OFF)</span>
-                                                                    )}
-                                                                </p>
-                                                            </div>
-                                                        </div>
-                                                        <div className={`w-4 h-4 border-2 rounded ${formData.products.includes(product._id)
-                                                                ? 'bg-blue-600 border-blue-600'
-                                                                : 'border-gray-300'
-                                                            }`}>
-                                                            {formData.products.includes(product._id) && (
-                                                                <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
-                                                                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                            {/* Products List */}
+                            <div className="border border-gray-300 rounded-lg max-h-48 overflow-y-auto">
+                                {loading ? (
+                                    <div className="p-4 text-center text-gray-500">Loading...</div>
+                                ) : products.length === 0 ? (
+                                    <div className="p-4 text-center text-gray-500">No products found</div>
+                                ) : (
+                                    <div className="divide-y divide-gray-200">
+                                        {products.map((product) => (
+                                            <div
+                                                key={product._id}
+                                                className={`p-3 cursor-pointer hover:bg-gray-50 transition-colors duration-200 ${formData.products.includes(product._id) ? 'bg-blue-50' : ''
+                                                    }`}
+                                                onClick={() => handleProductSelect(product._id)}
+                                            >
+                                                <div className="flex items-center justify-between">
+                                                    <div className="flex items-center space-x-3">
+                                                        {product.images && product.images.length > 0 ? (
+                                                            <img
+                                                                src={product.images[0]}
+                                                                alt={product.name}
+                                                                className="w-10 h-10 object-cover rounded"
+                                                            />
+                                                        ) : (
+                                                            <div className="w-10 h-10 bg-gray-200 rounded flex items-center justify-center">
+                                                                <svg className="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
                                                                 </svg>
-                                                            )}
+                                                            </div>
+                                                        )}
+                                                        <div>
+                                                            <p className="text-sm font-medium text-gray-900">{product.name}</p>
+                                                            <p className="text-xs text-gray-500">
+                                                                {product.productBrand?.name} • ₹{product.price}
+                                                                {product.discount > 0 && (
+                                                                    <span className="text-red-600 ml-1">({product.discount}% OFF)</span>
+                                                                )}
+                                                            </p>
                                                         </div>
                                                     </div>
+                                                    <div className={`w-4 h-4 border-2 rounded ${formData.products.includes(product._id)
+                                                        ? 'bg-blue-600 border-blue-600'
+                                                        : 'border-gray-300'
+                                                        }`}>
+                                                        {formData.products.includes(product._id) && (
+                                                            <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                                                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                                                            </svg>
+                                                        )}
+                                                    </div>
                                                 </div>
-                                            ))}
-                                        </div>
-                                    )}
-                                </div>
-                                <p className="text-xs text-gray-500 mt-2">
-                                    {formData.products.length} product(s) selected
-                                </p>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
                             </div>
+
+                            <p className="text-xs text-gray-500 mt-2">
+                                {formData.products.length} product(s) selected
+                            </p>
                         </div>
                     </div>
 
@@ -195,11 +243,11 @@ const MainCarouselModal = ({
 };
 
 // Reusable Form Components
-const FormInput = ({ label, name, type = "text", value, onChange, placeholder, required = false }) => (
+const FormInput = ({ label, name, value, onChange, placeholder, required = false }) => (
     <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">{label}</label>
         <input
-            type={type}
+            type="text"
             name={name}
             value={value}
             onChange={onChange}
@@ -210,7 +258,7 @@ const FormInput = ({ label, name, type = "text", value, onChange, placeholder, r
     </div>
 );
 
-const FormSelect = ({ label, name, value, onChange, children, required = false }) => (
+const FormSelect = ({ label, name, value, onChange, children }) => (
     <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">{label}</label>
         <select
@@ -218,7 +266,6 @@ const FormSelect = ({ label, name, value, onChange, children, required = false }
             value={value}
             onChange={onChange}
             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200"
-            required={required}
         >
             {children}
         </select>
@@ -241,9 +288,7 @@ const ImageUpload = ({ preview, onChange, onRemove, required = false, label }) =
                         onClick={onRemove}
                         className="absolute top-2 right-2 bg-red-600 text-white p-1 rounded-full hover:bg-red-700 transition-colors duration-200"
                     >
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                        </svg>
+                        ×
                     </button>
                 </div>
             ) : (
@@ -252,9 +297,7 @@ const ImageUpload = ({ preview, onChange, onRemove, required = false, label }) =
                         <svg className="w-8 h-8 mb-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                         </svg>
-                        <p className="mb-2 text-sm text-gray-500">
-                            <span className="font-semibold">Click to upload</span>
-                        </p>
+                        <p className="mb-2 text-sm text-gray-500"><span className="font-semibold">Click to upload</span></p>
                         <p className="text-xs text-gray-500">PNG, JPG, GIF up to 10MB</p>
                     </div>
                     <input

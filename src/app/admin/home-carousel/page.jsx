@@ -1,4 +1,5 @@
 "use client";
+
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "sonner";
@@ -13,12 +14,13 @@ import DeleteConfirmationModal from "../main-categories/components/DeleteModal";
 import HomeCarouselHeader from "./components/HomeCarouselHeader";
 import HomeCarouselList from "./components/HomeCarouselList";
 import HomeCarouselModal from "./components/HomeCarouselModal";
+import Pagination from "../../../components/shared/Pagination";
 import { IMG_URL } from "../../../redux/baseUrl";
 import ProtectedRoute from "../../../components/admin/ProtectedRoute";
 
 const HomeCarouselManager = () => {
   const dispatch = useDispatch();
-  const { homeCarouselList, loading, error } = useSelector((s) => s.adminHomeCarousel);
+  const { homeCarouselList = [], loading, error } = useSelector((s) => s.adminHomeCarousel);
   const { products } = useSelector((s) => s.adminProduct);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -31,8 +33,12 @@ const HomeCarouselManager = () => {
   const [editingCarousel, setEditingCarousel] = useState(null);
   const [preview, setPreview] = useState(null);
   const [productSearch, setProductSearch] = useState("");
+
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(5);
+
   useEffect(() => {
-   
     dispatch(fetchHomeCarousels());
     dispatch(getAllProducts({}));
   }, [dispatch]);
@@ -45,9 +51,7 @@ const HomeCarouselManager = () => {
     setIsModalOpen(true);
   };
 
-  // Open edit modal
   const openEditModal = (carousel) => {
-    console.log("Editing carousel:", carousel);
     setFormData({
       title: carousel.title,
       products: carousel.products?.map(p => p._id) || [],
@@ -86,34 +90,21 @@ const HomeCarouselManager = () => {
   const handleProductSelect = (productId) => {
     const currentProducts = [...formData.products];
     if (currentProducts.includes(productId)) {
-      setFormData({
-        ...formData,
-        products: currentProducts.filter(id => id !== productId)
-      });
+      setFormData({ ...formData, products: currentProducts.filter(id => id !== productId) });
     } else {
-      setFormData({
-        ...formData,
-        products: [...currentProducts, productId]
-      });
+      setFormData({ ...formData, products: [...currentProducts, productId] });
     }
   };
 
   const removeSelectedProduct = (productId) => {
-    setFormData({
-      ...formData,
-      products: formData.products.filter(id => id !== productId)
-    });
+    setFormData({ ...formData, products: formData.products.filter(id => id !== productId) });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Submitting form data:", formData);
-    
     const form = new FormData();
     form.append("title", formData.title);
-    formData.products.forEach((id) => {
-      form.append("products", id);
-    });
+    formData.products.forEach((id) => form.append("products", id));
     if (formData.image) form.append("image", formData.image);
 
     try {
@@ -147,22 +138,22 @@ const HomeCarouselManager = () => {
     return products.filter(product => formData.products.includes(product._id));
   };
 
+  // Pagination calculations
+  const totalPages = Math.ceil(homeCarouselList.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const paginatedCarousels = homeCarouselList.slice(startIndex, startIndex + itemsPerPage);
+
   return (
     <ProtectedRoute>
       <div className="min-h-screen">
         <div className="mx-auto">
-          
-          
-
-          {/* Header */}
           <HomeCarouselHeader
-            carouselCount={homeCarouselList?.length || 0}
+            carouselCount={homeCarouselList.length}
             onAddCarousel={openAddModal}
           />
 
-          {/* Carousel List */}
           <HomeCarouselList
-            carousels={homeCarouselList || []}
+            carousels={paginatedCarousels}
             loading={loading}
             error={error}
             onEdit={openEditModal}
@@ -170,7 +161,20 @@ const HomeCarouselManager = () => {
             onAddCarousel={openAddModal}
           />
 
-          {/* Add/Edit Modal */}
+          {/* Pagination */}
+          {homeCarouselList.length > 0 && (
+            <div className="mt-6 flex justify-center">
+              <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={setCurrentPage}
+                itemsPerPage={itemsPerPage}
+                setItemsPerPage={setItemsPerPage}
+                totalItems={homeCarouselList.length}
+              />
+            </div>
+          )}
+
           {isModalOpen && (
             <HomeCarouselModal
               isOpen={isModalOpen}
@@ -193,7 +197,6 @@ const HomeCarouselManager = () => {
             />
           )}
 
-          {/* Delete Confirmation Modal */}
           {deleteConfirm && (
             <DeleteConfirmationModal
               item={deleteConfirm}

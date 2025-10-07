@@ -1,5 +1,5 @@
-// components/ReviewTable/ReviewModal.jsx
 "use client";
+import { IMG_URL } from "@/redux/baseUrl";
 import { useState, useEffect } from "react";
 
 const ReviewModal = ({ 
@@ -13,9 +13,11 @@ const ReviewModal = ({
     message: "",
     name: "",
     designation: "",
-    isActive: true
+    isActive: true,
+    image: null
   });
 
+  const [imagePreview, setImagePreview] = useState(null);
   const [errors, setErrors] = useState({});
 
   useEffect(() => {
@@ -25,16 +27,30 @@ const ReviewModal = ({
         message: review.message || "",
         name: review.name || "",
         designation: review.designation || "",
-        isActive: review.isActive !== undefined ? review.isActive : true
+        isActive: review.isActive !== undefined ? review.isActive : true,
+        image: review.image || null
       });
+      
+      // Set image preview for existing review
+      if (review.image) {
+        if (typeof review.image === 'string') {
+          setImagePreview(review.image);
+        } else if (review.image.url) {
+          setImagePreview(review.image.url);
+        }
+      } else {
+        setImagePreview(null);
+      }
     } else {
       setFormData({
         title: "",
         message: "",
         name: "",
         designation: "",
-        isActive: true
+        isActive: true,
+        image: null
       });
+      setImagePreview(null);
     }
     setErrors({});
   }, [review, isOpen]);
@@ -54,6 +70,43 @@ const ReviewModal = ({
     }
   };
 
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      // Validate file type
+      const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+      if (!validTypes.includes(file.type)) {
+        setErrors(prev => ({ ...prev, image: 'Please select a valid image file (JPEG, PNG, GIF, WebP)' }));
+        return;
+      }
+
+      // Validate file size (max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        setErrors(prev => ({ ...prev, image: 'Image size should be less than 5MB' }));
+        return;
+      }
+
+      setFormData(prev => ({ ...prev, image: file }));
+      
+      // Create preview
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        setImagePreview(e.target.result);
+      };
+      reader.readAsDataURL(file);
+      
+      // Clear image error
+      if (errors.image) {
+        setErrors(prev => ({ ...prev, image: "" }));
+      }
+    }
+  };
+
+  const removeImage = () => {
+    setFormData(prev => ({ ...prev, image: null }));
+    setImagePreview(null);
+  };
+
   const validateForm = () => {
     const newErrors = {};
     
@@ -71,7 +124,23 @@ const ReviewModal = ({
     
     if (!validateForm()) return;
     
-    onSubmit(formData);
+    // Create FormData to handle file upload
+    const submitData = new FormData();
+    submitData.append("title", formData.title);
+    submitData.append("message", formData.message);
+    submitData.append("name", formData.name);
+    submitData.append("designation", formData.designation);
+    submitData.append("isActive", formData.isActive);
+    
+    if (formData.image instanceof File) {
+      submitData.append("image", formData.image);
+    } else if (formData.image && !review) {
+      // If it's not a file but exists (like a URL from existing review during edit), we might need to handle it differently
+      // This depends on your backend API
+      submitData.append("image", formData.image);
+    }
+    
+    onSubmit(submitData);
   };
 
   if (!isOpen) return null;
@@ -94,6 +163,49 @@ const ReviewModal = ({
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
+          {/* Image Upload */}
+          <div>
+            <label className="block text-sm font-medium mb-2 text-gray-700">Reviewer Image</label>
+            <div className="flex items-center space-x-4">
+              {imagePreview ? (
+                <div className="relative">
+                  <div className="w-20 h-20 rounded-full overflow-hidden border border-gray-300">
+                    <img 
+                      src={`${IMG_URL}/${imagePreview}`} 
+                      alt="Preview" 
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  <button
+                    type="button"
+                    onClick={removeImage}
+                    className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 transition-colors"
+                  >
+                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                </div>
+              ) : (
+                <div className="w-20 h-20 rounded-full bg-gray-100 flex items-center justify-center border border-gray-300 border-dashed">
+                  <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                  </svg>
+                </div>
+              )}
+              <div className="flex-1">
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageChange}
+                  className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100"
+                />
+                <p className="text-xs text-gray-500 mt-1">JPEG, PNG, GIF, WebP. Max 5MB.</p>
+                {errors.image && <p className="mt-1 text-sm text-red-600">{errors.image}</p>}
+              </div>
+            </div>
+          </div>
+
           <div>
             <label className="block text-sm font-medium mb-2 text-gray-700">Reviewer Name</label>
             <input
@@ -193,4 +305,4 @@ const ReviewModal = ({
   );
 };
 
-export default ReviewModal;
+export default ReviewModal; 
