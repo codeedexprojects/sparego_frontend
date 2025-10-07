@@ -41,6 +41,7 @@ import adminMainCarouselReducer from "./slices/adminMainCarouselSlice";
 import adminHomeCarouselReducer from "./slices/adminHomeCarouselSlice";
 import adminBottomCarouselReducer from "./slices/adminBottomCarouselSlice";
 import adminProductBrandReducer from "./slices/adminProductBrand";
+import adminBlogSliceReducer from "./slices/adminBlogSlice"
 
 export const store = configureStore({
   reducer: {
@@ -85,5 +86,6 @@ export const store = configureStore({
     adminHomeCarousel: adminHomeCarouselReducer,
     adminBottomCarousel: adminBottomCarouselReducer,
     adminProductBrand: adminProductBrandReducer,
+    adminBlog: adminBlogSliceReducer
   },
 });
