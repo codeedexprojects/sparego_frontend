@@ -202,75 +202,79 @@ const ProductForm = ({ productId, onSuccess, onCancel }) => {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    setSubmitting(true);
+  e.preventDefault();
+  setSubmitting(true);
 
-    if (!formData.section) {
-      alert('Section is required');
-      setSubmitting(false);
-      return;
-    }
+  if (!formData.name || !formData.price) {
+    alert('Product name and price are required');
+    setSubmitting(false);
+    return;
+  }
 
-    if (!formData.name || !formData.price) {
-      alert('Product name and price are required');
-      setSubmitting(false);
-      return;
-    }
+  try {
+    const submitData = new FormData();
 
-    try {
-      const submitData = new FormData();
+    // Append simple fields
+    submitData.append("name", formData.name);
+    submitData.append("description", formData.description);
+    submitData.append("price", parseFloat(formData.price));
+    submitData.append("discount", formData.discount || 0);
+    submitData.append("stock", formData.stock || 0);
+    submitData.append("vehicleType", formData.vehicleType);
+    submitData.append("overview", formData.overview);
+    submitData.append("warranty", formData.warranty);
+    submitData.append("partNumber", formData.partNumber);
+    submitData.append("isActive", formData.isActive);
+    submitData.append("isPopular", formData.isPopular);
 
-      // Append simple fields
-      submitData.append("name", formData.name);
-      submitData.append("description", formData.description);
-      submitData.append("price", parseFloat(formData.price));
-      submitData.append("discount", formData.discount || 0);
-      submitData.append("stock", formData.stock || 0);
-      submitData.append("vehicleType", formData.vehicleType);
-      submitData.append("overview", formData.overview);
-      submitData.append("warranty", formData.warranty);
-      submitData.append("partNumber", formData.partNumber);
-      submitData.append("isActive", formData.isActive);
-      submitData.append("isPopular", formData.isPopular);
-      submitData.append("section", formData.section);
+    if (formData.mainCategory) submitData.append("mainCategory", formData.mainCategory);
+    if (formData.category) submitData.append("category", formData.category);
+    if (formData.subCategory) submitData.append("subCategory", formData.subCategory);
+    if (formData.subSubCategory) submitData.append("subSubCategory", formData.subSubCategory);
+    if (formData.productBrand) submitData.append("productBrand", formData.productBrand);
+    if (formData.section) submitData.append("section", formData.section);
 
-      if (formData.mainCategory) submitData.append("mainCategory", formData.mainCategory);
-      if (formData.category) submitData.append("category", formData.category);
-      if (formData.subCategory) submitData.append("subCategory", formData.subCategory);
-      if (formData.subSubCategory) submitData.append("subSubCategory", formData.subSubCategory);
-      if (formData.productBrand) submitData.append("productBrand", formData.productBrand);
-
-      // Arrays (stringify them)
-      submitData.append("specifications", JSON.stringify(formData.specifications.filter(i => i.trim() !== "")));
-      submitData.append("usage", JSON.stringify(formData.usage.filter(i => i.trim() !== "")));
-      formData.technicalSpecs.forEach((spec, index) => {
-        submitData.append(`technicalSpecs[${index}][key]`, spec.key);
-        submitData.append(`technicalSpecs[${index}][value]`, spec.value);
+    // FIXED: Append arrays directly without JSON.stringify
+    formData.specifications
+      .filter(i => i.trim() !== "")
+      .forEach((spec, index) => {
+        submitData.append(`specifications[${index}]`, spec);
       });
 
-      // Append multiple images
-      images.forEach((file) => {
-        submitData.append("images", file);
+    formData.usage
+      .filter(i => i.trim() !== "")
+      .forEach((usage, index) => {
+        submitData.append(`usage[${index}]`, usage);
       });
 
-      if (productId) {
-        await dispatch(editProduct({ id: productId, data: submitData })).unwrap();
-      } else {
-        await dispatch(addProduct(submitData)).unwrap();
-      }
+    formData.technicalSpecs.forEach((spec, index) => {
+      submitData.append(`technicalSpecs[${index}][key]`, spec.key);
+      submitData.append(`technicalSpecs[${index}][value]`, spec.value);
+    });
 
-      if (onSuccess) {
-        onSuccess();
-      } else {
-        router.push("/product");
-      }
-    } catch (error) {
-      console.error("Error saving product:", error);
-      alert(`Error saving product: ${error.message || "Please check all required fields"}`);
-    } finally {
-      setSubmitting(false);
+    // Append multiple images
+    images.forEach((file) => {
+      submitData.append("images", file);
+    });
+
+    if (productId) {
+      await dispatch(editProduct({ id: productId, data: submitData })).unwrap();
+    } else {
+      await dispatch(addProduct(submitData)).unwrap();
     }
-  };
+
+    if (onSuccess) {
+      onSuccess();
+    } else {
+      router.push("/admin/ssproduct");
+    }
+  } catch (error) {
+    console.error("Error saving product:", error);
+    alert(`Error saving product: ${error.message || "Please check all required fields"}`);
+  } finally {
+    setSubmitting(false);
+  }
+};
 
   if (productLoading && productId) {
     return (
@@ -306,7 +310,7 @@ const ProductForm = ({ productId, onSuccess, onCancel }) => {
             onInputChange={handleInputChange}
             sections={sections}
             sectionsLoading={sectionsLoading}
-            brands={productBrands} // Pass all brands directly
+            brands={productBrands}
             brandsLoading={brandsLoading}
             mainCategories={mainCategories} // Pass all main categories directly
             mainCategoriesLoading={mainCategoriesLoading}
@@ -346,7 +350,7 @@ const ProductForm = ({ productId, onSuccess, onCancel }) => {
           <div className="flex justify-end space-x-4 pt-6">
             <button
               type="button"
-              onClick={onCancel || (() => router.push('/product'))}
+              onClick={onCancel || (() => router.push('/admin/ssproduct'))}
               disabled={submitting}
               className="px-8 py-3 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors disabled:opacity-50"
             >

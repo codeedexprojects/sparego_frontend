@@ -16,6 +16,7 @@ import ImagesSection from './components/ImageSection';
 import SpecificationsSection from './components/SpecificationSection';
 import AdditionalInfoSection from './components/AdditionalInfoSection';
 import { fetchBrands } from '../../../../../redux/slices/adminProductBrand';
+import ConfirmationAlertModal from '../../../../../components/shared/ConfirmationAlertModal';
 
 const EditProductForm = () => {
   const router = useRouter();
@@ -65,6 +66,11 @@ const EditProductForm = () => {
   const [filteredSubSubCategories, setFilteredSubSubCategories] = useState([]);
   const [submitting, setSubmitting] = useState(false);
   const [dataLoaded, setDataLoaded] = useState(false);
+  
+  // Alert states
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [showErrorModal, setShowErrorModal] = useState(false);
+  const [modalMessage, setModalMessage] = useState('');
 
   // Fetch all data on component mount
   useEffect(() => {
@@ -338,14 +344,9 @@ const EditProductForm = () => {
     e.preventDefault();
     setSubmitting(true);
 
-    if (!formData.section) {
-      alert('Section is required');
-      setSubmitting(false);
-      return;
-    }
-
     if (!formData.name || !formData.price) {
-      alert('Product name and price are required');
+      setModalMessage('Product name and price are required');
+      setShowErrorModal(true);
       setSubmitting(false);
       return;
     }
@@ -365,21 +366,27 @@ const EditProductForm = () => {
       submitData.append("partNumber", formData.partNumber);
       submitData.append("isActive", formData.isActive);
       submitData.append("isPopular", formData.isPopular);
-      submitData.append("section", formData.section);
 
       if (formData.mainCategory) submitData.append("mainCategory", formData.mainCategory);
       if (formData.category) submitData.append("category", formData.category);
       if (formData.subCategory) submitData.append("subCategory", formData.subCategory);
       if (formData.subSubCategory) submitData.append("subSubCategory", formData.subSubCategory);
       if (formData.productBrand) submitData.append("productBrand", formData.productBrand);
+      if (formData.section) submitData.append("section", formData.section);
 
-      // Handle arrays
+      // Handle arrays properly
       const cleanSpecifications = formData.specifications.filter(item => item.trim() !== "");
       const cleanUsage = formData.usage.filter(item => item.trim() !== "");
-      
-      submitData.append("specifications", JSON.stringify(cleanSpecifications));
-      submitData.append("usage", JSON.stringify(cleanUsage));
-      
+
+      // Append each array item individually
+      cleanSpecifications.forEach((spec, index) => {
+        submitData.append(`specifications[${index}]`, spec);
+      });
+
+      cleanUsage.forEach((usage, index) => {
+        submitData.append(`usage[${index}]`, usage);
+      });
+
       // Handle technical specs
       const cleanTechnicalSpecs = formData.technicalSpecs.filter(spec => 
         spec.key.trim() !== "" && spec.value.trim() !== ""
@@ -394,27 +401,33 @@ const EditProductForm = () => {
         submitData.append("images", file);
       });
 
-      // If existing images were removed, you might need to handle that
-      // This depends on your API - some APIs expect you to send all remaining images
-      // For now, we're only sending new images and the API should keep existing ones
-
       console.log('Submitting edit data for product:', productId);
       
       await dispatch(editProduct({ id: productId, data: submitData })).unwrap();
       
-      alert('Product updated successfully!');
-      router.push("//product");
+      setModalMessage('Product updated successfully!');
+      setShowSuccessModal(true);
       
     } catch (error) {
       console.error("Error updating product:", error);
-      alert(`Error updating product: ${error.message || "Please check all required fields"}`);
+      setModalMessage(`Error updating product: ${error.message || "Please check all required fields"}`);
+      setShowErrorModal(true);
     } finally {
       setSubmitting(false);
     }
   };
 
+  const handleSuccessConfirm = () => {
+    setShowSuccessModal(false);
+    router.push("/admin/spare-product");
+  };
+
+  const handleErrorConfirm = () => {
+    setShowErrorModal(false);
+  };
+
   const handleCancel = () => {
-    router.push('//product');
+    router.push('/admin/spare-product');
   };
 
   if (productLoading && !dataLoaded) {
@@ -440,7 +453,7 @@ const EditProductForm = () => {
           </div>
           <p className="text-red-600 mb-4">{error}</p>
           <button
-            onClick={() => router.push('//product')}
+            onClick={() => router.push('/admin/spare-product')}
             className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
           >
             Back to Products
@@ -555,6 +568,26 @@ const EditProductForm = () => {
             </button>
           </div>
         </form>
+
+        {/* Success Modal */}
+        <ConfirmationAlertModal
+          isOpen={showSuccessModal}
+          type="alert"
+          title="Success"
+          message={modalMessage}
+          confirmText="OK"
+          onConfirm={handleSuccessConfirm}
+        />
+
+        {/* Error Modal */}
+        <ConfirmationAlertModal
+          isOpen={showErrorModal}
+          type="alert"
+          title="Error"
+          message={modalMessage}
+          confirmText="OK"
+          onConfirm={handleErrorConfirm}
+        />
       </div>
     </div>
   );

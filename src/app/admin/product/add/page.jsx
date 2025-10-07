@@ -16,6 +16,23 @@ import { fetchMainCategories } from '../../../../redux/slices/adminMainCategoryS
 import { fetchCategories } from '../../../../redux/slices/adminCategorySlice';
 import { fetchSubCategories } from '../../../../redux/slices/adminSubCategorySlice';
 import { fetchSubSubCategories } from '../../../../redux/slices/adminSubSubCategorySlice';
+import ConfirmationAlertModal from '../../../../components/shared/ConfirmationAlertModal';
+
+// Helper function to parse array data
+const parseArray = (data) => {
+  if (Array.isArray(data)) {
+    return data.length > 0 ? data : [''];
+  }
+  if (typeof data === 'string' && data.trim() !== '') {
+    try {
+      const parsed = JSON.parse(data);
+      return Array.isArray(parsed) ? parsed : [''];
+    } catch {
+      return [data];
+    }
+  }
+  return [''];
+};
 
 const ProductForm = ({ productId, onSuccess, onCancel }) => {
   const router = useRouter();
@@ -59,6 +76,11 @@ const ProductForm = ({ productId, onSuccess, onCancel }) => {
   const [filteredSubCategories, setFilteredSubCategories] = useState([]);
   const [filteredSubSubCategories, setFilteredSubSubCategories] = useState([]);
   const [submitting, setSubmitting] = useState(false);
+  
+  // Modal states
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [showErrorModal, setShowErrorModal] = useState(false);
+  const [modalMessage, setModalMessage] = useState('');
 
   useEffect(() => {
     dispatch(fetchSections());
@@ -193,10 +215,8 @@ const ProductForm = ({ productId, onSuccess, onCancel }) => {
         stock: currentProduct.stock || '',
         vehicleType: currentProduct.vehicleType || 'Universal',
         overview: currentProduct.overview || '',
-        specifications: currentProduct.specifications?.length ?
-          currentProduct.specifications : [''],
-        usage: currentProduct.usage?.length ?
-          currentProduct.usage : [''],
+        specifications: parseArray(currentProduct.specifications),
+        usage: parseArray(currentProduct.usage),
         technicalSpecs: currentProduct.technicalSpecs?.length ?
           currentProduct.technicalSpecs : [{ key: '', value: '' }],
         warranty: currentProduct.warranty || '',
@@ -276,14 +296,9 @@ const ProductForm = ({ productId, onSuccess, onCancel }) => {
     e.preventDefault();
     setSubmitting(true);
 
-    if (!formData.section) {
-      alert('Section is required');
-      setSubmitting(false);
-      return;
-    }
-
     if (!formData.name || !formData.price) {
-      alert('Product name and price are required');
+      setModalMessage('Product name and price are required');
+      setShowErrorModal(true);
       setSubmitting(false);
       return;
     }
@@ -303,44 +318,74 @@ const ProductForm = ({ productId, onSuccess, onCancel }) => {
       submitData.append("partNumber", formData.partNumber);
       submitData.append("isActive", formData.isActive);
       submitData.append("isPopular", formData.isPopular);
-      submitData.append("section", formData.section);
 
       if (formData.mainCategory) submitData.append("mainCategory", formData.mainCategory);
       if (formData.category) submitData.append("category", formData.category);
       if (formData.subCategory) submitData.append("subCategory", formData.subCategory);
       if (formData.subSubCategory) submitData.append("subSubCategory", formData.subSubCategory);
       if (formData.productBrand) submitData.append("productBrand", formData.productBrand);
+      if (formData.section) submitData.append("section", formData.section);
 
-      // Arrays (stringify them)
-      submitData.append("specifications", JSON.stringify(formData.specifications.filter(i => i.trim() !== "")));
-      submitData.append("usage", JSON.stringify(formData.usage.filter(i => i.trim() !== "")));
-      formData.technicalSpecs.forEach((spec, index) => {
+
+      // Handle arrays properly
+      const cleanSpecifications = formData.specifications.filter(i => i && i.trim() !== "");
+      const cleanUsage = formData.usage.filter(i => i && i.trim() !== "");
+
+      // Append each array item individually
+      cleanSpecifications.forEach((spec, index) => {
+        submitData.append(`specifications[${index}]`, spec);
+      });
+
+      cleanUsage.forEach((usage, index) => {
+        submitData.append(`usage[${index}]`, usage);
+      });
+
+      // Handle technical specs
+      const cleanTechnicalSpecs = formData.technicalSpecs.filter(spec => 
+        spec.key && spec.key.trim() !== "" && spec.value && spec.value.trim() !== ""
+      );
+      
+      cleanTechnicalSpecs.forEach((spec, index) => {
         submitData.append(`technicalSpecs[${index}][key]`, spec.key);
         submitData.append(`technicalSpecs[${index}][value]`, spec.value);
       });
 
       // Append multiple images
       images.forEach((file) => {
-        submitData.append("images", file);  // API must accept "images" as array of files
+        submitData.append("images", file);
       });
 
       if (productId) {
         await dispatch(editProduct({ id: productId, data: submitData })).unwrap();
+        setModalMessage('Product updated successfully!');
+        setShowSuccessModal(true);
       } else {
         await dispatch(addProduct(submitData)).unwrap();
+        setModalMessage('Product added successfully!');
+        setShowSuccessModal(true);
       }
 
       if (onSuccess) {
         onSuccess();
-      } else {
-        router.push("/product");
       }
     } catch (error) {
       console.error("Error saving product:", error);
-      alert(`Error saving product: ${error.message || "Please check all required fields"}`);
+      setModalMessage(`Error saving product: ${error.message || "Please check all required fields"}`);
+      setShowErrorModal(true);
     } finally {
       setSubmitting(false);
     }
+  };
+
+  const handleSuccessConfirm = () => {
+    setShowSuccessModal(false);
+    if (!onSuccess) {
+      router.push("/admin/product");
+    }
+  };
+
+  const handleErrorConfirm = () => {
+    setShowErrorModal(false);
   };
 
   if (productLoading && productId) {
@@ -417,7 +462,7 @@ const ProductForm = ({ productId, onSuccess, onCancel }) => {
           <div className="flex justify-end space-x-4 pt-6">
             <button
               type="button"
-              onClick={onCancel || (() => router.push('/product'))}
+              onClick={onCancel || (() => router.push('/admin/product'))}
               disabled={submitting}
               className="px-8 py-3 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors disabled:opacity-50"
             >
@@ -439,6 +484,26 @@ const ProductForm = ({ productId, onSuccess, onCancel }) => {
             </button>
           </div>
         </form>
+
+        {/* Success Modal */}
+        <ConfirmationAlertModal
+          isOpen={showSuccessModal}
+          type="alert"
+          title="Success"
+          message={modalMessage}
+          confirmText="OK"
+          onConfirm={handleSuccessConfirm}
+        />
+
+        {/* Error Modal */}
+        <ConfirmationAlertModal
+          isOpen={showErrorModal}
+          type="alert"
+          title="Error"
+          message={modalMessage}
+          confirmText="OK"
+          onConfirm={handleErrorConfirm}
+        />
       </div>
     </div>
   );

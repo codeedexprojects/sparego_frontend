@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchProducts, toggleProductStatus } from '../../../../redux/slices/adminProductSlice';
+import { getAllProducts, toggleProductStatus } from '../../../../redux/slices/adminProductSlice';
 import { IMG_URL } from '../../../../redux/baseUrl';
 import Link from 'next/link';
 import Pagination from '../../../../components/shared/Pagination';
@@ -17,12 +17,12 @@ const ProductList = () => {
   const [filterStatus, setFilterStatus] = useState('all');
 
   useEffect(() => {
-    dispatch(fetchProducts({ page: currentPage, limit }));
+    dispatch(getAllProducts({ page: currentPage, limit }));
   }, [dispatch, currentPage, limit]);
 
   const handleToggleStatus = (id, currentStatus) => {
     dispatch(toggleProductStatus({ id, isActive: !currentStatus })).then(() => {
-      dispatch(fetchProducts({ page: currentPage, limit }));
+      dispatch(getAllProducts({ page: currentPage, limit }));
     });
   };
 
@@ -65,7 +65,7 @@ const ProductList = () => {
           </div>
           <p className="text-red-600">{error}</p>
           <button
-            onClick={() => dispatch(fetchProducts({ page: currentPage, limit }))}
+            onClick={() => dispatch(getAllProducts({ page: currentPage, limit }))}
             className="mt-4 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
           >
             Try Again
@@ -166,8 +166,8 @@ const ProductList = () => {
                           </span>
                         </td>
                         <td className="px-6 py-4 text-right text-sm font-medium flex justify-end gap-2">
-                          <Link href={`/admin/product/view/${product._id}`} className="px-3 py-1.5 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200">View</Link>
-                          <Link href={`/admin/product/edit/${product._id}`} className="px-3 py-1.5 bg-blue-100 text-blue-700 rounded-md hover:bg-blue-200">Edit</Link>
+                          <Link href={`/admin/spare-product/view/${product._id}`} className="px-3 py-1.5 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200">View</Link>
+                          <Link href={`/admin/spare-product/edit/${product._id}`} className="px-3 py-1.5 bg-blue-100 text-blue-700 rounded-md hover:bg-blue-200">Edit</Link>
                           <button
                             onClick={() => handleToggleStatus(product._id, product.isActive)}
                             className={`px-3 py-1.5 rounded-md text-white ${
@@ -214,8 +214,8 @@ const ProductList = () => {
                           </div>
                         </div>
                         <div className="flex gap-2">
-                          <Link href={`/admin/product/view/${product._id}`} className="flex-1 text-center px-3 py-1.5 text-xs bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200">View</Link>
-                          <Link href={`/admin/product/edit/${product._id}`} className="flex-1 text-center px-3 py-1.5 text-xs bg-blue-100 text-blue-700 rounded-md hover:bg-blue-200">Edit</Link>
+                          <Link href={`/admin/spare-product/view/${product._id}`} className="flex-1 text-center px-3 py-1.5 text-xs bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200">View</Link>
+                          <Link href={`/admin/spare-product/edit/${product._id}`} className="flex-1 text-center px-3 py-1.5 text-xs bg-blue-100 text-blue-700 rounded-md hover:bg-blue-200">Edit</Link>
                           <button
                             onClick={() => handleToggleStatus(product._id, product.isActive)}
                             className={`flex-1 px-3 py-1.5 text-xs rounded-md text-white ${

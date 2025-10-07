@@ -1,4 +1,4 @@
-// components/ReviewTable/ReviewTableRow.jsx
+import { IMG_URL } from "@/redux/baseUrl";
 const ReviewTableRow = ({ review, serialNumber, onEdit, onDelete, onToggleStatus }) => {
   // Helper function to safely get string values
   const getStringValue = (value) => {
@@ -9,10 +9,58 @@ const ReviewTableRow = ({ review, serialNumber, onEdit, onDelete, onToggleStatus
     return String(value || '');
   };
 
+  // Helper function to get image URL
+  const getImageUrl = (image) => {
+    if (!image) return null;
+    
+    if (typeof image === 'string') {
+      return image;
+    }
+    
+    if (typeof image === 'object') {
+      return image.url || image.path || image.src || null;
+    }
+    
+    return null;
+  };
+
+  const imageUrl = getImageUrl(review.image);
+
   return (
     <tr className="hover:bg-gray-50 transition-colors">
       {/* Serial Number */}
       <td className="px-6 py-4 font-medium text-gray-900">{serialNumber}</td>
+
+      {/* Image */}
+      <td className="px-6 py-4">
+        {imageUrl ? (
+          <div className="w-12 h-12 rounded-full overflow-hidden border border-gray-200">
+            <img 
+              src={`${IMG_URL}/${imageUrl}`} 
+              alt={getStringValue(review.name)}
+              className="w-full h-full object-cover"
+              onError={(e) => {
+                e.target.style.display = 'none';
+                e.target.nextSibling.style.display = 'flex';
+              }}
+            />
+            <div 
+              className="w-full h-full bg-gray-100 flex items-center justify-center hidden"
+              style={{ display: 'none' }}
+            >
+              <svg className="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+              </svg>
+            </div>
+          </div>
+        ) : (
+          <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center border border-gray-200">
+            <svg className="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+            </svg>
+          </div>
+        )}
+      </td>
 
       {/* Reviewer Name */}
       <td className="px-6 py-4">

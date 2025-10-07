@@ -1,20 +1,27 @@
-const SpecificationsSection = ({ 
-  formData, 
-  onArrayFieldChange, 
-  onAddArrayField, 
-  onRemoveArrayField, 
-  onTechSpecChange 
+"use client";
+
+const SpecificationsSection = ({
+  formData,
+  onArrayFieldChange,
+  onAddArrayField,
+  onRemoveArrayField,
+  onTechSpecChange
 }) => {
+  const safeSpecifications = Array.isArray(formData.specifications) ? formData.specifications : [''];
+  const safeUsage = Array.isArray(formData.usage) ? formData.usage : [''];
+  const safeTechnicalSpecs = Array.isArray(formData.technicalSpecs) ? formData.technicalSpecs : [{ key: '', value: '' }];
+
   return (
     <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
       <h3 className="text-lg font-semibold text-gray-900 mb-4">Specifications</h3>
       <div className="space-y-6">
+
         {/* Product Specifications */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Product Specifications
           </label>
-          {formData.specifications.map((spec, index) => (
+          {safeSpecifications.map((spec, index) => (
             <div key={index} className="flex gap-2 mb-2">
               <input
                 type="text"
@@ -23,7 +30,7 @@ const SpecificationsSection = ({
                 className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="Enter specification"
               />
-              {formData.specifications.length > 1 && (
+              {safeSpecifications.length > 1 && (
                 <button
                   type="button"
                   onClick={() => onRemoveArrayField('specifications', index)}
@@ -48,7 +55,7 @@ const SpecificationsSection = ({
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Usage Instructions
           </label>
-          {formData.usage.map((usageItem, index) => (
+          {safeUsage.map((usageItem, index) => (
             <div key={index} className="flex gap-2 mb-2">
               <input
                 type="text"
@@ -57,7 +64,7 @@ const SpecificationsSection = ({
                 className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="Enter usage instruction"
               />
-              {formData.usage.length > 1 && (
+              {safeUsage.length > 1 && (
                 <button
                   type="button"
                   onClick={() => onRemoveArrayField('usage', index)}
@@ -82,7 +89,7 @@ const SpecificationsSection = ({
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Technical Specifications
           </label>
-          {formData.technicalSpecs.map((spec, index) => (
+          {safeTechnicalSpecs.map((spec, index) => (
             <div key={index} className="grid grid-cols-1 md:grid-cols-2 gap-2 mb-2">
               <input
                 type="text"
@@ -99,7 +106,7 @@ const SpecificationsSection = ({
                   className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   placeholder="Specification value"
                 />
-                {formData.technicalSpecs.length > 1 && (
+                {safeTechnicalSpecs.length > 1 && (
                   <button
                     type="button"
                     onClick={() => onRemoveArrayField('technicalSpecs', index)}
@@ -119,6 +126,7 @@ const SpecificationsSection = ({
             Add Technical Specification
           </button>
         </div>
+
       </div>
     </div>
   );

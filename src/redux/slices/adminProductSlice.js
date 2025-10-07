@@ -11,16 +11,37 @@ export const getAllProducts = createAsyncThunk(
   "adminProduct/getAllProducts",
   async (params = {}, { rejectWithValue }) => {
     try {
-      const query = new URLSearchParams(params).toString();
-      const res = await axios.get(`${BASE_URL}/products/all?${query}`, {
+      // Map frontend params to backend query params
+      const query = new URLSearchParams();
+
+      if (params.search) query.append("search", params.search);
+      if (params.mainCategory) query.append("mainCategory", params.mainCategory);
+      if (params.category) query.append("category", params.category);
+      if (params.subCategory) query.append("subCategory", params.subCategory);
+      if (params.subSubCategory) query.append("subSubCategory", params.subSubCategory);
+      if (params.productBrand) query.append("productBrand", params.productBrand);
+      if (params.vehicleId) query.append("vehicleId", params.vehicleId);
+      if (params.vehicleType) query.append("vehicleType", params.vehicleType);
+      if (params.minPrice) query.append("minPrice", params.minPrice);
+      if (params.maxPrice) query.append("maxPrice", params.maxPrice);
+      if (params.sortBy) query.append("sortBy", params.sortBy);
+      if (params.order) query.append("order", params.order);
+      if (params.status) query.append("status", params.status); // active/inactive
+
+      // section is optional, we can skip it if unused
+      // if (params.section) query.append("section", params.section);
+
+      const res = await axios.get(`${BASE_URL}/products/all?${query.toString()}`, {
         headers: { Authorization: `Bearer ${getToken()}` },
       });
+
       return res.data;
     } catch (err) {
       return rejectWithValue(err.response?.data?.message || err.message);
     }
   }
 );
+
 
 // Fetch products with pagination
 export const fetchProducts = createAsyncThunk(

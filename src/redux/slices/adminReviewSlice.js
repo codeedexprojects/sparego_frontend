@@ -48,17 +48,27 @@ export const getReviewById = createAsyncThunk(
   }
 );
 
-// POST Operations
+// POST Operations - UPDATED for FormData
 export const createReview = createAsyncThunk(
   "adminReview/createReview",
   async (reviewData, { rejectWithValue }) => {
     try {
       const token = localStorage.getItem("adminToken");
+      
+      // Check if reviewData is FormData (for image upload) or regular object
+      const isFormData = reviewData instanceof FormData;
+      
+      const headers = {
+        Authorization: `Bearer ${token}`
+      };
+      
+      // Only set Content-Type for JSON, FormData sets its own content type
+      if (!isFormData) {
+        headers["Content-Type"] = "application/json";
+      }
+      
       const response = await axios.post(`${BASE_URL}/reviews/`, reviewData, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json"
-        }
+        headers: headers
       });
       return response.data?.data || response.data;
     } catch (error) {
@@ -71,17 +81,27 @@ export const createReview = createAsyncThunk(
   }
 );
 
-// PATCH Operations
+// PATCH Operations - UPDATED for FormData
 export const updateReview = createAsyncThunk(
   "adminReview/updateReview",
   async ({ id, reviewData }, { rejectWithValue }) => {
     try {
       const token = localStorage.getItem("adminToken");
+      
+      // Check if reviewData is FormData (for image upload) or regular object
+      const isFormData = reviewData instanceof FormData;
+      
+      const headers = {
+        Authorization: `Bearer ${token}`
+      };
+      
+      // Only set Content-Type for JSON, FormData sets its own content type
+      if (!isFormData) {
+        headers["Content-Type"] = "application/json";
+      }
+      
       const response = await axios.patch(`${BASE_URL}/reviews/${id}`, reviewData, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json"
-        }
+        headers: headers
       });
       return response.data?.data || response.data;
     } catch (error) {

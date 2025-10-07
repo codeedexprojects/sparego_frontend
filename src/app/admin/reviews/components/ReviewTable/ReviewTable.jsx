@@ -159,6 +159,7 @@ const ReviewTable = ({
           <thead className="bg-gray-50">
             <tr className="text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
               <th className="px-6 py-3">S/N</th>
+              <th className="px-6 py-3">Image</th>
               <th className="px-6 py-3">Reviewer</th>
               <th className="px-6 py-3">Designation</th>
               <th className="px-6 py-3">Title</th>
@@ -184,7 +185,7 @@ const ReviewTable = ({
               })
             ) : (
               <tr>
-                <td colSpan="7" className="px-6 py-8 text-center text-gray-500">
+                <td colSpan="8" className="px-6 py-8 text-center text-gray-500">
                   <div className="flex flex-col items-center">
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 text-gray-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z" />

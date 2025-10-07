@@ -9,6 +9,7 @@ import {
   editDealBanner,
   deleteDealBanner,
 } from "../../../redux/slices/adminDealBannerSlice";
+import { getAllProducts } from "../../../redux/slices/adminProductSlice";
 import DeleteConfirmationModal from "../main-categories/components/DeleteModal";
 import DealBannerHeader from "./components/DealBannerHeader";
 import DealBannerList from "./components/DealBannerList";
@@ -21,12 +22,13 @@ const DealBannerManager = () => {
   const { banners, loading, error, totalPages, currentPage, totalItems } =
     useSelector((s) => s.adminDealBanner);
   const { sections } = useSelector((s) => s.sections);
+  const { products: productData, loading: productsLoading } = useSelector((s) => s.adminProduct); // Get products from store
 
   // 🔹 Filters & pagination
   const [filters, setFilters] = useState({
     section: "",
     currentPage: 1,
-    limit: 10, // number of banners per page
+    limit: 10,
   });
 
   const [itemsPerPage, setItemsPerPage] = useState(10);
@@ -40,24 +42,36 @@ const DealBannerManager = () => {
     discountText: "",
     section: "",
     page: "",
+    productId: "",
+    isActive: true,
     image: null,
   });
   const [editingBanner, setEditingBanner] = useState(null);
   const [preview, setPreview] = useState(null);
 
-  // Page options
+  // Page options - updated to match model enum
   const pageOptions = [
     { value: "home", label: "Home Page" },
     { value: "category", label: "Category Page" },
+    { value: "sub-category", label: "Sub Category Page" },
+    { value: "sub-sub-category", label: "Sub Sub Category Page" },
     { value: "product", label: "Product Page" },
-    { value: "cart", label: "Cart Page" },
-    { value: "checkout", label: "Checkout Page" },
+    { value: "product-detail", label: "Product Detail Page" },
+    { value: "wishlist", label: "Wishlist Page" },
+    { value: "brand", label: "Brand Page" },
   ];
 
-  // ✅ Fetch banners & sections
+  // Extract products from productData - FIXED
+  const products = productData?.products || productData || [];
+
+  // ✅ Fetch banners, sections, and products
   useEffect(() => {
     dispatch(fetchDealBanners(filters));
     dispatch(fetchSections());
+    // Fetch products for dropdown - with error handling
+    dispatch(getAllProducts({ page: 1, limit: 1000 })).catch((err) => {
+      console.error("Failed to fetch products:", err);
+    });
   }, [dispatch, filters]);
 
   // 🔹 Filter handler
@@ -76,7 +90,7 @@ const DealBannerManager = () => {
     setFilters((prev) => ({
       ...prev,
       limit: value,
-      currentPage: 1, // reset to first page
+      currentPage: 1,
     }));
   };
 
@@ -88,6 +102,8 @@ const DealBannerManager = () => {
       discountText: "",
       section: "",
       page: "",
+      productId: "",
+      isActive: true,
       image: null,
     });
     setPreview(null);
@@ -102,6 +118,8 @@ const DealBannerManager = () => {
       discountText: banner.discountText,
       section: banner.section?._id || "",
       page: banner.page,
+      productId: banner.productId?._id || banner.productId || "",
+      isActive: banner.isActive !== undefined ? banner.isActive : true,
       image: null,
     });
     setPreview(banner.image || null);
@@ -117,6 +135,8 @@ const DealBannerManager = () => {
       discountText: "",
       section: "",
       page: "",
+      productId: "",
+      isActive: true,
       image: null,
     });
     setEditingBanner(null);
@@ -124,39 +144,60 @@ const DealBannerManager = () => {
   };
 
   const handleChange = (e) => {
-    const { name, value, files } = e.target;
+    const { name, value, type, checked, files } = e.target;
+    
     if (name === "image" && files[0]) {
-      setFormData({ ...formData, image: files[0] });
+      setFormData(prev => ({ ...prev, image: files[0] }));
       setPreview(URL.createObjectURL(files[0]));
+    } else if (type === "checkbox") {
+      setFormData(prev => ({ ...prev, [name]: checked }));
     } else {
-      setFormData({ ...formData, [name]: value });
+      setFormData(prev => ({ ...prev, [name]: value }));
     }
   };
 
   // 🔹 Submit add/edit
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const form = new FormData();
-    form.append("title", formData.title);
-    form.append("description", formData.description);
-    form.append("discountText", formData.discountText);
-    form.append("section", formData.section);
-    form.append("page", formData.page);
-    if (formData.image) form.append("image", formData.image);
+    
+    // Validate required fields
+    if (!formData.title || !formData.page) {
+      toast.error("Title and Page are required fields");
+      return;
+    }
+
+    if (!editingBanner && !formData.image) {
+      toast.error("Banner image is required");
+      return;
+    }
+
+    const submitData = new FormData();
+    submitData.append("title", formData.title);
+    submitData.append("description", formData.description);
+    submitData.append("discountText", formData.discountText);
+    submitData.append("section", formData.section);
+    submitData.append("page", formData.page);
+    submitData.append("productId", formData.productId);
+    submitData.append("isActive", formData.isActive);
+    
+    if (formData.image) {
+      submitData.append("image", formData.image);
+    }
 
     try {
       if (editingBanner) {
         await dispatch(
-          editDealBanner({ id: editingBanner._id, data: form })
+          editDealBanner({ id: editingBanner._id, data: submitData })
         ).unwrap();
         toast.success("Deal banner updated successfully");
       } else {
-        await dispatch(addDealBanner(form)).unwrap();
+        await dispatch(addDealBanner(submitData)).unwrap();
         toast.success("Deal banner added successfully");
       }
       closeModal();
       dispatch(fetchDealBanners(filters));
     } catch (err) {
+      console.error("Error saving deal banner:", err);
       toast.error(err?.message || "Error saving deal banner");
     }
   };
@@ -221,11 +262,13 @@ const DealBannerManager = () => {
               preview={preview}
               onRemoveImage={() => {
                 setPreview(null);
-                setFormData({ ...formData, image: null });
+                setFormData(prev => ({ ...prev, image: null }));
               }}
               sections={sections}
               pageOptions={pageOptions}
               editingBanner={editingBanner}
+              products={products} // Pass products to modal
+              productsLoading={productsLoading} // Pass loading state
             />
           )}
 
