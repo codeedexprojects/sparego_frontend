@@ -15,10 +15,10 @@ import {
   LayoutGrid,
   Star,
   Car,
-  ShieldCheck,
   Section,
   ChevronDown,
   ChevronRight,
+  FileText
 } from "lucide-react";
 
 const menuItems = [
@@ -29,7 +29,6 @@ const menuItems = [
     children: [
       { name: "Spare Products", path: "/admin/spare-product" },
       { name: "Other Products", path: "/admin/product" },
-
     ],
   },
   { name: "Orders", icon: ShoppingCart, path: "/admin/orders" },
@@ -59,13 +58,13 @@ const menuItems = [
   { name: "Home Cards", icon: LayoutGrid, path: "/admin/home-cards" },
   { name: "Reviews", icon: Star, path: "/admin/reviews" },
   { name: "Vehicles", icon: Car, path: "/admin/vehicles" },
-  // { name: "Sub Admin", icon: ShieldCheck, path: "/admin/sub-admin" },
+  { name: "Blog", icon: FileText, path: "/admin/blog" },
 ];
 
 export default function Sidebar() {
   const [isHovered, setIsHovered] = useState(false);
   const [openDropdown, setOpenDropdown] = useState(null);
-  const pathname = usePathname(); // reactive, updates automatically on navigation
+  const pathname = usePathname();
 
   const toggleDropdown = (name) => {
     setOpenDropdown(openDropdown === name ? null : name);
