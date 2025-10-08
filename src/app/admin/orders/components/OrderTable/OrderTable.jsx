@@ -71,8 +71,8 @@ const OrderTable = ({ orders = [], onViewOrder }) => {
                   {getSerialNumber(index)}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="text-sm text-gray-900">{order.user.name}</div>
-                  <div className="text-sm text-gray-500">{order.user.email}</div>
+                  <div className="text-sm text-gray-900">{order.user?.name}</div>
+                  <div className="text-sm text-gray-500">{order.user?.email}</div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div className="text-sm text-gray-900">{formatDate(order.createdAt)}</div>

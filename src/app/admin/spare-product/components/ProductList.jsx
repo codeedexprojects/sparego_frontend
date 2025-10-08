@@ -154,7 +154,7 @@ const ProductList = () => {
                             {product.partNumber && <div className="text-sm text-gray-500">Part: {product.partNumber}</div>}
                           </div>
                         </td>
-                        <td className="px-6 py-4 text-sm text-gray-900">{product.price}</td>
+                        <td className="px-6 py-4 text-sm text-gray-900">₹{product.price}</td>
                         <td className={`px-6 py-4 text-sm font-medium ${
                           product.stock > 10 ? 'text-green-600' : product.stock > 0 ? 'text-yellow-600' : 'text-red-600'
                         }`}>{product.stock} units</td>
@@ -208,7 +208,7 @@ const ProductList = () => {
                           </span>
                         </div>
                         <div className="flex items-center justify-between mb-3">
-                          <div className="text-lg font-bold text-gray-900">${product.price}</div>
+                          <div className="text-lg font-bold text-gray-900">₹{product.price}</div>
                           <div className={`text-sm font-medium ${product.stock > 10 ? 'text-green-600' : product.stock > 0 ? 'text-yellow-600' : 'text-red-600'}`}>
                             {product.stock} units
                           </div>
