@@ -28,6 +28,7 @@ const AddressPage = () => {
   const [formLoading, setFormLoading] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [token, setToken] = useState(null);
+  
 
   const hasFetchedData = useRef(false);
 
@@ -66,30 +67,32 @@ const AddressPage = () => {
     }
   };
 
-  const handleSubmitAddress = (addressData) => {
-    setFormLoading(true);
+ const handleSubmitAddress = (addressData) => {
+  setFormLoading(true);
 
-    if (editingAddress) {
-      dispatch(
-        updateAddress({ id: editingAddress._id, updatedData: addressData })
-      )
-        .unwrap()
-        .then(() => {
-          setFormLoading(false);
-          setShowForm(false);
-          setEditingAddress(null);
-        })
-        .catch(() => setFormLoading(false));
-    } else {
-      dispatch(createAddress(addressData))
-        .unwrap()
-        .then(() => {
-          setFormLoading(false);
-          setShowForm(false);
-        })
-        .catch(() => setFormLoading(false));
-    }
-  };
+  if (editingAddress) {
+    dispatch(
+      updateAddress({ id: editingAddress._id, updatedData: addressData })
+    )
+      .unwrap()
+      .then(() => {
+        setFormLoading(false);
+        setShowForm(false);
+        setEditingAddress(null);
+        router.back(); 
+      })
+      .catch(() => setFormLoading(false));
+  } else {
+    dispatch(createAddress(addressData))
+      .unwrap()
+      .then(() => {
+        setFormLoading(false);
+        setShowForm(false);
+        router.back(); 
+      })
+      .catch(() => setFormLoading(false));
+  }
+};
 
   const handleCancelForm = () => {
     setShowForm(false);

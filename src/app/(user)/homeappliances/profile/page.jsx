@@ -1,6 +1,7 @@
 "use client";
 import React, { useState, useEffect, useRef } from "react";
 import { Pencil, User2Icon } from "lucide-react";
+import Header from "@/components/user/homeappliance/Header";
 import Footer from "@/components/landing/Footer";
 import { useSelector, useDispatch } from "react-redux";
 import {
@@ -13,7 +14,6 @@ import { AddressForm } from "./components/AddressForm";
 import { AddressList } from "./components/AddressList";
 import { getUserProfile, logout } from "@/redux/slices/authSlice";
 import { useRouter } from "next/navigation";
-import Header from "@/components/user/homeappliance/Header";
 
 const AddressPage = () => {
   const dispatch = useDispatch();
@@ -28,6 +28,7 @@ const AddressPage = () => {
   const [formLoading, setFormLoading] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [token, setToken] = useState(null);
+  
 
   const hasFetchedData = useRef(false);
 
@@ -66,30 +67,32 @@ const AddressPage = () => {
     }
   };
 
-  const handleSubmitAddress = (addressData) => {
-    setFormLoading(true);
+ const handleSubmitAddress = (addressData) => {
+  setFormLoading(true);
 
-    if (editingAddress) {
-      dispatch(
-        updateAddress({ id: editingAddress._id, updatedData: addressData })
-      )
-        .unwrap()
-        .then(() => {
-          setFormLoading(false);
-          setShowForm(false);
-          setEditingAddress(null);
-        })
-        .catch(() => setFormLoading(false));
-    } else {
-      dispatch(createAddress(addressData))
-        .unwrap()
-        .then(() => {
-          setFormLoading(false);
-          setShowForm(false);
-        })
-        .catch(() => setFormLoading(false));
-    }
-  };
+  if (editingAddress) {
+    dispatch(
+      updateAddress({ id: editingAddress._id, updatedData: addressData })
+    )
+      .unwrap()
+      .then(() => {
+        setFormLoading(false);
+        setShowForm(false);
+        setEditingAddress(null);
+        router.back(); 
+      })
+      .catch(() => setFormLoading(false));
+  } else {
+    dispatch(createAddress(addressData))
+      .unwrap()
+      .then(() => {
+        setFormLoading(false);
+        setShowForm(false);
+        router.back(); 
+      })
+      .catch(() => setFormLoading(false));
+  }
+};
 
   const handleCancelForm = () => {
     setShowForm(false);
@@ -158,7 +161,6 @@ const AddressPage = () => {
     <div>
       <Header />
       <div className="bg-white min-h-screen py-10 px-6 lg:px-20 space-y-6">
-        {/* Username & Number Section */}
         {mounted && (
           <div className="bg-gray-50 p-6 rounded-lg border border-gray-200">
             <div className="flex items-center justify-between mb-2">
@@ -173,7 +175,6 @@ const AddressPage = () => {
           </div>
         )}
 
-        {/* Address Form/List */}
         {mounted && (
           <>
             {showForm ? (
