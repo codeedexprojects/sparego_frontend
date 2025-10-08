@@ -72,7 +72,7 @@ const dispatch = useDispatch();
                 </div>
                 <div>
                   <label className="font-medium text-gray-700">Price:</label>
-                  <p className="mt-1">${currentProduct.price}</p>
+                  <p className="mt-1">₹{currentProduct.price}</p>
                 </div>
                 <div>
                   <label className="font-medium text-gray-700">Discount:</label>

@@ -206,7 +206,7 @@ const ProductViewPage = () => {
                 <div>
                   <label className="text-sm font-medium text-gray-500">Price</label>
                   <div className="mt-1 flex items-center gap-2">
-                    <span className="text-lg font-bold text-gray-900">${currentProduct.price}</span>
+                    <span className="text-lg font-bold text-gray-900">₹{currentProduct.price}</span>
                     {currentProduct.discount > 0 && (
                       <span className="text-sm text-red-600 bg-red-50 px-2 py-1 rounded">
                         {currentProduct.discount}% OFF

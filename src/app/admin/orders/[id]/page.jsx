@@ -258,8 +258,8 @@ const OrderDetailPage = ({ params }) => {
                         <p className="text-gray-600">Quantity: {item.quantity || 0}</p>
                       </div>
                       <div className="text-right">
-                        <p className="font-medium">${((item.price || 0) * (item.quantity || 0)).toFixed(2)}</p>
-                        <p className="text-gray-600">${(item.price || 0).toFixed(2)} each</p>
+                        <p className="font-medium">₹{((item.price || 0) * (item.quantity || 0)).toFixed(2)}</p>
+                        <p className="text-gray-600">₹{(item.price || 0).toFixed(2)} each</p>
                       </div>
                     </div>
                   )) : (
@@ -322,17 +322,17 @@ const OrderDetailPage = ({ params }) => {
             <h3 className="text-lg font-medium mb-4">Payment Information</h3>
             <div className="flex justify-between mb-2">
               <span className="text-gray-600">Subtotal:</span>
-              <span>${(order.totalAmount || 0).toFixed(2)}</span>
+              <span>₹{(order.totalAmount || 0).toFixed(2)}</span>
             </div>
             {(order.discount || 0) > 0 && (
               <div className="flex justify-between mb-2">
                 <span className="text-gray-600">Discount:</span>
-                <span className="text-green-600">-${(order.discount || 0).toFixed(2)}</span>
+                <span className="text-green-600">-₹{(order.discount || 0).toFixed(2)}</span>
               </div>
             )}
             <div className="flex justify-between font-medium text-lg mt-4 pt-4 border-t border-gray-200">
               <span>Total:</span>
-              <span>${(order.finalAmount || order.totalAmount || 0).toFixed(2)}</span>
+              <span>₹{(order.finalAmount || order.totalAmount || 0).toFixed(2)}</span>
             </div>
             <div className="mt-4">
               <p className="text-gray-600">Payment Method: {order.paymentMethod || "Not specified"}</p>
