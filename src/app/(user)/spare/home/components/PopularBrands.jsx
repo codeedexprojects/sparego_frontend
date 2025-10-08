@@ -146,11 +146,11 @@ export default function PopularBrandsSection() {
               {/* Desktop grid */}
               <div className="hidden md:grid md:grid-cols-5 lg:grid-cols-10 gap-6">
                 {displayedBrands.map((brand) => (
-                  <Link
+                  <div
                     key={brand._id}
-                    href={`/brands/${brand.name
-                      .toLowerCase()
-                      .replace(/\s+/g, "-")}`}
+                    // href={`/brands/${brand.name
+                    //   .toLowerCase()
+                    //   .replace(/\s+/g, "-")}`}
                     className="group relative flex flex-col items-center"
                   >
                     <div className="relative w-25 h-25 mb-3 flex flex-col items-center justify-between bg-white rounded-lg border border-gray-300 overflow-hidden group">                     
@@ -169,7 +169,7 @@ export default function PopularBrandsSection() {
                         {brand.name}
                       </span>
                     </div>
-                  </Link>
+                  </div>
                 ))}
               </div>
             </div>
