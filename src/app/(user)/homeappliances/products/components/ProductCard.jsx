@@ -212,11 +212,11 @@ useEffect(() => {
                   )}
                 </button>
               </div>
-              {product.partNumber && (
+              {/* {product.partNumber && (
                 <div className="mt-2 text-xs text-gray-500">
                   Part #: {product.partNumber}
                 </div>
-              )}
+              )} */}
             </div>
           ))}
         </div>

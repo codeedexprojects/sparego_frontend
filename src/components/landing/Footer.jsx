@@ -21,7 +21,7 @@ export default function Footer() {
   ];
 
   return (
-    <footer className="bg-gray-900 text-white" id="contact">
+    <footer className="bg-black text-white" id="contact">
       <div className="max-w-6xl mx-auto px-6 py-12">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           
@@ -37,7 +37,7 @@ export default function Footer() {
 
           {/* Quick Links */}
           <div className="col-span-1">
-            <h3 className="text-white font-semibold text-lg mb-4">Quick Links</h3>
+            <h3 className=" font-semibold text-lg mb-4 text-[#BE1E2D]">Quick Links</h3>
             <ul className="space-y-3">
               {quickLinks.map((link) => (
                 <li key={link.name}>
@@ -54,7 +54,7 @@ export default function Footer() {
 
           {/* Support */}
           <div className="col-span-1">
-            <h3 className="text-white font-semibold text-lg mb-4">Support</h3>
+            <h3 className="text-[#BE1E2D] font-semibold text-lg mb-4">Support</h3>
             <ul className="space-y-3">
               {supportLinks.map((link) => (
                 <li key={link.name}>
@@ -71,7 +71,7 @@ export default function Footer() {
 
           {/* Get in Touch */}
           <div className="col-span-1">
-            <h3 className="text-white font-semibold text-lg mb-4">Get in Touch</h3>
+            <h3 className="text-[#BE1E2D] font-semibold text-lg mb-4">Get in Touch</h3>
             <div className="space-y-4 text-sm">
               
               {/* Address */}

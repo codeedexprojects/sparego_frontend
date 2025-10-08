@@ -12,7 +12,7 @@ export const getProductsByVehicle = createAsyncThunk(
         return rejectWithValue("All vehicle parameters are required");
       }
       const response = await axios.get(`${BASE_URL}/products/vehicle`, {
-        params: { type,  productBrand: brand, modelLine, year, modification },
+        params: { type, productBrand: brand, modelLine, year, modification },
       });
       return response.data;
     } catch (error) {
@@ -89,12 +89,12 @@ export const searchProductsBySection = createAsyncThunk(
     try {
       const response = await axios.get(`${BASE_URL}/products/all`, {
         params: {
-                    sectionId: sectionId || "", 
+          sectionId: sectionId || "",
 
           search: search || "",
         },
       });
-      return response.data.products; 
+      return response.data.products;
     } catch (error) {
       return rejectWithValue(
         error.response?.data || "Failed to search product"
@@ -126,7 +126,7 @@ const productSlice = createSlice({
     products: [],
     vehicleProducts: [],
     similarProducts: [],
-    searchResults:[],
+    searchResults: [],
 
     product: null,
 
@@ -205,7 +205,7 @@ const productSlice = createSlice({
       })
       .addCase(searchProductsBySection.fulfilled, (state, action) => {
         state.loading = false;
-        state.searchResults = action.payload; 
+        state.searchResults = action.payload;
       })
       .addCase(searchProductsBySection.rejected, (state, action) => {
         state.loading = false;

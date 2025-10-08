@@ -202,11 +202,8 @@ const HeroSection = ({ product }) => {
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 <div className="space-y-6">
-                    <div className="flex justify-between items-center">
-                        <div className="flex items-center text-gray-600">
-                            <MapPin className="w-4 h-4 mr-2 text-red-500" />
-                            <span className="text-sm">Delivering To Perinthalmanna 686551</span>
-                        </div>
+                    <div className="flex justify-end items-center">
+                       
                         <button
                             onClick={handleWishlistAction}
                             disabled={isAddingToWishlist}
@@ -301,10 +298,7 @@ const HeroSection = ({ product }) => {
                                 {product?.partNumber || 'Product Code'}
                             </span>
                         </div>
-                        <div className="flex items-center text-gray-600">
-                            <Truck className="w-5 h-5 mr-2" />
-                            <span className="text-sm font-medium">Deliver Within 8 Days</span>
-                        </div>
+                       
                     </div>
                     
                     <div>
