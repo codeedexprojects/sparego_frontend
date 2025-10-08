@@ -41,7 +41,9 @@ export default function LoginPage() {
       })
       .catch((error) => {
         console.error("Login failed:", error);
-        toast.error(error?.message || "Failed to send OTP");
+        toast.error(error?.message || "User already exists, please login instead");
+        router.push("/spare/register");
+
       });
   };
 
