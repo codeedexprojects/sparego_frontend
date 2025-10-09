@@ -8,7 +8,7 @@ import {
   editCategory,
   deleteCategory,
 } from "../../../redux/slices/adminCategorySlice";
-import { fetchMainCategories } from "../../../redux/slices/adminMainCategorySlice";
+import { getHomeCards } from "../../../redux/slices/adminHomeCardSlice";
 import DeleteConfirmationModal from "../main-categories/components/DeleteModal";
 import CategoryHeader from "./components/CategoryHeader";
 import CategoryList from "./components/CategoryList";
@@ -21,14 +21,14 @@ const CategoryManager = () => {
   const { categories = [], loading, error } = useSelector(
     (s) => s.adminCategory
   );
-  const { mainCategories } = useSelector((s) => s.adminMainCategory);
+  const { homeCards = [] } = useSelector((s) => s.adminHomeCard);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState(null);
   const [formData, setFormData] = useState({
     name: "",
     description: "",
-    mainCategory: "",
+    section: "", // Changed from mainCategory to section
     type: "",
     image: null,
   });
@@ -47,12 +47,12 @@ const CategoryManager = () => {
 
   useEffect(() => {
     dispatch(fetchCategories());
-    dispatch(fetchMainCategories());
+    dispatch(getHomeCards());
   }, [dispatch]);
 
   // Modal handlers
   const openAddModal = () => {
-    setFormData({ name: "", description: "", mainCategory: "", type: "", image: null });
+    setFormData({ name: "", description: "", section: "", type: "", image: null }); // Updated field
     setPreview(null);
     setEditingCategory(null);
     setIsModalOpen(true);
@@ -62,7 +62,7 @@ const CategoryManager = () => {
     setFormData({
       name: cat.name || "",
       description: cat.description || "",
-      mainCategory: cat.mainCategory?._id || "",
+      section: cat.section?._id || cat.section || "", // Updated field
       type: cat.type || "",
       image: null,
     });
@@ -73,7 +73,7 @@ const CategoryManager = () => {
 
   const closeModal = () => {
     setIsModalOpen(false);
-    setFormData({ name: "", description: "", mainCategory: "", type: "", image: null });
+    setFormData({ name: "", description: "", section: "", type: "", image: null }); // Updated field
     setEditingCategory(null);
     setPreview(null);
   };
@@ -82,29 +82,36 @@ const CategoryManager = () => {
   const handleChange = (e) => {
     const { name, value, files } = e.target;
     if (name === "image" && files?.[0]) {
-      setFormData({ ...formData, image: files[0] });
+      setFormData(prev => ({ ...prev, image: files[0] }));
       setPreview(URL.createObjectURL(files[0]));
     } else {
-      setFormData({ ...formData, [name]: value });
+      setFormData(prev => ({ ...prev, [name]: value }));
     }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const form = new FormData();
-    form.append("name", formData.name);
-    form.append("description", formData.description);
-    form.append("mainCategory", formData.mainCategory);
+    
+    // Validation
+    if (!formData.name?.trim()) {
+      toast.error("Category name is required");
+      return;
+    }
 
-    if (formData.type) form.append("type", formData.type); // type is optional
-    if (formData.image) form.append("image", formData.image);
+    const submitData = new FormData();
+    submitData.append("name", formData.name.trim());
+    submitData.append("description", formData.description.trim());
+    submitData.append("section", formData.section || ""); // Updated field
+
+    if (formData.type) submitData.append("type", formData.type); // type is optional
+    if (formData.image) submitData.append("image", formData.image);
 
     try {
       if (editingCategory) {
-        await dispatch(editCategory({ id: editingCategory._id, data: form })).unwrap();
+        await dispatch(editCategory({ id: editingCategory._id, data: submitData })).unwrap();
         toast.success("Category updated successfully");
       } else {
-        await dispatch(addCategory(form)).unwrap();
+        await dispatch(addCategory(submitData)).unwrap();
         toast.success("Category added successfully");
       }
       closeModal();
@@ -122,7 +129,7 @@ const CategoryManager = () => {
       setDeleteConfirm(null);
       dispatch(fetchCategories());
     } catch (err) {
-      toast.error("Failed to delete category");
+      toast.error(err?.message || "Failed to delete category");
     }
   };
 
@@ -131,7 +138,10 @@ const CategoryManager = () => {
       <div className="min-h-screen">
         <div className="max-w-7xl mx-auto">
           {/* Header */}
-          <CategoryHeader categoryCount={categories.length} onAddCategory={openAddModal} />
+          <CategoryHeader 
+            categoryCount={categories.length} 
+            onAddCategory={openAddModal} 
+          />
 
           {/* Categories List */}
           <CategoryList
@@ -168,9 +178,9 @@ const CategoryManager = () => {
               preview={preview}
               onRemoveImage={() => {
                 setPreview(null);
-                setFormData({ ...formData, image: null });
+                setFormData(prev => ({ ...prev, image: null }));
               }}
-              mainCategories={mainCategories}
+              homeCards={homeCards}
               editingCategory={editingCategory}
             />
           )}

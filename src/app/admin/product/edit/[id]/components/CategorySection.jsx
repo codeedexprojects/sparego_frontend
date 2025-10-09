@@ -5,8 +5,6 @@ const CategorySection = ({
   sectionsLoading, 
   brands, 
   brandsLoading,
-  mainCategories,
-  mainCategoriesLoading,
   categories,
   categoriesLoading,
   subCategories,
@@ -35,7 +33,7 @@ const CategorySection = ({
             </option>
             {sections.map((section) => (
               <option key={section._id} value={section._id}>
-                {section.name}
+                {section.title}
               </option>
             ))}
           </select>
@@ -72,34 +70,9 @@ const CategorySection = ({
         )}
 
         {/* Categories */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {/* Main Category - Only show when section is selected */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {/* Category - Only show when section is selected */}
           {formData.section && (
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Main Category
-              </label>
-              <select
-                name="mainCategory"
-                value={formData.mainCategory}
-                onChange={onInputChange}
-                disabled={mainCategoriesLoading}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
-              >
-                <option value="">
-                  {mainCategoriesLoading ? 'Loading...' : mainCategories.length === 0 ? 'No main categories' : 'Select Main Category'}
-                </option>
-                {mainCategories.map((category) => (
-                  <option key={category._id} value={category._id}>
-                    {category.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-          )}
-
-          {/* Category - Only show when main category is selected */}
-          {formData.mainCategory && (
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Category
@@ -174,22 +147,6 @@ const CategorySection = ({
           )}
         </div>
 
-        {/* Vehicle Type */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Vehicle Type
-          </label>
-          <select
-            name="vehicleType"
-            value={formData.vehicleType}
-            onChange={onInputChange}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-          >
-            <option value="Universal">Universal</option>
-            <option value="Two-Wheeler">Two-Wheeler</option>
-            <option value="Four-Wheeler">Four-Wheeler</option>
-          </select>
-        </div>
       </div>
     </div>
   );

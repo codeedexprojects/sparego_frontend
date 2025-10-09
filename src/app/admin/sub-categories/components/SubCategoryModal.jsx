@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 
 const SubCategoryModal = ({
   isOpen,
@@ -10,7 +10,30 @@ const SubCategoryModal = ({
   onRemoveImage,
   mainCategories,
   editingCategory,
+  sections, // Add sections prop to get available sections
 }) => {
+  const [filteredCategories, setFilteredCategories] = useState(mainCategories);
+
+  // Filter categories when section changes
+  useEffect(() => {
+    if (formData.section === "") {
+      // When "Spare Parts" is selected (empty value), show categories with no section
+      const filtered = mainCategories.filter(
+        category => !category.section || category.section === ""
+      );
+      setFilteredCategories(filtered);
+    } else if (formData.section) {
+      // When a specific section is selected, show categories for that section
+      const filtered = mainCategories.filter(
+        category => category.section === formData.section
+      );
+      setFilteredCategories(filtered);
+    } else {
+      // When no section is selected yet, show all categories
+      setFilteredCategories(mainCategories);
+    }
+  }, [formData.section, mainCategories]);
+
   if (!isOpen) return null;
 
   return (
@@ -34,29 +57,46 @@ const SubCategoryModal = ({
                 required
               />
 
+              {/* Section Selection */}
+              <FormSelect
+                label="Section *"
+                name="section"
+                value={formData.section}
+                onChange={onChange}
+                
+              >
+                <option value="">Spare Parts</option>
+                {sections.map((section) => (
+                  <option key={section._id} value={section._id}>
+                    {section.title}
+                  </option>
+                ))}
+              </FormSelect>
+
+              {/* Category Selection - filtered by section */}
               <FormSelect
                 label="Category *"
                 name="category"
                 value={formData.category}
                 onChange={onChange}
                 required
+                disabled={!formData.section && formData.section !== ""} // Allow when Spare Parts is selected
               >
-                <option value="">Select Category</option>
-                {mainCategories.map((mc) => (
-                  <option key={mc._id} value={mc._id}>{mc.name}</option>
+                <option value="">
+                  {formData.section !== undefined ? "Select Category" : "First select a section"}
+                </option>
+                {filteredCategories.map((category) => (
+                  <option key={category._id} value={category._id}>
+                    {category.name}
+                  </option>
                 ))}
               </FormSelect>
 
-              <FormSelect
-                label="Type (Optional)"
-                name="type"
-                value={formData.type || ""}
-                onChange={onChange}
-              >
-                <option value="">Select Type</option>
-                <option value="Two-wheeler">Two Wheeler</option>
-                <option value="Four-wheeler">Four Wheeler</option>
-              </FormSelect>
+              {filteredCategories.length === 0 && formData.section !== undefined && (
+                <p className="text-sm text-red-600">
+                  No categories available for this section
+                </p>
+              )}
             </div>
 
             {/* Right Column */}
@@ -103,7 +143,7 @@ const SubCategoryModal = ({
   );
 };
 
-// Reusable Form Components
+// Reusable Form Components (keep the same as before)
 const FormInput = ({ label, name, value, onChange, placeholder, required = false }) => (
   <div>
     <label className="block text-sm font-medium text-gray-700 mb-2">{label}</label>
@@ -119,15 +159,18 @@ const FormInput = ({ label, name, value, onChange, placeholder, required = false
   </div>
 );
 
-const FormSelect = ({ label, name, value, onChange, children, required = false }) => (
+const FormSelect = ({ label, name, value, onChange, children, required = false, disabled = false }) => (
   <div>
     <label className="block text-sm font-medium text-gray-700 mb-2">{label}</label>
     <select
       name={name}
       value={value}
       onChange={onChange}
-      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200"
+      className={`w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200 ${
+        disabled ? 'bg-gray-100 cursor-not-allowed' : ''
+      }`}
       required={required}
+      disabled={disabled}
     >
       {children}
     </select>
@@ -170,7 +213,7 @@ const ImageUpload = ({ preview, onChange, onRemove }) => (
           </button>
         </div>
       ) : (
-        <label className="flex flex-col items-center justify-center w-full h-48 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100 transition-colors duration-200">
+        <label className="flex flex-col items-center justify-center w-full h-40 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100 transition-colors duration-200">
           <div className="flex flex-col items-center justify-center pt-5 pb-6">
             <svg className="w-8 h-8 mb-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -178,7 +221,7 @@ const ImageUpload = ({ preview, onChange, onRemove }) => (
             <p className="mb-2 text-sm text-gray-500">
               <span className="font-semibold">Click to upload</span>
             </p>
-            <p className="text-xs text-gray-500">PNG, JPG, GIF up to 10MB</p>
+            <p className="text-xs text-gray-500">PNG, JPG, GIF up to 3MB</p>
           </div>
           <input
             type="file"

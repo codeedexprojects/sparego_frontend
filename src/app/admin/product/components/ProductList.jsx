@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { useSearchParams } from 'next/navigation';
 import { fetchProducts, toggleProductStatus } from '../../../../redux/slices/adminProductSlice';
 import { IMG_URL } from '../../../../redux/baseUrl';
 import Link from 'next/link';
@@ -9,6 +10,9 @@ import Pagination from '../../../../components/shared/Pagination';
 
 const ProductList = () => {
   const dispatch = useDispatch();
+  const searchParams = useSearchParams();
+  const section = searchParams.get('section');
+
   const { products, loading, error, total, page: apiPage, pages } = useSelector(state => state.adminProduct);
 
   const [currentPage, setCurrentPage] = useState(1);
@@ -17,12 +21,12 @@ const ProductList = () => {
   const [filterStatus, setFilterStatus] = useState('all');
 
   useEffect(() => {
-    dispatch(fetchProducts({ page: currentPage, limit }));
-  }, [dispatch, currentPage, limit]);
+    dispatch(fetchProducts({ page: currentPage, limit, section }));
+  }, [dispatch, currentPage, limit, section]);
 
   const handleToggleStatus = (id, currentStatus) => {
     dispatch(toggleProductStatus({ id, isActive: !currentStatus })).then(() => {
-      dispatch(fetchProducts({ page: currentPage, limit }));
+      dispatch(fetchProducts({ page: currentPage, limit, section: section }));
     });
   };
 

@@ -9,8 +9,6 @@ const CategorySection = ({
   sectionsLoading, 
   brands, 
   brandsLoading,
-  mainCategories,
-  mainCategoriesLoading,
   categories,
   categoriesLoading,
   subCategories,
@@ -66,7 +64,7 @@ const CategorySection = ({
             </option>
             {sections.map((section) => (
               <option key={section._id} value={section._id}>
-                {section.name}
+                {section.title}
               </option>
             ))}
           </select>
@@ -103,32 +101,8 @@ const CategorySection = ({
         )}
 
         {/* Categories */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {formData.section && (
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Main Category
-              </label>
-              <select
-                name="mainCategory"
-                value={formData.mainCategory}
-                onChange={onInputChange}
-                disabled={mainCategoriesLoading}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
-              >
-                <option value="">
-                  {mainCategoriesLoading ? 'Loading...' : mainCategories.length === 0 ? 'No main categories' : 'Select Main Category'}
-                </option>
-                {mainCategories.map((category) => (
-                  <option key={category._id} value={category._id}>
-                    {category.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-          )}
-
-          {formData.mainCategory && (
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Category
@@ -201,77 +175,7 @@ const CategorySection = ({
           )}
         </div>
 
-        {/* Vehicle Type */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Vehicle Type
-          </label>
-          <select
-            name="vehicleType"
-            value={formData.vehicleType}
-            onChange={onInputChange}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-          >
-            <option value="Universal">Universal</option>
-            <option value="Two-Wheeler">Two-Wheeler</option>
-            <option value="Four-Wheeler">Four-Wheeler</option>
-          </select>
-        </div>
 
-        {/* Compatible Vehicles Multi-Select */}
-        {formData.vehicleType !== "Universal" && vehicleOptions.length > 0 && (
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Compatible Vehicles
-            </label>
-            <select
-              multiple
-              value={formData.compatibleVehicles || []}
-              onChange={handleCompatibleVehiclesChange}
-              className="w-full h-32 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              {vehicleOptions.map(vehicle => (
-                <option key={vehicle._id} value={vehicle._id}>
-                  {vehicle.brand?.name || ""} - {vehicle.modelLine || vehicle.model}
-                </option>
-              ))}
-            </select>
-            {vehiclesLoading && (
-              <p className="mt-1 text-sm text-gray-500">Loading vehicles...</p>
-            )}
-          </div>
-        )}
-
-        {/* Selected Compatible Vehicles Tags */}
-        {formData.compatibleVehicles && formData.compatibleVehicles.length > 0 && (
-          <div className="mt-3">
-            <p className="text-sm font-medium text-gray-700 mb-2">Selected Compatible Vehicles:</p>
-            <div className="flex flex-wrap gap-2">
-              {formData.compatibleVehicles.map((vehicleId) => {
-                const vehicle = vehicleOptions.find(v => v._id === vehicleId);
-                if (!vehicle) return null;
-                return (
-                  <span
-                    key={vehicle._id}
-                    className="inline-flex items-center px-3 py-1 rounded-full text-xs bg-blue-100 text-blue-800"
-                  >
-                    {vehicle.brand?.name || ""} - {vehicle.modelLine || vehicle.model}
-                    <button
-                      type="button"
-                      onClick={() => {
-                        const updated = formData.compatibleVehicles.filter(id => id !== vehicle._id);
-                        onInputChange({ target: { name: "compatibleVehicles", value: updated } });
-                      }}
-                      className="ml-2 text-blue-600 hover:text-blue-800"
-                    >
-                      ×
-                    </button>
-                  </span>
-                );
-              })}
-            </div>
-          </div>
-        )}
       </div>
     </div>
   );

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 
 const SubSubCategoryModal = ({
   isOpen,
@@ -8,9 +8,32 @@ const SubSubCategoryModal = ({
   onChange,
   preview,
   onRemoveImage,
-  subCategories, // renamed from mainCategories
+  subCategories,
+  sections, // Add sections prop
   editingCategory,
 }) => {
+  const [filteredSubCategories, setFilteredSubCategories] = useState(subCategories);
+
+  // Filter sub-categories when section changes
+  useEffect(() => {
+    if (formData.section === "") {
+      // When "Spare Parts" is selected (empty value), show sub-categories with no section
+      const filtered = subCategories.filter(
+        subCat => !subCat.section || subCat.section === ""
+      );
+      setFilteredSubCategories(filtered);
+    } else if (formData.section) {
+      // When a specific section is selected, show sub-categories for that section
+      const filtered = subCategories.filter(
+        subCat => subCat.section === formData.section
+      );
+      setFilteredSubCategories(filtered);
+    } else {
+      // When no section is selected yet, show all sub-categories
+      setFilteredSubCategories(subCategories);
+    }
+  }, [formData.section, subCategories]);
+
   if (!isOpen) return null;
 
   return (
@@ -34,30 +57,45 @@ const SubSubCategoryModal = ({
                 required
               />
 
+              {/* Section Selection */}
+              <FormSelect
+                label="Section *"
+                name="section"
+                value={formData.section}
+                onChange={onChange}
+              >
+                <option value="">Spare Parts</option>
+                {sections.map((section) => (
+                  <option key={section._id} value={section._id}>
+                    {section.title}
+                  </option>
+                ))}
+              </FormSelect>
+
+              {/* Sub-category Selection - filtered by section */}
               <FormSelect
                 label="Sub-category *"
                 name="subCategory"
                 value={formData.subCategory}
                 onChange={onChange}
                 required
+                disabled={!formData.section && formData.section !== ""} // Allow when Spare Parts is selected
               >
-                <option value="">Select Sub-category</option>
-                {subCategories.map((sc) => (
-                  <option key={sc._id} value={sc._id}>{sc.name}</option>
+                <option value="">
+                  {formData.section !== undefined ? "Select Sub-category" : "First select a section"}
+                </option>
+                {filteredSubCategories.map((subCat) => (
+                  <option key={subCat._id} value={subCat._id}>
+                    {subCat.name}
+                  </option>
                 ))}
               </FormSelect>
 
-              <FormSelect
-                label="Type *"
-                name="type"
-                value={formData.type}
-                onChange={onChange}
-                required
-              >
-                <option value="">Select Type</option>
-                <option value="Two-wheeler">Two Wheeler</option>
-                <option value="Four-wheeler">Four Wheeler</option>
-              </FormSelect>
+              {filteredSubCategories.length === 0 && formData.section !== undefined && (
+                <p className="text-sm text-red-600">
+                  No sub-categories available for this section
+                </p>
+              )}
             </div>
 
             {/* Right Column */}
@@ -104,7 +142,7 @@ const SubSubCategoryModal = ({
   );
 };
 
-// Reusable Form Components
+// Reusable Form Components (keep the same as before)
 const FormInput = ({ label, name, value, onChange, placeholder, required = false }) => (
   <div>
     <label className="block text-sm font-medium text-gray-700 mb-2">{label}</label>
@@ -120,15 +158,18 @@ const FormInput = ({ label, name, value, onChange, placeholder, required = false
   </div>
 );
 
-const FormSelect = ({ label, name, value, onChange, children, required = false }) => (
+const FormSelect = ({ label, name, value, onChange, children, required = false, disabled = false }) => (
   <div>
     <label className="block text-sm font-medium text-gray-700 mb-2">{label}</label>
     <select
       name={name}
       value={value}
       onChange={onChange}
-      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200"
+      className={`w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200 ${
+        disabled ? 'bg-gray-100 cursor-not-allowed' : ''
+      }`}
       required={required}
+      disabled={disabled}
     >
       {children}
     </select>

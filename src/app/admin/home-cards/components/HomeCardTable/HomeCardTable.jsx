@@ -15,7 +15,6 @@ const HomeCardTable = ({
   onEditHomeCard, 
   onDeleteHomeCard,
   onToggleStatus,
-  sections = [],
   initialItemsPerPage = 6
 }) => {
   const [currentPage, setCurrentPage] = useState(1);
@@ -118,15 +117,20 @@ const HomeCardTable = ({
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
           {paginatedHomeCards.length > 0 ? (
-            paginatedHomeCards.map((homeCard) => (
-              <HomeCardTableRow
-                key={homeCard._id || homeCard.id}
-                homeCard={homeCard}
-                onEdit={handleEdit}
-                onDelete={handleDelete}
-                onToggleStatus={handleToggleStatus}
-              />
-            ))
+            paginatedHomeCards.map((homeCard, index) => {
+              // Create a unique key using multiple fallbacks
+              const uniqueKey = homeCard._id || homeCard.id || `homecard-${index}-${homeCard.title}`;
+              
+              return (
+                <HomeCardTableRow
+                  key={uniqueKey}
+                  homeCard={homeCard}
+                  onEdit={handleEdit}
+                  onDelete={handleDelete}
+                  onToggleStatus={handleToggleStatus}
+                />
+              );
+            })
           ) : (
             <div className="col-span-full bg-gray-50 rounded-lg p-8 text-center">
               <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 mx-auto text-gray-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -157,8 +161,6 @@ const HomeCardTable = ({
         onClose={() => setIsModalOpen(false)}
         onSubmit={handleSubmit}
         homeCard={editingHomeCard}
-        sections={sections}
-
       />
 
       {/* Delete Confirmation Modal */}

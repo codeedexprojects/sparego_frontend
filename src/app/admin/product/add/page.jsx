@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { addProduct, editProduct, viewProductById } from '../../../../redux/slices/adminProductSlice';
-import { fetchSections } from '../../../../redux/slices/sectionSlice';
+import { getHomeCards } from '../../../../redux/slices/adminHomeCardSlice';
 import { useRouter } from 'next/navigation';
 import AdditionalInfoSection from './components/AdditionalInfoSection';
 import BasicInfoSection from './components/BasicInfoSection';
@@ -12,7 +12,6 @@ import DescriptionSection from './components/DescriptionSection';
 import ImagesSection from './components/ImageSection';
 import SpecificationsSection from './components/SpecificationSection';
 import { fetchBrands } from '../../../../redux/slices/adminProductBrand';
-import { fetchMainCategories } from '../../../../redux/slices/adminMainCategorySlice';
 import { fetchCategories } from '../../../../redux/slices/adminCategorySlice';
 import { fetchSubCategories } from '../../../../redux/slices/adminSubCategorySlice';
 import { fetchSubSubCategories } from '../../../../redux/slices/adminSubSubCategorySlice';
@@ -38,12 +37,11 @@ const ProductForm = ({ productId, onSuccess, onCancel }) => {
   const router = useRouter();
   const dispatch = useDispatch();
   const { currentProduct, loading: productLoading } = useSelector(state => state.adminProduct);
-  const { sections, loading: sectionsLoading } = useSelector(state => state.sections);
-  const { brands: productBrands, loading: brandsLoading } = useSelector(state => state.adminProductBrand);
-  const { mainCategories, loading: mainCategoriesLoading } = useSelector(state => state.adminMainCategory);
-  const { categories, loading: categoriesLoading } = useSelector(state => state.adminCategory);
-  const { subCategories, loading: subCategoriesLoading } = useSelector(state => state.adminSubCategory);
-  const { subSubCategories, loading: subSubCategoriesLoading } = useSelector(state => state.adminSubSubCategory);
+  const { homeCards: sections = [], loading: sectionsLoading } = useSelector(state => state.adminHomeCard); // Fixed selector
+  const { brands: productBrands = [], loading: brandsLoading } = useSelector(state => state.adminProductBrand);
+  const { categories = [], loading: categoriesLoading } = useSelector(state => state.adminCategory);
+  const { subCategories = [], loading: subCategoriesLoading } = useSelector(state => state.adminSubCategory);
+  const { subSubCategories = [], loading: subSubCategoriesLoading } = useSelector(state => state.adminSubSubCategory);
 
   const [formData, setFormData] = useState({
     name: '',
@@ -51,7 +49,7 @@ const ProductForm = ({ productId, onSuccess, onCancel }) => {
     price: '',
     discount: '',
     stock: '',
-    vehicleType: 'Universal',
+    vehicleType: 'Universal', // Added back vehicleType
     overview: '',
     specifications: [''],
     usage: [''],
@@ -61,7 +59,6 @@ const ProductForm = ({ productId, onSuccess, onCancel }) => {
     isActive: true,
     isPopular: false,
     section: '',
-    mainCategory: '',
     category: '',
     subCategory: '',
     subSubCategory: '',
@@ -71,7 +68,6 @@ const ProductForm = ({ productId, onSuccess, onCancel }) => {
   const [images, setImages] = useState([]);
   const [imagePreviews, setImagePreviews] = useState([]);
   const [filteredBrands, setFilteredBrands] = useState([]);
-  const [filteredMainCategories, setFilteredMainCategories] = useState([]);
   const [filteredCategories, setFilteredCategories] = useState([]);
   const [filteredSubCategories, setFilteredSubCategories] = useState([]);
   const [filteredSubSubCategories, setFilteredSubSubCategories] = useState([]);
@@ -83,9 +79,8 @@ const ProductForm = ({ productId, onSuccess, onCancel }) => {
   const [modalMessage, setModalMessage] = useState('');
 
   useEffect(() => {
-    dispatch(fetchSections());
+    dispatch(getHomeCards());
     dispatch(fetchBrands());
-    dispatch(fetchMainCategories());
     dispatch(fetchCategories());
     dispatch(fetchSubCategories());
     dispatch(fetchSubSubCategories());
@@ -114,36 +109,11 @@ const ProductForm = ({ productId, onSuccess, onCancel }) => {
     }
   }, [formData.section, productBrands]);
 
-  // Filter main categories by section
+  // Filter categories by section
   useEffect(() => {
-    if (formData.section && mainCategories?.length > 0) {
-      const filtered = mainCategories.filter(cat =>
-        cat.section && cat.section._id === formData.section
-      );
-      setFilteredMainCategories(filtered);
-
-      if (formData.mainCategory) {
-        const exists = filtered.some(cat => cat._id === formData.mainCategory);
-        if (!exists) {
-          setFormData(prev => ({
-            ...prev,
-            mainCategory: '',
-            category: '',
-            subCategory: '',
-            subSubCategory: ''
-          }));
-        }
-      }
-    } else {
-      setFilteredMainCategories([]);
-    }
-  }, [formData.section, mainCategories]);
-
-  // Filter categories by main category
-  useEffect(() => {
-    if (formData.mainCategory && categories?.length > 0) {
+    if (formData.section && categories?.length > 0) {
       const filtered = categories.filter(cat =>
-        cat.mainCategory && cat.mainCategory._id === formData.mainCategory
+        cat.section && cat.section._id === formData.section
       );
       setFilteredCategories(filtered);
 
@@ -161,7 +131,7 @@ const ProductForm = ({ productId, onSuccess, onCancel }) => {
     } else {
       setFilteredCategories([]);
     }
-  }, [formData.mainCategory, categories]);
+  }, [formData.section, categories]);
 
   // Filter sub categories by category
   useEffect(() => {
@@ -213,7 +183,7 @@ const ProductForm = ({ productId, onSuccess, onCancel }) => {
         price: currentProduct.price || '',
         discount: currentProduct.discount || '',
         stock: currentProduct.stock || '',
-        vehicleType: currentProduct.vehicleType || 'Universal',
+        vehicleType: currentProduct.vehicleType || 'Universal', // Added back
         overview: currentProduct.overview || '',
         specifications: parseArray(currentProduct.specifications),
         usage: parseArray(currentProduct.usage),
@@ -224,7 +194,6 @@ const ProductForm = ({ productId, onSuccess, onCancel }) => {
         isActive: currentProduct.isActive !== undefined ? currentProduct.isActive : true,
         isPopular: currentProduct.isPopular !== undefined ? currentProduct.isPopular : false,
         section: currentProduct.section?._id || currentProduct.section || '',
-        mainCategory: currentProduct.mainCategory?._id || currentProduct.mainCategory || '',
         category: currentProduct.category?._id || currentProduct.category || '',
         subCategory: currentProduct.subCategory?._id || currentProduct.subCategory || '',
         subSubCategory: currentProduct.subSubCategory?._id || currentProduct.subSubCategory || '',
@@ -274,9 +243,13 @@ const ProductForm = ({ productId, onSuccess, onCancel }) => {
 
   const handleImageChange = (e) => {
     const files = Array.from(e.target.files);
+    if (files.length === 0) return;
+
     setImages(files);
 
+    // Clean up old previews
     imagePreviews.forEach(preview => URL.revokeObjectURL(preview));
+    
     const previews = files.map(file => URL.createObjectURL(file));
     setImagePreviews(previews);
   };
@@ -293,89 +266,110 @@ const ProductForm = ({ productId, onSuccess, onCancel }) => {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    setSubmitting(true);
+  e.preventDefault();
+  setSubmitting(true);
 
-    if (!formData.name || !formData.price) {
-      setModalMessage('Product name and price are required');
-      setShowErrorModal(true);
-      setSubmitting(false);
-      return;
+  // Enhanced validation
+  if (!formData.name?.trim()) {
+    setModalMessage('Product name is required');
+    setShowErrorModal(true);
+    setSubmitting(false);
+    return;
+  }
+
+  if (!formData.price || parseFloat(formData.price) <= 0) {
+    setModalMessage('Valid product price is required');
+    setShowErrorModal(true);
+    setSubmitting(false);
+    return;
+  }
+
+  if (!formData.section) {
+    setModalMessage('Please select a section');
+    setShowErrorModal(true);
+    setSubmitting(false);
+    return;
+  }
+
+  // Fixed: Use productId to check if editing, not editingCarousel
+  if (!productId && images.length === 0) {
+    setModalMessage('At least one product image is required');
+    setShowErrorModal(true);
+    setSubmitting(false);
+    return;
+  }
+
+  try {
+    const submitData = new FormData();
+
+    // Append simple fields
+    submitData.append("name", formData.name.trim());
+    submitData.append("description", formData.description.trim());
+    submitData.append("price", parseFloat(formData.price));
+    submitData.append("discount", formData.discount || 0);
+    submitData.append("stock", parseInt(formData.stock) || 0);
+    submitData.append("vehicleType", formData.vehicleType);
+    submitData.append("overview", formData.overview.trim());
+    submitData.append("warranty", formData.warranty.trim());
+    submitData.append("partNumber", formData.partNumber.trim());
+    submitData.append("isActive", formData.isActive);
+    submitData.append("isPopular", formData.isPopular);
+
+    if (formData.category) submitData.append("category", formData.category);
+    if (formData.subCategory) submitData.append("subCategory", formData.subCategory);
+    if (formData.subSubCategory) submitData.append("subSubCategory", formData.subSubCategory);
+    if (formData.productBrand) submitData.append("productBrand", formData.productBrand);
+    if (formData.section) submitData.append("section", formData.section);
+
+    // Handle arrays properly
+    const cleanSpecifications = formData.specifications.filter(i => i && i.trim() !== "");
+    const cleanUsage = formData.usage.filter(i => i && i.trim() !== "");
+
+    // Append each array item individually
+    cleanSpecifications.forEach((spec, index) => {
+      submitData.append(`specifications[${index}]`, spec);
+    });
+
+    cleanUsage.forEach((usage, index) => {
+      submitData.append(`usage[${index}]`, usage);
+    });
+
+    // Handle technical specs
+    const cleanTechnicalSpecs = formData.technicalSpecs.filter(spec => 
+      spec.key && spec.key.trim() !== "" && spec.value && spec.value.trim() !== ""
+    );
+    
+    cleanTechnicalSpecs.forEach((spec, index) => {
+      submitData.append(`technicalSpecs[${index}][key]`, spec.key);
+      submitData.append(`technicalSpecs[${index}][value]`, spec.value);
+    });
+
+    // Append multiple images
+    images.forEach((file) => {
+      submitData.append("images", file);
+    });
+
+    if (productId) {
+      await dispatch(editProduct({ id: productId, data: submitData })).unwrap();
+      setModalMessage('Product updated successfully!');
+      setShowSuccessModal(true);
+    } else {
+      await dispatch(addProduct(submitData)).unwrap();
+      setModalMessage('Product added successfully!');
+      setShowSuccessModal(true);
     }
 
-    try {
-      const submitData = new FormData();
-
-      // Append simple fields
-      submitData.append("name", formData.name);
-      submitData.append("description", formData.description);
-      submitData.append("price", parseFloat(formData.price));
-      submitData.append("discount", formData.discount || 0);
-      submitData.append("stock", formData.stock || 0);
-      submitData.append("vehicleType", formData.vehicleType);
-      submitData.append("overview", formData.overview);
-      submitData.append("warranty", formData.warranty);
-      submitData.append("partNumber", formData.partNumber);
-      submitData.append("isActive", formData.isActive);
-      submitData.append("isPopular", formData.isPopular);
-
-      if (formData.mainCategory) submitData.append("mainCategory", formData.mainCategory);
-      if (formData.category) submitData.append("category", formData.category);
-      if (formData.subCategory) submitData.append("subCategory", formData.subCategory);
-      if (formData.subSubCategory) submitData.append("subSubCategory", formData.subSubCategory);
-      if (formData.productBrand) submitData.append("productBrand", formData.productBrand);
-      if (formData.section) submitData.append("section", formData.section);
-
-
-      // Handle arrays properly
-      const cleanSpecifications = formData.specifications.filter(i => i && i.trim() !== "");
-      const cleanUsage = formData.usage.filter(i => i && i.trim() !== "");
-
-      // Append each array item individually
-      cleanSpecifications.forEach((spec, index) => {
-        submitData.append(`specifications[${index}]`, spec);
-      });
-
-      cleanUsage.forEach((usage, index) => {
-        submitData.append(`usage[${index}]`, usage);
-      });
-
-      // Handle technical specs
-      const cleanTechnicalSpecs = formData.technicalSpecs.filter(spec => 
-        spec.key && spec.key.trim() !== "" && spec.value && spec.value.trim() !== ""
-      );
-      
-      cleanTechnicalSpecs.forEach((spec, index) => {
-        submitData.append(`technicalSpecs[${index}][key]`, spec.key);
-        submitData.append(`technicalSpecs[${index}][value]`, spec.value);
-      });
-
-      // Append multiple images
-      images.forEach((file) => {
-        submitData.append("images", file);
-      });
-
-      if (productId) {
-        await dispatch(editProduct({ id: productId, data: submitData })).unwrap();
-        setModalMessage('Product updated successfully!');
-        setShowSuccessModal(true);
-      } else {
-        await dispatch(addProduct(submitData)).unwrap();
-        setModalMessage('Product added successfully!');
-        setShowSuccessModal(true);
-      }
-
-      if (onSuccess) {
-        onSuccess();
-      }
-    } catch (error) {
-      console.error("Error saving product:", error);
-      setModalMessage(`Error saving product: ${error.message || "Please check all required fields"}`);
-      setShowErrorModal(true);
-    } finally {
-      setSubmitting(false);
+    if (onSuccess) {
+      onSuccess();
     }
-  };
+  } catch (error) {
+    console.error("Error saving product:", error);
+    setModalMessage(`Error saving product: ${error.message || "Please check all required fields"}`);
+    setShowErrorModal(true);
+  } finally {
+    setSubmitting(false);
+  }
+};
 
   const handleSuccessConfirm = () => {
     setShowSuccessModal(false);
@@ -424,8 +418,6 @@ const ProductForm = ({ productId, onSuccess, onCancel }) => {
             sectionsLoading={sectionsLoading}
             brands={filteredBrands}
             brandsLoading={brandsLoading}
-            mainCategories={filteredMainCategories}
-            mainCategoriesLoading={mainCategoriesLoading}
             categories={filteredCategories}
             categoriesLoading={categoriesLoading}
             subCategories={filteredSubCategories}

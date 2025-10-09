@@ -9,6 +9,7 @@ import {
   deleteSubCategory,
 } from "../../../redux/slices/adminSubCategorySlice";
 import { fetchCategories } from "../../../redux/slices/adminCategorySlice";
+import { getHomeCards } from "../../../redux/slices/adminHomeCardSlice";
 import DeleteConfirmationModal from "../main-categories/components/DeleteModal";
 import SubCategoryHeader from "./components/SubCategoryHeader";
 import SubCategoryList from "./components/SubCategoryList";
@@ -22,6 +23,7 @@ const SubCategoryManager = () => {
     (s) => s.adminSubCategory
   );
   const { categories: mainCategories } = useSelector((s) => s.adminCategory);
+  const { homeCards = [] } = useSelector((s) => s.adminHomeCard); // Fixed this line
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState(null);
@@ -29,7 +31,7 @@ const SubCategoryManager = () => {
     name: "",
     description: "",
     category: "",
-    type: "",
+    section: "", // Field name is section
     image: null,
   });
   const [editingSubCategory, setEditingSubCategory] = useState(null);
@@ -48,22 +50,33 @@ const SubCategoryManager = () => {
   useEffect(() => {
     dispatch(fetchSubCategories());
     dispatch(fetchCategories());
+    dispatch(getHomeCards());
   }, [dispatch]);
 
   // Modal handlers
   const openAddModal = () => {
-    setFormData({ name: "", description: "", category: "", type: "", image: null });
+    setFormData({ 
+      name: "", 
+      description: "", 
+      category: "", 
+      section: "", 
+      image: null 
+    });
     setPreview(null);
     setEditingSubCategory(null);
     setIsModalOpen(true);
   };
 
   const openEditModal = (subCat) => {
+    // Find the section ID from the category
+    const category = mainCategories.find(cat => cat._id === subCat.category?._id);
+    const sectionId = category?.section || "";
+    
     setFormData({
       name: subCat.name || "",
       description: subCat.description || "",
       category: subCat.category?._id || "",
-      type: subCat.type || "", // type is optional
+      section: sectionId, // Set section for editing
       image: null,
     });
     setPreview(subCat.image || null);
@@ -73,7 +86,13 @@ const SubCategoryManager = () => {
 
   const closeModal = () => {
     setIsModalOpen(false);
-    setFormData({ name: "", description: "", category: "", type: "", image: null });
+    setFormData({ 
+      name: "", 
+      description: "", 
+      category: "", 
+      section: "", 
+      image: null 
+    });
     setEditingSubCategory(null);
     setPreview(null);
   };
@@ -84,6 +103,12 @@ const SubCategoryManager = () => {
     if (name === "image" && files?.[0]) {
       setFormData({ ...formData, image: files[0] });
       setPreview(URL.createObjectURL(files[0]));
+    } else if (name === "section") {
+      setFormData({ 
+        ...formData, 
+        section: value, 
+        category: "" // Reset category when section changes
+      });
     } else {
       setFormData({ ...formData, [name]: value });
     }
@@ -91,13 +116,20 @@ const SubCategoryManager = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    // Validate form - check section and category
+    if (!formData.category) {
+      toast.error("Please select both section and category");
+      return;
+    }
+    
     const form = new FormData();
     form.append("name", formData.name);
     form.append("description", formData.description);
     form.append("category", formData.category);
     
-    if (formData.type) form.append("type", formData.type); // type is optional
     if (formData.image) form.append("image", formData.image);
+    if (formData.section) form.append("section", formData.section);
+    
 
     try {
       if (editingSubCategory) {
@@ -175,6 +207,7 @@ const SubCategoryManager = () => {
                 setPreview(null);
                 setFormData({ ...formData, image: null });
               }}
+              sections={homeCards} // Pass homeCards as sections
               mainCategories={mainCategories}
               editingCategory={editingSubCategory}
             />

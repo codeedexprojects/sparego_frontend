@@ -46,10 +46,21 @@ export const getAllProducts = createAsyncThunk(
 // Fetch products with pagination
 export const fetchProducts = createAsyncThunk(
   "adminProduct/fetchProducts",
-  async ({ page = 1, limit = 10 } = {}, { rejectWithValue }) => {
+  async ({ page = 1, limit = 10, section } = {}, { rejectWithValue }) => {
     try {
+      // FIX: Use URLSearchParams for proper URL construction
+      const queryParams = new URLSearchParams({
+        page: page.toString(),
+        limit: limit.toString()
+      });
+      
+      // Only add section if it exists and is not 'all'
+      if (section && section !== 'all') {
+        queryParams.append('section', section);
+      }
+
       const res = await axios.get(
-        `${BASE_URL}/products?page=${page}&limit=${limit}`,
+        `${BASE_URL}/products?${queryParams.toString()}`,
         { headers: { Authorization: `Bearer ${getToken()}` } }
       );
       return res.data;

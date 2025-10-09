@@ -37,10 +37,10 @@ const BottomCarouselModal = ({
                         value={formData.section}
                         onChange={onChange}
                     >
-                        <option value="">Select Section</option>
+                        <option value="">Spare Parts</option>
                         {sections.map((s) => (
                             <option key={s._id} value={s._id}>
-                                {s.name}
+                                {s.title}
                             </option>
                         ))}
                     </FormSelect>

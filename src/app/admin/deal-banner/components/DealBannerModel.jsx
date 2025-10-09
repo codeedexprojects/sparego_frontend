@@ -53,10 +53,10 @@ const DealBannerModal = ({
                 value={formData.section}
                 onChange={onChange}
               >
-                <option value="">All Sections</option>
+                <option value="">Spare Parts</option>
                 {sections.map((s) => (
                   <option key={s._id} value={s._id}>
-                    {s.name}
+                    {s.title}
                   </option>
                 ))}
               </FormSelect>
