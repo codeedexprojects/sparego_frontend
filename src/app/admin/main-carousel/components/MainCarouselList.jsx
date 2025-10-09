@@ -77,88 +77,97 @@ const MainCarouselList = ({
 };
 
 // Individual Carousel Card Component
-const MainCarouselCard = ({ carousel, onEdit, onDelete }) => (
-  <div className="bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200 overflow-hidden">
-    {/* Carousel Image */}
-    <div className="aspect-w-16 aspect-h-9 bg-gray-200 overflow-hidden">
-      {carousel.image ? (
-        <img 
-           
-          src={`${IMG_URL}/${carousel.image}`}
-          alt={carousel.title}
-          className="w-full h-48 object-cover"
-        />
-      ) : (
-        <div className="w-full h-48 bg-gray-100 flex items-center justify-center">
-          <svg className="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-          </svg>
-        </div>
-      )}
-    </div>
+const MainCarouselCard = ({ carousel, onEdit, onDelete }) => {
+  // Create a unique key for each product with multiple fallbacks
+  const getProductKey = (product, index) => {
+    return product._id || product.id || `product-${index}-${product.name}`;
+  };
 
-    {/* Carousel Info */}
-    <div className="p-4">
-      <div className="flex items-start justify-between mb-2">
-        <h3 className="text-lg font-semibold text-gray-900 truncate flex-1">
-          {carousel.title}
-        </h3>
-        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-          carousel.isActive 
-            ? 'bg-green-100 text-green-800' 
-            : 'bg-red-100 text-red-800'
-        }`}>
-          {carousel.isActive ? 'Active' : 'Inactive'}
-        </span>
+  return (
+    <div className="bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200 overflow-hidden">
+      {/* Carousel Image */}
+      <div className="aspect-w-16 aspect-h-9 bg-gray-200 overflow-hidden">
+        {carousel.image ? (
+          <img 
+            src={`${IMG_URL}/${carousel.image}`}
+            alt={carousel.title}
+            className="w-full h-48 object-cover"
+          />
+        ) : (
+          <div className="w-full h-48 bg-gray-100 flex items-center justify-center">
+            <svg className="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+          </div>
+        )}
       </div>
 
-      <div className="space-y-2 text-sm text-gray-500 mb-3">
-        <div className="flex items-center">
-          <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-          </svg>
-          Section: {carousel.section?.name || "All Sections"}
+      {/* Carousel Info */}
+      <div className="p-4">
+        <div className="flex items-start justify-between mb-2">
+          <h3 className="text-lg font-semibold text-gray-900 truncate flex-1">
+            {carousel.title}
+          </h3>
+          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+            carousel.isActive 
+              ? 'bg-green-100 text-green-800' 
+              : 'bg-red-100 text-red-800'
+          }`}>
+            {carousel.isActive ? 'Active' : 'Inactive'}
+          </span>
         </div>
-        <div className="flex items-center">
-          <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-          </svg>
-          Products: {carousel.products?.length || 0}
-        </div>
-      </div>
 
-      {/* Product Preview */}
-      {carousel.products && carousel.products.length > 0 && (
-        <div className="mb-3">
-          <p className="text-xs font-medium text-gray-700 mb-1">Featured Products:</p>
-          <div className="flex flex-wrap gap-1">
-            {carousel.products.slice(0, 3).map((product, index) => (
-              <span key={product._id} className="inline-flex items-center px-2 py-1 rounded text-xs bg-blue-100 text-blue-800">
-                {product.name}
-                {index === 2 && carousel.products.length > 3 && ` +${carousel.products.length - 3}`}
-              </span>
-            ))}
+        <div className="space-y-2 text-sm text-gray-500 mb-3">
+          <div className="flex items-center">
+            <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+            </svg>
+            Section: {carousel.section?.name || "All Sections"}
+          </div>
+          <div className="flex items-center">
+            <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+            </svg>
+            Products: {carousel.products?.length || 0}
           </div>
         </div>
-      )}
 
-      {/* Actions */}
-      <div className="flex justify-end space-x-2 mt-4 pt-3 border-t border-gray-200">
-        <button
-          onClick={() => onEdit(carousel)}
-          className="text-blue-600 hover:text-blue-800 disabled:text-blue-400 font-medium py-1 px-3 rounded-md transition-colors duration-200 text-sm"
-        >
-          Edit
-        </button>
-        <button
-          onClick={() => onDelete(carousel)}
-          className="text-red-600 hover:text-red-800 disabled:text-red-400 font-medium py-1 px-3 rounded-md transition-colors duration-200 text-sm"
-        >
-          Delete
-        </button>
+        {/* Product Preview */}
+        {carousel.products && carousel.products.length > 0 && (
+          <div className="mb-3">
+            <p className="text-xs font-medium text-gray-700 mb-1">Featured Products:</p>
+            <div className="flex flex-wrap gap-1">
+              {carousel.products.slice(0, 3).map((product, index) => (
+                <span 
+                  key={getProductKey(product, index)} 
+                  className="inline-flex items-center px-2 py-1 rounded text-xs bg-blue-100 text-blue-800"
+                >
+                  {product.name || product.title}
+                  {index === 2 && carousel.products.length > 3 && ` +${carousel.products.length - 3}`}
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Actions */}
+        <div className="flex justify-end space-x-2 mt-4 pt-3 border-t border-gray-200">
+          <button
+            onClick={() => onEdit(carousel)}
+            className="text-blue-600 hover:text-blue-800 disabled:text-blue-400 font-medium py-1 px-3 rounded-md transition-colors duration-200 text-sm"
+          >
+            Edit
+          </button>
+          <button
+            onClick={() => onDelete(carousel)}
+            className="text-red-600 hover:text-red-800 disabled:text-red-400 font-medium py-1 px-3 rounded-md transition-colors duration-200 text-sm"
+          >
+            Delete
+          </button>
+        </div>
       </div>
     </div>
-  </div>
-);
+  );
+};
 
 export default MainCarouselList;

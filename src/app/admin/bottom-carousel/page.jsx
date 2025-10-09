@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "sonner";
-import { fetchSections } from "../../../redux/slices/sectionSlice";
+import { getHomeCards } from "../../../redux/slices/adminHomeCardSlice"; // Fixed import name
 import {
   fetchBottomCarousels,
   addBottomCarousel,
@@ -19,8 +19,8 @@ import ProtectedRoute from "../../../components/admin/ProtectedRoute";
 
 const BottomCarouselManager = () => {
   const dispatch = useDispatch();
-  const { bottomCarousels, loading, error } = useSelector((s) => s.adminBottomCarousel);
-  const { sections } = useSelector((s) => s.sections);
+  const { bottomCarousels = [], loading, error } = useSelector((s) => s.adminBottomCarousel);
+  const { homeCards: sections = [] } = useSelector((s) => s.adminHomeCard); // Fixed selector
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState(null);
@@ -38,7 +38,7 @@ const BottomCarouselManager = () => {
 
   useEffect(() => {
     dispatch(fetchBottomCarousels());
-    dispatch(fetchSections());
+    dispatch(getHomeCards()); // Fixed function name
   }, [dispatch]);
 
   const openAddModal = () => {
@@ -50,8 +50,8 @@ const BottomCarouselManager = () => {
 
   const openEditModal = (carousel) => {
     setFormData({
-      title: carousel.title,
-      section: carousel.section?._id || "",
+      title: carousel.title || "",
+      section: carousel.section?._id || carousel.section || "",
       image: null,
     });
     setPreview(carousel.image || null);
@@ -68,24 +68,39 @@ const BottomCarouselManager = () => {
 
   const handleChange = (e) => {
     const { name, value, files } = e.target;
-    if (name === "image" && files[0]) {
-      setFormData({ ...formData, image: files[0] });
+    if (name === "image" && files && files[0]) {
+      setFormData(prev => ({ ...prev, image: files[0] }));
       setPreview(URL.createObjectURL(files[0]));
     } else {
-      setFormData({ ...formData, [name]: value });
+      setFormData(prev => ({ ...prev, [name]: value }));
     }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    // Validation
+    if (!formData.title?.trim()) {
+      toast.error("Title is required");
+      return;
+    }
+
+    if (!editingCarousel && !formData.image) {
+      toast.error("Image is required for new carousel");
+      return;
+    }
+
     const form = new FormData();
-    form.append("title", formData.title);
+    form.append("title", formData.title.trim());
     if (formData.section) form.append("section", formData.section);
     if (formData.image) form.append("image", formData.image);
 
     try {
       if (editingCarousel) {
-        await dispatch(editBottomCarousel({ id: editingCarousel._id, data: form })).unwrap();
+        await dispatch(editBottomCarousel({ 
+          id: editingCarousel._id, 
+          data: form 
+        })).unwrap();
         toast.success("Bottom carousel updated successfully");
       } else {
         await dispatch(addBottomCarousel(form)).unwrap();
@@ -106,7 +121,7 @@ const BottomCarouselManager = () => {
       setDeleteConfirm(null);
       dispatch(fetchBottomCarousels());
     } catch (err) {
-      toast.error("Failed to delete carousel");
+      toast.error(err?.message || "Failed to delete carousel");
     }
   };
 
@@ -157,7 +172,7 @@ const BottomCarouselManager = () => {
               preview={preview}
               onRemoveImage={() => {
                 setPreview(null);
-                setFormData({ ...formData, image: null });
+                setFormData(prev => ({ ...prev, image: null }));
               }}
               sections={sections}
               editingCarousel={editingCarousel}

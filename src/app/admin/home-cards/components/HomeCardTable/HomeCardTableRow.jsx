@@ -47,7 +47,7 @@ const HomeCardTableRow = ({ homeCard, onEdit, onDelete, onToggleStatus }) => {
             Edit
           </button>
         )}
-        {onToggleStatus && (
+        {/* {onToggleStatus && (
           <button 
             onClick={() => onToggleStatus(homeCard)}
             className={`px-3 py-2 text-sm rounded-lg transition-colors flex items-center gap-1 ${
@@ -65,7 +65,7 @@ const HomeCardTableRow = ({ homeCard, onEdit, onDelete, onToggleStatus }) => {
             </svg>
             {homeCard.isActive ? 'Deactivate' : 'Activate'}
           </button>
-        )}
+        )} */}
         {onDelete && (
           <button 
             onClick={() => onDelete(homeCard)}

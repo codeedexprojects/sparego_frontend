@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "sonner";
 import { fetchSections } from "../../../redux/slices/sectionSlice";
-import { getAllProducts } from "../../../redux/slices/adminProductSlice";
+import { getHomeCards } from "../../../redux/slices/adminHomeCardSlice";
 import {
   fetchMainCarousels,
   addMainCarousel,
@@ -20,9 +20,9 @@ import ProtectedRoute from "../../../components/admin/ProtectedRoute";
 
 const MainCarouselManager = () => {
   const dispatch = useDispatch();
-  const { mainCarousels, loading, error } = useSelector((s) => s.adminMainCarousel);
-  const { sections } = useSelector((s) => s.sections);
-  const { products } = useSelector((s) => s.adminProduct);
+  const { mainCarousels = [], loading, error } = useSelector((s) => s.adminMainCarousel);
+  const { homeCards: sections = [] } = useSelector((s) => s.adminHomeCard); // Fixed selector name
+  const { products = [] } = useSelector((s) => s.adminProduct);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState(null);
@@ -43,7 +43,7 @@ const MainCarouselManager = () => {
   useEffect(() => {
     dispatch(fetchMainCarousels());
     dispatch(fetchSections());
-    dispatch(getAllProducts({}));
+    dispatch(getHomeCards({}));
   }, [dispatch]);
 
   // Modal handlers
@@ -57,9 +57,9 @@ const MainCarouselManager = () => {
 
   const openEditModal = (carousel) => {
     setFormData({
-      title: carousel.title,
-      section: carousel.section?._id || "",
-      products: carousel.products?.map(p => p._id) || [],
+      title: carousel.title || "",
+      section: carousel.section?._id || carousel.section || "",
+      products: carousel.products?.map(p => p._id || p) || [],
       image: null,
     });
     setPreview(carousel.image || null);
@@ -79,48 +79,63 @@ const MainCarouselManager = () => {
   // Form handlers
   const handleChange = (e) => {
     const { name, value, files } = e.target;
-    if (name === "image" && files[0]) {
-      setFormData({ ...formData, image: files[0] });
+    if (name === "image" && files && files[0]) {
+      setFormData(prev => ({ ...prev, image: files[0] }));
       setPreview(URL.createObjectURL(files[0]));
     } else {
-      setFormData({ ...formData, [name]: value });
+      setFormData(prev => ({ ...prev, [name]: value }));
     }
   };
 
   const handleProductSearch = (e) => {
     const searchTerm = e.target.value;
     setProductSearch(searchTerm);
-    dispatch(getAllProducts({ search: searchTerm }));
+    // You might want to dispatch a search action here if needed
+    // dispatch(getHomeCards({ search: searchTerm }));
   };
 
   const handleProductSelect = (productId) => {
-    const currentProducts = [...formData.products];
-    setFormData({
-      ...formData,
-      products: currentProducts.includes(productId)
-        ? currentProducts.filter(id => id !== productId)
-        : [...currentProducts, productId],
-    });
+    setFormData(prev => ({
+      ...prev,
+      products: prev.products.includes(productId)
+        ? prev.products.filter(id => id !== productId)
+        : [...prev.products, productId],
+    }));
   };
 
   const removeSelectedProduct = (productId) => {
-    setFormData({
-      ...formData,
-      products: formData.products.filter(id => id !== productId)
-    });
+    setFormData(prev => ({
+      ...prev,
+      products: prev.products.filter(id => id !== productId)
+    }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    // Validation
+    if (!formData.title?.trim()) {
+      toast.error("Title is required");
+      return;
+    }
+
+    if (!editingCarousel && !formData.image) {
+      toast.error("Image is required for new carousel");
+      return;
+    }
+
     const form = new FormData();
-    form.append("title", formData.title);
+    form.append("title", formData.title.trim());
     if (formData.section) form.append("section", formData.section);
     formData.products.forEach(id => form.append("products", id));
     if (formData.image) form.append("image", formData.image);
 
     try {
       if (editingCarousel) {
-        await dispatch(editMainCarousel({ id: editingCarousel._id, data: form })).unwrap();
+        await dispatch(editMainCarousel({ 
+          id: editingCarousel._id, 
+          data: form 
+        })).unwrap();
         toast.success("Main carousel updated successfully");
       } else {
         await dispatch(addMainCarousel(form)).unwrap();
@@ -141,17 +156,26 @@ const MainCarouselManager = () => {
       setDeleteConfirm(null);
       dispatch(fetchMainCarousels());
     } catch (err) {
-      toast.error("Failed to delete carousel");
+      toast.error(err?.message || "Failed to delete carousel");
     }
   };
 
   const getSelectedProducts = () =>
-    products.filter(product => formData.products.includes(product._id));
+    products.filter(product => 
+      formData.products.includes(product._id) || 
+      formData.products.includes(product.id)
+    );
 
   // Pagination calculations
   const totalPages = Math.ceil(mainCarousels.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const paginatedCarousels = mainCarousels.slice(startIndex, startIndex + itemsPerPage);
+
+  // Filter products based on search
+  const filteredProducts = products.filter(product =>
+    product.name?.toLowerCase().includes(productSearch.toLowerCase()) ||
+    product.title?.toLowerCase().includes(productSearch.toLowerCase())
+  );
 
   return (
     <ProtectedRoute>
@@ -173,6 +197,7 @@ const MainCarouselManager = () => {
 
           {/* Pagination */}
           {mainCarousels.length > 0 && (
+            <div className="mt-6">
               <Pagination
                 currentPage={currentPage}
                 totalPages={totalPages}
@@ -181,6 +206,7 @@ const MainCarouselManager = () => {
                 setItemsPerPage={setItemsPerPage}
                 totalItems={mainCarousels.length}
               />
+            </div>
           )}
 
           {isModalOpen && (
@@ -193,10 +219,10 @@ const MainCarouselManager = () => {
               preview={preview}
               onRemoveImage={() => {
                 setPreview(null);
-                setFormData({ ...formData, image: null });
+                setFormData(prev => ({ ...prev, image: null }));
               }}
               sections={sections}
-              products={products}
+              products={filteredProducts} // Pass filtered products
               productSearch={productSearch}
               onProductSearch={handleProductSearch}
               onProductSelect={handleProductSelect}

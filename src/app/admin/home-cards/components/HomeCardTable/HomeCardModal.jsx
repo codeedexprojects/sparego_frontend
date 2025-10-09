@@ -7,7 +7,6 @@ const HomeCardModal = ({
   onClose, 
   onSubmit, 
   homeCard, 
-  sections = [] 
 }) => {
   const [formData, setFormData] = useState({
     title: "",
@@ -16,7 +15,6 @@ const HomeCardModal = ({
     imagePreview: null,
     buttonText: "Shop Now",
     isActive: true,
-    section: "" // Added section field
   });
 
   const [errors, setErrors] = useState({});
@@ -30,7 +28,6 @@ const HomeCardModal = ({
         imagePreview: homeCard.image || null,
         buttonText: homeCard.buttonText || "Shop Now",
         isActive: homeCard.isActive !== undefined ? homeCard.isActive : true,
-        section: homeCard.section?._id || "" // Prefill section
       });
     } else {
       setFormData({
@@ -40,7 +37,6 @@ const HomeCardModal = ({
         imagePreview: null,
         buttonText: "Shop Now",
         isActive: true,
-        section: ""
       });
     }
     setErrors({});
@@ -74,7 +70,6 @@ const HomeCardModal = ({
     if (!formData.title.trim()) newErrors.title = "Title is required";
     if (!formData.description.trim()) newErrors.description = "Description is required";
     if (!formData.image && !formData.imagePreview) newErrors.image = "Image is required";
-    if (!formData.section) newErrors.section = "Section is required"; // Section validation
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -151,25 +146,6 @@ const HomeCardModal = ({
               placeholder="Enter button text"
               className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
             />
-          </div>
-
-          {/* Section */}
-          <div>
-            <label className="block text-sm font-medium mb-2 text-gray-700">Section</label>
-            <select
-              name="section"
-              value={formData.section}
-              onChange={handleChange}
-              className={`w-full p-3 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition ${
-                errors.section ? 'border-red-500' : 'border-gray-300'
-              }`}
-            >
-              <option value="">Select Section</option>
-              {sections.map(sec => (
-                <option key={sec._id} value={sec._id}>{sec.name}</option>
-              ))}
-            </select>
-            {errors.section && <p className="mt-1 text-sm text-red-600">{errors.section}</p>}
           </div>
 
           {/* Image */}

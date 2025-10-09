@@ -9,6 +9,7 @@ import {
   deleteSubSubCategory,
 } from "../../../redux/slices/adminSubSubCategorySlice";
 import { fetchSubCategories } from "../../../redux/slices/adminSubCategorySlice";
+import { getHomeCards } from "../../../redux/slices/adminHomeCardSlice"; // Add this import
 import DeleteConfirmationModal from "../main-categories/components/DeleteModal";
 import SubSubCategoryHeader from "./components/SubSubCategoryHeader";
 import SubSubCategoryList from "./components/SubSubCategoryList";
@@ -22,6 +23,7 @@ const SubSubCategoryManager = () => {
     (s) => s.adminSubSubCategory
   );
   const { subCategories = [] } = useSelector((s) => s.adminSubCategory);
+  const { homeCards = [] } = useSelector((s) => s.adminHomeCard); // Add sections
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState(null);
@@ -29,7 +31,7 @@ const SubSubCategoryManager = () => {
     name: "",
     description: "",
     subCategory: "",
-    type: "",
+    section: "", // Add section
     image: null,
   });
   const [editingSubSubCategory, setEditingSubSubCategory] = useState(null);
@@ -48,22 +50,27 @@ const SubSubCategoryManager = () => {
   useEffect(() => {
     dispatch(fetchSubSubCategories());
     dispatch(fetchSubCategories());
+    dispatch(getHomeCards()); // Fetch sections
   }, [dispatch]);
 
   // Modal handlers
   const openAddModal = () => {
-    setFormData({ name: "", description: "", subCategory: "", type: "", image: null });
+    setFormData({ name: "", description: "", subCategory: "", section: "", image: null });
     setPreview(null);
     setEditingSubSubCategory(null);
     setIsModalOpen(true);
   };
 
   const openEditModal = (subSubCat) => {
+    // Find the section ID from the sub-category
+    const subCategory = subCategories.find(sc => sc._id === subSubCat.subCategory?._id);
+    const sectionId = subCategory?.section || "";
+    
     setFormData({
       name: subSubCat.name,
       description: subSubCat.description,
       subCategory: subSubCat.subCategory?._id || "",
-      type: subSubCat.type,
+      section: sectionId, // Set section for editing
       image: null,
     });
     setPreview(subSubCat.image || null);
@@ -73,7 +80,7 @@ const SubSubCategoryManager = () => {
 
   const closeModal = () => {
     setIsModalOpen(false);
-    setFormData({ name: "", description: "", subCategory: "", type: "", image: null });
+    setFormData({ name: "", description: "", subCategory: "", section: "", image: null });
     setEditingSubSubCategory(null);
     setPreview(null);
   };
@@ -84,6 +91,13 @@ const SubSubCategoryManager = () => {
     if (name === "image" && files[0]) {
       setFormData({ ...formData, image: files[0] });
       setPreview(URL.createObjectURL(files[0]));
+    } else if (name === "section") {
+      // When section changes, reset subCategory
+      setFormData({ 
+        ...formData, 
+        section: value, 
+        subCategory: "" 
+      });
     } else {
       setFormData({ ...formData, [name]: value });
     }
@@ -91,12 +105,19 @@ const SubSubCategoryManager = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    // Validate form
+    if (!formData.subCategory) {
+      toast.error("Please select both section and sub-category");
+      return;
+    }
+    
     const form = new FormData();
     form.append("name", formData.name);
     form.append("description", formData.description);
     form.append("subCategory", formData.subCategory);
-    form.append("type", formData.type);
     if (formData.image) form.append("image", formData.image);
+    if (formData.section) form.append("section", formData.section);
 
     try {
       if (editingSubSubCategory) {
@@ -175,6 +196,7 @@ const SubSubCategoryManager = () => {
                 setFormData({ ...formData, image: null });
               }}
               subCategories={subCategories}
+              sections={homeCards} // Pass sections to modal
               editingCategory={editingSubSubCategory}
             />
           )}

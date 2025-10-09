@@ -13,23 +13,18 @@ import {
   clearOperationSuccess 
 } from "../../../redux/slices/adminHomeCardSlice";
 
-import { fetchSections } from "../../../redux/slices/sectionSlice"; 
 
 const HomeCardsPage = () => {
   const dispatch = useDispatch();
   
   const { homeCards, loading, error, operationSuccess } = useSelector((state) => state.adminHomeCard);
-  const { sections, loading: sectionsLoading, error: sectionsError } = useSelector((state) => state.sections);
 
   // Fetch home cards on mount
   useEffect(() => {
     dispatch(getHomeCards());
   }, [dispatch]);
 
-  // Fetch sections on mount
-  useEffect(() => {
-    dispatch(fetchSections());
-  }, [dispatch]);
+
 
   // Handle home card errors
   useEffect(() => {
@@ -92,14 +87,11 @@ const HomeCardsPage = () => {
     <ProtectedRoute>
       <HomeCardTable
         homeCards={homeCards}
-        loading={loading || sectionsLoading}
-        error={error || sectionsError}
         operationSuccess={operationSuccess}
         onAddHomeCard={handleAddHomeCard}
         onEditHomeCard={handleEditHomeCard}
         onDeleteHomeCard={handleDeleteHomeCard}
         onToggleStatus={handleToggleStatus}
-        sections={sections} 
         itemsPerPage={6}
       />
     </ProtectedRoute>

@@ -144,7 +144,7 @@ const BrandModal = ({
                 <option value="">-- No Section --</option>
                 {sections.map((s) => (
                   <option key={s._id} value={s._id}>
-                    {s.name}
+                    {s.title}
                   </option>
                 ))}
               </select>

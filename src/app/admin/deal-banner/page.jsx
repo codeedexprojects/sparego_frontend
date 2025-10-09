@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "sonner";
-import { fetchSections } from "../../../redux/slices/sectionSlice";
+import { getHomeCards } from "../../../redux/slices/adminHomeCardSlice";
 import {
   fetchDealBanners,
   addDealBanner,
@@ -19,10 +19,10 @@ import ProtectedRoute from "../../../components/admin/ProtectedRoute";
 
 const DealBannerManager = () => {
   const dispatch = useDispatch();
-  const { banners, loading, error, totalPages, currentPage, totalItems } =
+  const { banners = [], loading, error, totalPages, currentPage, totalItems } =
     useSelector((s) => s.adminDealBanner);
-  const { sections } = useSelector((s) => s.sections);
-  const { products: productData, loading: productsLoading } = useSelector((s) => s.adminProduct); // Get products from store
+  const { homeCards: sections = [] } = useSelector((s) => s.adminHomeCard); // Fixed sections selector
+  const { products: productData = [], loading: productsLoading } = useSelector((s) => s.adminProduct);
 
   // 🔹 Filters & pagination
   const [filters, setFilters] = useState({
@@ -61,17 +61,21 @@ const DealBannerManager = () => {
     { value: "brand", label: "Brand Page" },
   ];
 
-  // Extract products from productData - FIXED
-  const products = productData?.products || productData || [];
+  // Extract products from productData - FIXED with better fallback
+  const products = Array.isArray(productData) ? productData : (productData?.products || []);
 
   // ✅ Fetch banners, sections, and products
   useEffect(() => {
     dispatch(fetchDealBanners(filters));
-    dispatch(fetchSections());
+    dispatch(getHomeCards());
+    
     // Fetch products for dropdown - with error handling
-    dispatch(getAllProducts({ page: 1, limit: 1000 })).catch((err) => {
-      console.error("Failed to fetch products:", err);
-    });
+    if (!productsLoading) {
+      dispatch(getAllProducts({ page: 1, limit: 1000 })).catch((err) => {
+        console.error("Failed to fetch products:", err);
+        toast.error("Failed to load products");
+      });
+    }
   }, [dispatch, filters]);
 
   // 🔹 Filter handler
@@ -86,10 +90,11 @@ const DealBannerManager = () => {
 
   // 🔹 Items per page change
   const handleItemsPerPageChange = (value) => {
-    setItemsPerPage(value);
+    const newLimit = parseInt(value);
+    setItemsPerPage(newLimit);
     setFilters((prev) => ({
       ...prev,
-      limit: value,
+      limit: newLimit,
       currentPage: 1,
     }));
   };
@@ -113,11 +118,11 @@ const DealBannerManager = () => {
 
   const openEditModal = (banner) => {
     setFormData({
-      title: banner.title,
-      description: banner.description,
-      discountText: banner.discountText,
-      section: banner.section?._id || "",
-      page: banner.page,
+      title: banner.title || "",
+      description: banner.description || "",
+      discountText: banner.discountText || "",
+      section: banner.section?._id || banner.section || "",
+      page: banner.page || "",
       productId: banner.productId?._id || banner.productId || "",
       isActive: banner.isActive !== undefined ? banner.isActive : true,
       image: null,
@@ -146,7 +151,7 @@ const DealBannerManager = () => {
   const handleChange = (e) => {
     const { name, value, type, checked, files } = e.target;
     
-    if (name === "image" && files[0]) {
+    if (name === "image" && files && files[0]) {
       setFormData(prev => ({ ...prev, image: files[0] }));
       setPreview(URL.createObjectURL(files[0]));
     } else if (type === "checkbox") {
@@ -161,8 +166,13 @@ const DealBannerManager = () => {
     e.preventDefault();
     
     // Validate required fields
-    if (!formData.title || !formData.page) {
-      toast.error("Title and Page are required fields");
+    if (!formData.title?.trim()) {
+      toast.error("Title is required");
+      return;
+    }
+
+    if (!formData.page) {
+      toast.error("Page selection is required");
       return;
     }
 
@@ -172,9 +182,9 @@ const DealBannerManager = () => {
     }
 
     const submitData = new FormData();
-    submitData.append("title", formData.title);
-    submitData.append("description", formData.description);
-    submitData.append("discountText", formData.discountText);
+    submitData.append("title", formData.title.trim());
+    submitData.append("description", formData.description.trim());
+    submitData.append("discountText", formData.discountText.trim());
     submitData.append("section", formData.section);
     submitData.append("page", formData.page);
     submitData.append("productId", formData.productId);
@@ -211,7 +221,7 @@ const DealBannerManager = () => {
       setDeleteConfirm(null);
       dispatch(fetchDealBanners(filters));
     } catch (err) {
-      toast.error("Failed to delete deal banner");
+      toast.error(err?.message || "Failed to delete deal banner");
     }
   };
 
@@ -241,14 +251,16 @@ const DealBannerManager = () => {
 
           {/* Pagination */}
           {totalPages > 1 && (
-            <Pagination
-              currentPage={filters.currentPage}
-              totalPages={totalPages}
-              onPageChange={handlePageChange}
-              itemsPerPage={itemsPerPage}
-              setItemsPerPage={handleItemsPerPageChange}
-              totalItems={totalItems || banners.length}
-            />
+            <div className="mt-6">
+              <Pagination
+                currentPage={filters.currentPage}
+                totalPages={totalPages}
+                onPageChange={handlePageChange}
+                itemsPerPage={itemsPerPage}
+                setItemsPerPage={handleItemsPerPageChange}
+                totalItems={totalItems || banners.length}
+              />
+            </div>
           )}
 
           {/* Add/Edit Modal */}
@@ -267,8 +279,8 @@ const DealBannerManager = () => {
               sections={sections}
               pageOptions={pageOptions}
               editingBanner={editingBanner}
-              products={products} // Pass products to modal
-              productsLoading={productsLoading} // Pass loading state
+              products={products}
+              productsLoading={productsLoading}
             />
           )}
 

@@ -8,10 +8,22 @@ const CategoryModal = ({
   onChange,
   preview,
   onRemoveImage,
-  mainCategories,
+  homeCards,
   editingCategory,
 }) => {
   if (!isOpen) return null;
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    
+    
+    // Ensure section is included in the submission
+    if (!formData.section) {
+      console.log("No section selected, using empty string");
+    }
+    
+    onSubmit(e);
+  };
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50 p-4">
@@ -21,7 +33,7 @@ const CategoryModal = ({
             {editingCategory ? "Edit Category" : "Add New Category"}
           </h2>
         </div>
-        <form onSubmit={onSubmit} className="px-6 py-4">
+        <form onSubmit={handleSubmit} className="px-6 py-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Left Column */}
             <div className="space-y-4">
@@ -35,31 +47,33 @@ const CategoryModal = ({
               />
 
               <FormSelect
-                label="Main Category *"
-                name="mainCategory"
-                value={formData.mainCategory}
+                label="Section *"
+                name="section"
+                value={formData.section}
                 onChange={onChange}
-                required
+                required={true} // Added required prop
               >
-                <option value="">Select Main Category</option>
-                {mainCategories.map((mc) => (
+                <option value="">Spare Parts</option>
+                {homeCards.map((mc) => (
                   <option key={mc._id} value={mc._id}>
-                    {mc.name}
+                    {mc.title}
                   </option>
                 ))}
               </FormSelect>
 
-              {/* Type is now optional */}
-              <FormSelect
-                label="Type (Optional)"
-                name="type"
-                value={formData.type || ""}
-                onChange={onChange}
-              >
-                <option value="">Select Type</option>
-                <option value="Two-wheeler">Two Wheeler</option>
-                <option value="Four-wheeler">Four Wheeler</option>
-              </FormSelect>
+              {/* Show Type dropdown ONLY when no section is selected (when Spare Parts is selected) */}
+              {!formData.section && (
+                <FormSelect
+                  label="Type (Optional)"
+                  name="type"
+                  value={formData.type || ""}
+                  onChange={onChange}
+                >
+                  <option value="">Select Type</option>
+                  <option value="Two-wheeler">Two Wheeler</option>
+                  <option value="Four-wheeler">Four Wheeler</option>
+                </FormSelect>
+              )}
             </div>
 
             {/* Right Column */}
@@ -83,6 +97,7 @@ const CategoryModal = ({
               rows={3}
             />
           </div>
+
 
           {/* Actions */}
           <div className="flex justify-end space-x-3 pt-6 mt-6 border-t border-gray-200">
