@@ -9,8 +9,6 @@ const CategorySection = ({
   sectionsLoading, 
   brands, 
   brandsLoading,
-  mainCategories,
-  mainCategoriesLoading,
   categories,
   categoriesLoading,
   subCategories,
@@ -58,12 +56,11 @@ const CategorySection = ({
             name="section"
             value={formData.section}
             onChange={onInputChange}
-            
             disabled={sectionsLoading}
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
           >
             <option value="">
-              {sectionsLoading ? 'Loading sections...' : 'Select Section'}
+              {sectionsLoading ? 'Loading sections...' : 'Spare Parts'}
             </option>
             {sections.map((section) => (
               <option key={section._id} value={section._id}>
@@ -98,55 +95,28 @@ const CategorySection = ({
 
         {/* Categories */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {/* Main Category - Available regardless of section selection */}
+          {/* Category - Available regardless of section selection */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Main Category
+              Category
             </label>
             <select
-              name="mainCategory"
-              value={formData.mainCategory}
+              name="category"
+              value={formData.category}
               onChange={onInputChange}
-              disabled={mainCategoriesLoading}
+              disabled={categoriesLoading}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
             >
               <option value="">
-                {mainCategoriesLoading ? 'Loading...' : 'Select Main Category'}
+                {categoriesLoading ? 'Loading...' : 'Select Category'}
               </option>
-              {mainCategories.map((category) => (
+              {categories.map((category) => (
                 <option key={category._id} value={category._id}>
                   {category.name}
                 </option>
               ))}
             </select>
           </div>
-
-          {formData.mainCategory && (
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Category
-              </label>
-              <select
-                name="category"
-                value={formData.category}
-                onChange={onInputChange}
-                disabled={categoriesLoading}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
-              >
-                <option value="">
-                  {categoriesLoading ? 'Loading...' : categories.length === 0 ? 'No categories' : 'Select Category'}
-                </option>
-                {categories
-                  .filter(cat => cat.mainCategory && cat.mainCategory._id === formData.mainCategory)
-                  .map((category) => (
-                    <option key={category._id} value={category._id}>
-                      {category.name}
-                    </option>
-                  ))
-                }
-              </select>
-            </div>
-          )}
 
           {formData.category && (
             <div>

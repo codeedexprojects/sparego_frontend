@@ -3,6 +3,7 @@ import { useState } from "react";
 import BrandTableRow from "./BrandTableRow";
 import BrandModal from "./BrandModal";
 import DeleteConfirmationModal from "../../../main-categories/components/DeleteModal";
+import BrandTableFilters from "./BrandTableFilters";
 
 const BrandTable = ({
   brands,
@@ -14,9 +15,35 @@ const BrandTable = ({
 }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedBrand, setSelectedBrand] = useState(null);
-
-  // State for delete modal
   const [brandToDelete, setBrandToDelete] = useState(null);
+
+  // Filter states (remove statusFilter)
+  const [searchTerm, setSearchTerm] = useState("");
+  const [sectionFilter, setSectionFilter] = useState("all");
+
+  // Filter brands based on search and section only
+  const filteredBrands = brands.filter(brand => {
+    // Search filter
+    const matchesSearch = searchTerm === "" || 
+      brand.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      brand.description?.toLowerCase().includes(searchTerm.toLowerCase());
+
+    // Section filter (only for product brands)
+    let matchesSection = true;
+    if (brandType === "product") {
+      if (sectionFilter === "all") {
+        matchesSection = true;
+      } else if (sectionFilter === "") {
+        // Filter for brands with no section (Spare Parts)
+        matchesSection = !brand.section;
+      } else {
+        // Filter for specific section
+        matchesSection = brand.section?._id === sectionFilter;
+      }
+    }
+
+    return matchesSearch && matchesSection;
+  });
 
   const openAddModal = () => {
     setSelectedBrand(null);
@@ -55,7 +82,22 @@ const BrandTable = ({
 
   return (
     <div className="space-y-6">
-      {/* Add Brand Button */}
+      {/* Filters - remove statusFilter props */}
+      <BrandTableFilters
+        searchTerm={searchTerm}
+        setSearchTerm={setSearchTerm}
+        sectionFilter={sectionFilter}
+        setSectionFilter={setSectionFilter}
+        sections={sections}
+        brandType={brandType}
+      />
+
+      {/* Results Count */}
+      <div className="text-sm text-gray-600">
+        Showing {filteredBrands.length} of {brands.length} brands
+      </div>
+
+      {/* Rest of the component remains the same */}
       <div className="flex justify-end">
         <button
           onClick={openAddModal}
@@ -67,19 +109,22 @@ const BrandTable = ({
 
       {/* Brands Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {brands && brands.length > 0 ? (
-          brands.map((brand, index) => (
+        {filteredBrands && filteredBrands.length > 0 ? (
+          filteredBrands.map((brand, index) => (
             <BrandTableRow
               key={brand._id || index}
               brand={brand}
               onEdit={openEditModal}
               onDelete={handleDelete}
               brandType={brandType}
-              sections={brandType === "product" ? sections : []} // Only product brands get sections
+              sections={brandType === "product" ? sections : []}
             />
           ))
         ) : (
-          <p className="text-gray-500 col-span-full text-center">No brands found.</p>
+          <div className="col-span-full text-center py-12">
+            <p className="text-gray-500 text-lg">No brands found matching your filters.</p>
+            <p className="text-gray-400 text-sm mt-2">Try adjusting your search or filter criteria.</p>
+          </div>
         )}
       </div>
 

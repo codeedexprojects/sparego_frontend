@@ -5,19 +5,20 @@ import ProtectedRoute from '../../../../components/admin/ProtectedRoute';
 import { useDispatch, useSelector } from "react-redux";
 import { getOrderById, updateOrderStatus, clearError } from "../../../../redux/slices/adminOrderSlice";
 import { IMG_URL, BASE_URL } from "../../../../redux/baseUrl";
-
+import ConfirmationAlertModal from "../../../../components/shared/ConfirmationAlertModal";
 
 const OrderDetailPage = ({ params }) => {
   const router = useRouter();
   const dispatch = useDispatch();
   
-  // Unwrap params Promise using React.use()
   const resolvedParams = use(params);
   
   const { currentOrder, loading, error } = useSelector((state) => state.adminOrder);
   const [order, setOrder] = useState(null);
   const [updatingStatus, setUpdatingStatus] = useState(false);
   const [successMessage, setSuccessMessage] = useState(null);
+  const [showConfirmation, setShowConfirmation] = useState(false);
+  const [pendingStatus, setPendingStatus] = useState(null);
 
   const resolveImageUrl = (path) => {
     if (!path) return "/placeholder-image.jpg";
@@ -37,61 +38,56 @@ const OrderDetailPage = ({ params }) => {
 
   useEffect(() => {
     if (currentOrder) {
-      console.log("=== ORDER DETAIL DEBUG ===");
-      console.log("Order data received:", currentOrder);
-      console.log("Order status:", currentOrder.status);
-      console.log("Order keys:", Object.keys(currentOrder));
-      console.log("Order items:", currentOrder.items);
-      console.log("Order user:", currentOrder.user);
-      console.log("Order address:", currentOrder.address);
-      console.log("Order totalAmount:", currentOrder.totalAmount);
-      console.log("Order finalAmount:", currentOrder.finalAmount);
-      console.log("Order createdAt:", currentOrder.createdAt);
-      console.log("Order _id:", currentOrder._id);
-      console.log("Order id:", currentOrder.id);
-      console.log("===========================");
       setOrder(currentOrder);
     }
   }, [currentOrder]);
 
   useEffect(() => {
     if (error) {
-      console.error("Order detail error:", error);
       dispatch(clearError());
     }
   }, [error, dispatch]);
 
-  const handleUpdateStatus = async (newStatus) => {
+  const handleStatusUpdateClick = (newStatus) => {
+    setPendingStatus(newStatus);
+    setShowConfirmation(true);
+  };
+
+  const handleConfirmStatusUpdate = async () => {
+    if (!pendingStatus) return;
+    
     try {
       setUpdatingStatus(true);
       setSuccessMessage(null);
-      console.log("Updating order status to:", newStatus);
+      setShowConfirmation(false);
+      
       await dispatch(updateOrderStatus({ 
         id: resolvedParams.id, 
-        status: newStatus 
+        status: pendingStatus 
       })).unwrap();
       
-      // Refresh the order data after status update
       dispatch(getOrderById(resolvedParams.id));
       
-      setSuccessMessage(`Order status updated to ${newStatus} successfully!`);
-      console.log("Order status updated successfully");
+      setSuccessMessage(`Order status updated to ${pendingStatus} successfully!`);
       
-      // Clear success message after 3 seconds
       setTimeout(() => {
         setSuccessMessage(null);
       }, 3000);
     } catch (error) {
-      console.error("Failed to update order status:", error);
       setSuccessMessage(`Failed to update order status: ${error.message || 'Unknown error'}`);
       
-      // Clear error message after 5 seconds
       setTimeout(() => {
         setSuccessMessage(null);
       }, 5000);
     } finally {
       setUpdatingStatus(false);
+      setPendingStatus(null);
     }
+  };
+
+  const handleCancelStatusUpdate = () => {
+    setShowConfirmation(false);
+    setPendingStatus(null);
   };
 
   const formatDate = (dateString) => {
@@ -105,7 +101,6 @@ const OrderDetailPage = ({ params }) => {
         minute: "2-digit"
       });
     } catch (e) {
-      console.error("Date formatting error:", e);
       return "Invalid date";
     }
   };
@@ -151,7 +146,7 @@ const OrderDetailPage = ({ params }) => {
         <div className="container mx-auto px-4 py-8">
           <div className="bg-white shadow-md rounded-lg p-6 text-center">
             <h2 className="text-2xl font-bold text-red-600 mb-4">Error Loading Order</h2>
-            <p className="text-gray-600 mb-6">{error.message || "Failed to load order details"}</p>
+            <p className="text-gray-600 mb-6">Failed to load order details</p>
             <button
               onClick={() => router.push("/admin/orders")}
               className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700"
@@ -196,7 +191,6 @@ const OrderDetailPage = ({ params }) => {
           </button>
         </div>
 
-        {/* Success/Error Message */}
         {successMessage && (
           <div className={`mb-6 p-4 rounded-md ${
             successMessage.includes('successfully') 
@@ -208,7 +202,6 @@ const OrderDetailPage = ({ params }) => {
         )}
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Order Summary */}
           <div className="lg:col-span-2">
             <div className="bg-white shadow-md rounded-lg p-6 mb-6">
               <div className="flex justify-between items-start mb-6">
@@ -229,7 +222,7 @@ const OrderDetailPage = ({ params }) => {
                   {["pending", "confirmed", "shipped", "delivered", "cancelled"].map((status) => (
                     <button
                       key={status}
-                      onClick={() => handleUpdateStatus(status)}
+                      onClick={() => handleStatusUpdateClick(status)}
                       disabled={updatingStatus}
                       className={`px-3 py-1 rounded-full text-sm font-medium ${
                         order.status === status
@@ -237,7 +230,7 @@ const OrderDetailPage = ({ params }) => {
                           : "bg-gray-100 text-gray-800 hover:bg-gray-200"
                       } ${updatingStatus ? 'opacity-50 cursor-not-allowed' : ''}`}
                     >
-                      {updatingStatus ? 'Updating...' : formatStatus(status)}
+                      {formatStatus(status)}
                     </button>
                   ))}
                 </div>
@@ -273,9 +266,7 @@ const OrderDetailPage = ({ params }) => {
           </div>
         </div>
 
-        {/* Order Information */}
         <div className="space-y-6">
-          {/* Customer Information */}
           <div className="bg-white shadow-md rounded-lg p-6">
             <h3 className="text-lg font-medium mb-4">Customer Information</h3>
             {order.user ? (
@@ -297,7 +288,6 @@ const OrderDetailPage = ({ params }) => {
             )}
           </div>
 
-          {/* Shipping Address */}
           <div className="bg-white shadow-md rounded-lg p-6">
             <h3 className="text-lg font-medium mb-4">Shipping Address</h3>
             {order.address ? (
@@ -317,7 +307,6 @@ const OrderDetailPage = ({ params }) => {
             )}
           </div>
 
-          {/* Payment Information */}
           <div className="bg-white shadow-md rounded-lg p-6">
             <h3 className="text-lg font-medium mb-4">Payment Information</h3>
             <div className="flex justify-between mb-2">
@@ -351,6 +340,17 @@ const OrderDetailPage = ({ params }) => {
             </div>
           </div>
         </div>
+
+        <ConfirmationAlertModal
+          isOpen={showConfirmation}
+          type="confirm"
+          title="Confirm Status Update"
+          message={`Are you sure you want to update this order status to "${pendingStatus}"?`}
+          confirmText="Yes, Update"
+          cancelText="Cancel"
+          onConfirm={handleConfirmStatusUpdate}
+          onCancel={handleCancelStatusUpdate}
+        />
       </div>
     </ProtectedRoute>
   );

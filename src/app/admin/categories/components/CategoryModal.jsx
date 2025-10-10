@@ -51,7 +51,6 @@ const CategoryModal = ({
                 name="section"
                 value={formData.section}
                 onChange={onChange}
-                required={true} // Added required prop
               >
                 <option value="">Spare Parts</option>
                 {homeCards.map((mc) => (
@@ -64,10 +63,11 @@ const CategoryModal = ({
               {/* Show Type dropdown ONLY when no section is selected (when Spare Parts is selected) */}
               {!formData.section && (
                 <FormSelect
-                  label="Type (Optional)"
+                  label="Type *"
                   name="type"
                   value={formData.type || ""}
                   onChange={onChange}
+                  required={true}
                 >
                   <option value="">Select Type</option>
                   <option value="Two-wheeler">Two Wheeler</option>

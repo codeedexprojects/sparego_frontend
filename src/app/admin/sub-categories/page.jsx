@@ -22,8 +22,8 @@ const SubCategoryManager = () => {
   const { subCategories = [], loading, error } = useSelector(
     (s) => s.adminSubCategory
   );
-  const { categories: mainCategories } = useSelector((s) => s.adminCategory);
-  const { homeCards = [] } = useSelector((s) => s.adminHomeCard); // Fixed this line
+  const { categories } = useSelector((s) => s.adminCategory);
+  const { homeCards = [] } = useSelector((s) => s.adminHomeCard);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [deleteConfirm, setDeleteConfirm] = useState(null);
@@ -31,7 +31,7 @@ const SubCategoryManager = () => {
     name: "",
     description: "",
     category: "",
-    section: "", // Field name is section
+    section: "",
     image: null,
   });
   const [editingSubCategory, setEditingSubCategory] = useState(null);
@@ -69,14 +69,14 @@ const SubCategoryManager = () => {
 
   const openEditModal = (subCat) => {
     // Find the section ID from the category
-    const category = mainCategories.find(cat => cat._id === subCat.category?._id);
-    const sectionId = category?.section || "";
+    const category = categories.find(cat => cat._id === subCat.category?._id);
+    const sectionId = category?.section?._id || category?.section || "";
     
     setFormData({
       name: subCat.name || "",
       description: subCat.description || "",
       category: subCat.category?._id || "",
-      section: sectionId, // Set section for editing
+      section: sectionId,
       image: null,
     });
     setPreview(subCat.image || null);
@@ -116,8 +116,8 @@ const SubCategoryManager = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    // Validate form - check section and category
-    if (!formData.category) {
+    // Validate form
+    if (!formData.section || !formData.category) {
       toast.error("Please select both section and category");
       return;
     }
@@ -129,7 +129,6 @@ const SubCategoryManager = () => {
     
     if (formData.image) form.append("image", formData.image);
     if (formData.section) form.append("section", formData.section);
-    
 
     try {
       if (editingSubCategory) {
@@ -207,8 +206,8 @@ const SubCategoryManager = () => {
                 setPreview(null);
                 setFormData({ ...formData, image: null });
               }}
-              sections={homeCards} // Pass homeCards as sections
-              mainCategories={mainCategories}
+              sections={homeCards}
+              categories={categories}
               editingCategory={editingSubCategory}
             />
           )}

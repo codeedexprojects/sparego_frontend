@@ -3,9 +3,8 @@
 import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { editProduct, viewProductById } from '../../../../../redux/slices/adminProductSlice';
-import { fetchSections } from '../../../../../redux/slices/sectionSlice';
+import { getHomeCards } from '../../../../../redux/slices/adminHomeCardSlice';
 import { useRouter, useParams } from 'next/navigation';
-import { fetchMainCategories } from '../../../../../redux/slices/adminMainCategorySlice';
 import { fetchCategories } from '../../../../../redux/slices/adminCategorySlice';
 import { fetchSubCategories } from '../../../../../redux/slices/adminSubCategorySlice';
 import { fetchSubSubCategories } from '../../../../../redux/slices/adminSubSubCategorySlice';
@@ -28,7 +27,6 @@ const EditProductForm = () => {
   const { currentProduct, loading: productLoading, error } = useSelector(state => state.adminProduct);
   const { sections, loading: sectionsLoading } = useSelector(state => state.sections);
   const { brands: productBrands, loading: brandsLoading } = useSelector(state => state.adminProductBrand);
-  const { mainCategories, loading: mainCategoriesLoading } = useSelector(state => state.adminMainCategory);
   const { categories, loading: categoriesLoading } = useSelector(state => state.adminCategory);
   const { subCategories, loading: subCategoriesLoading } = useSelector(state => state.adminSubCategory);
   const { subSubCategories, loading: subSubCategoriesLoading } = useSelector(state => state.adminSubSubCategory);
@@ -49,7 +47,6 @@ const EditProductForm = () => {
     isActive: true,
     isPopular: false,
     section: '',
-    mainCategory: '',
     category: '',
     subCategory: '',
     subSubCategory: '',
@@ -60,7 +57,6 @@ const EditProductForm = () => {
   const [imagePreviews, setImagePreviews] = useState([]);
   const [existingImages, setExistingImages] = useState([]);
   const [filteredBrands, setFilteredBrands] = useState([]);
-  const [filteredMainCategories, setFilteredMainCategories] = useState([]);
   const [filteredCategories, setFilteredCategories] = useState([]);
   const [filteredSubCategories, setFilteredSubCategories] = useState([]);
   const [filteredSubSubCategories, setFilteredSubSubCategories] = useState([]);
@@ -77,9 +73,8 @@ const EditProductForm = () => {
     if (productId) {
       dispatch(viewProductById(productId));
     }
-    dispatch(fetchSections());
+    dispatch(getHomeCards());
     dispatch(fetchBrands());
-    dispatch(fetchMainCategories());
     dispatch(fetchCategories());
     dispatch(fetchSubCategories());
     dispatch(fetchSubSubCategories());
@@ -150,7 +145,6 @@ const EditProductForm = () => {
         isActive: currentProduct.isActive !== undefined ? currentProduct.isActive : true,
         isPopular: currentProduct.isPopular !== undefined ? currentProduct.isPopular : false,
         section: currentProduct.section?._id || currentProduct.section || '',
-        mainCategory: currentProduct.mainCategory?._id || currentProduct.mainCategory || '',
         category: currentProduct.category?._id || currentProduct.category || '',
         subCategory: currentProduct.subCategory?._id || currentProduct.subCategory || '',
         subSubCategory: currentProduct.subSubCategory?._id || currentProduct.subSubCategory || '',
@@ -185,36 +179,11 @@ const EditProductForm = () => {
     }
   }, [formData.section, productBrands]);
 
-  // Filter main categories by section
+  // Filter categories by section
   useEffect(() => {
-    if (formData.section && mainCategories?.length > 0) {
-      const filtered = mainCategories.filter(cat =>
-        cat.section && cat.section._id === formData.section
-      );
-      setFilteredMainCategories(filtered);
-
-      if (formData.mainCategory) {
-        const exists = filtered.some(cat => cat._id === formData.mainCategory);
-        if (!exists) {
-          setFormData(prev => ({
-            ...prev,
-            mainCategory: '',
-            category: '',
-            subCategory: '',
-            subSubCategory: ''
-          }));
-        }
-      }
-    } else {
-      setFilteredMainCategories([]);
-    }
-  }, [formData.section, mainCategories]);
-
-  // Filter categories by main category
-  useEffect(() => {
-    if (formData.mainCategory && categories?.length > 0) {
+    if (formData.section && categories?.length > 0) {
       const filtered = categories.filter(cat =>
-        cat.mainCategory && cat.mainCategory._id === formData.mainCategory
+        cat.section && cat.section._id === formData.section
       );
       setFilteredCategories(filtered);
 
@@ -232,7 +201,7 @@ const EditProductForm = () => {
     } else {
       setFilteredCategories([]);
     }
-  }, [formData.mainCategory, categories]);
+  }, [formData.section, categories]);
 
   // Filter sub categories by category
   useEffect(() => {
@@ -278,10 +247,41 @@ const EditProductForm = () => {
 
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: type === 'checkbox' ? checked : value
-    }));
+    
+    // If section changes, reset dependent fields
+    if (name === 'section') {
+      setFormData(prev => ({
+        ...prev,
+        [name]: value,
+        category: '',
+        subCategory: '',
+        subSubCategory: '',
+        productBrand: ''
+      }));
+    } 
+    // If category changes, reset dependent fields
+    else if (name === 'category') {
+      setFormData(prev => ({
+        ...prev,
+        [name]: value,
+        subCategory: '',
+        subSubCategory: ''
+      }));
+    }
+    // If subCategory changes, reset dependent fields
+    else if (name === 'subCategory') {
+      setFormData(prev => ({
+        ...prev,
+        [name]: value,
+        subSubCategory: ''
+      }));
+    }
+    else {
+      setFormData(prev => ({
+        ...prev,
+        [name]: type === 'checkbox' ? checked : value
+      }));
+    }
   };
 
   const handleArrayFieldChange = (field, index, value) => {
@@ -367,12 +367,12 @@ const EditProductForm = () => {
       submitData.append("isActive", formData.isActive);
       submitData.append("isPopular", formData.isPopular);
 
-      if (formData.mainCategory) submitData.append("mainCategory", formData.mainCategory);
+      // Append category fields (only if they have values)
+      if (formData.section) submitData.append("section", formData.section);
       if (formData.category) submitData.append("category", formData.category);
       if (formData.subCategory) submitData.append("subCategory", formData.subCategory);
       if (formData.subSubCategory) submitData.append("subSubCategory", formData.subSubCategory);
       if (formData.productBrand) submitData.append("productBrand", formData.productBrand);
-      if (formData.section) submitData.append("section", formData.section);
 
       // Handle arrays properly
       const cleanSpecifications = formData.specifications.filter(item => item.trim() !== "");
@@ -502,8 +502,6 @@ const EditProductForm = () => {
             sectionsLoading={sectionsLoading}
             brands={filteredBrands}
             brandsLoading={brandsLoading}
-            mainCategories={filteredMainCategories}
-            mainCategoriesLoading={mainCategoriesLoading}
             categories={filteredCategories}
             categoriesLoading={categoriesLoading}
             subCategories={filteredSubCategories}

@@ -101,10 +101,10 @@ const CategoryManager = () => {
     const submitData = new FormData();
     submitData.append("name", formData.name.trim());
     submitData.append("description", formData.description.trim());
-    submitData.append("section", formData.section || ""); // Updated field
 
     if (formData.type) submitData.append("type", formData.type); // type is optional
     if (formData.image) submitData.append("image", formData.image);
+    if (formData.section) submitData.append("section", formData.section);
 
     try {
       if (editingCategory) {

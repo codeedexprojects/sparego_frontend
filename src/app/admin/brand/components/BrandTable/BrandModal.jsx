@@ -134,14 +134,14 @@ const BrandModal = ({
           {/* Product Section (optional) */}
           {brandType === "product" && (
             <div>
-              <label className="block text-sm font-medium mb-2">Product Section (optional)</label>
+              <label className="block text-sm font-medium mb-2">Product Section</label>
               <select
                 name="section"
                 value={formData.section}
                 onChange={handleChange}
                 className="w-full p-3 border rounded-lg focus:ring-indigo-500"
               >
-                <option value="">-- No Section --</option>
+                <option value="">Spare Parts</option>
                 {sections.map((s) => (
                   <option key={s._id} value={s._id}>
                     {s.title}
@@ -165,21 +165,38 @@ const BrandModal = ({
             </label>
           </div>
 
-          {/* Logo */}
+          {/* Logo - Fixed border */}
           <div>
             <label className="block text-sm font-medium mb-2">Brand Logo</label>
-            <input type="file" name="logo" accept="image/*" onChange={handleChange} />
+            <input 
+              type="file" 
+              name="logo" 
+              accept="image/*" 
+              onChange={handleChange}
+              className="w-full p-3 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500"
+            />
             {formData.logoPreview && (
-              <img src={formData.logoPreview} alt="Preview" className="mt-2 h-24 object-contain" />
+              <img 
+                src={formData.logoPreview} 
+                alt="Preview" 
+                className="mt-2 h-24 w-24 object-contain border border-gray-300 rounded-lg" 
+              />
             )}
           </div>
 
           {/* Actions */}
           <div className="flex justify-end gap-3 pt-4">
-            <button type="button" onClick={onClose} className="px-4 py-2 border rounded-lg">
+            <button 
+              type="button" 
+              onClick={onClose} 
+              className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
+            >
               Cancel
             </button>
-            <button type="submit" className="px-4 py-2 bg-indigo-600 text-white rounded-lg">
+            <button 
+              type="submit" 
+              className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
+            >
               {brand ? "Update" : "Add"} Brand
             </button>
           </div>

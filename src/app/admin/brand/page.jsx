@@ -12,7 +12,7 @@ import {
   clearError,
   clearSuccess,
 } from "../../../redux/slices/adminBrandSlice";
-import { getHomeCards } from "../../../redux/slices/adminHomeCardSlice"; // Fixed import name
+import { getHomeCards } from "../../../redux/slices/adminHomeCardSlice"; 
 
 const BrandPage = ({ 
   title = "Brand Management", 

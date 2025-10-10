@@ -2,14 +2,17 @@
 const BrandTableFilters = ({
   searchTerm,
   setSearchTerm,
-  statusFilter,
-  setStatusFilter
+  sectionFilter,
+  setSectionFilter,
+  sections = [],
+  brandType = "product"
 }) => {
   return (
-    <div className="bg-gray-50 p-4 rounded-lg mb-6 shadow-sm">
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="md:col-span-2">
-          <label className="block text-sm font-medium text-gray-700 mb-1">Search</label>
+    <div className="bg-white p-6 rounded-lg border border-gray-200 mb-6 shadow-sm">
+      <div className="flex flex-col sm:flex-row gap-4 items-end">
+        {/* Search Input */}
+        <div className="flex-1 min-w-0">
+          <label className="block text-sm font-medium text-gray-700 mb-2">Search Brands</label>
           <div className="relative">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
               <svg className="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
@@ -18,26 +21,33 @@ const BrandTableFilters = ({
             </div>
             <input
               type="text"
-              placeholder="Search by brand name or description"
-              className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg w-full focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+              placeholder="Search by brand name or description..."
+              className="pl-10 pr-4 py-3 border border-gray-300 rounded-lg w-full focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
         </div>
         
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
-          <select
-            className="w-full p-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
-          >
-            <option value="all">All Status</option>
-            <option value="active">Active</option>
-            <option value="inactive">Inactive</option>
-          </select>
-        </div>
+        {/* Section Filter - Only show for product brands */}
+        {brandType === "product" && (
+          <div className="w-full sm:w-64">
+            <label className="block text-sm font-medium text-gray-700 mb-2">Filter by Section</label>
+            <select
+              className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+              value={sectionFilter}
+              onChange={(e) => setSectionFilter(e.target.value)}
+            >
+              <option value="all">All Sections</option>
+              <option value="">Spare Parts</option>
+              {sections.map((section) => (
+                <option key={section._id} value={section._id}>
+                  {section.title || section.name}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
       </div>
     </div>
   );
