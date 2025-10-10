@@ -14,11 +14,25 @@ const BrandTableRow = ({ brand, onEdit, onDelete, brandType, sections = [] }) =>
   const brandName = brand.name || 'Unnamed Brand';
   const brandImage = brand.logo || brand.image;
 
-  // Only for product brands, find section name
-  const sectionName =
-    brandType === 'product'
-      ? sections.find(s => s._id === brand.section)?.name || 'Unknown Section'
-      : null;
+  // Find section name for product brands
+  const getSectionName = () => {
+    if (brandType !== 'product') return null;
+    
+    // If brand has section data populated from backend
+    if (brand.section && typeof brand.section === 'object') {
+      return brand.section.title || 'Unknown Section';
+    }
+    
+    // If brand has section ID only, find in sections array
+    if (brand.section) {
+      const section = sections.find(s => s._id === brand.section);
+      return section?.title || section?.name || 'Unknown Section';
+    }
+    
+    return 'No Section';
+  };
+
+  const sectionName = getSectionName();
 
   return (
     <div className="bg-white rounded-lg shadow-md border border-gray-200 overflow-hidden hover:shadow-lg transition-shadow">
@@ -46,7 +60,7 @@ const BrandTableRow = ({ brand, onEdit, onDelete, brandType, sections = [] }) =>
           </span>
         </div>
 
-        {brandType === 'product' && sectionName && (
+        {brandType === 'product' && (
           <div className="mb-2">
             <span className="text-xs font-medium text-gray-500">Section:</span>
             <span className="text-xs text-gray-700 ml-1">{sectionName}</span>

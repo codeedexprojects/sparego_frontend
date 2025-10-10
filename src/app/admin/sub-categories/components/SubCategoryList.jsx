@@ -59,7 +59,7 @@ const SubCategoryList = ({ categories, loading, error, onEdit, onDelete, onAddCa
             <tr>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Sub-category</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Section</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
               <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
             </tr>
@@ -108,8 +108,8 @@ const SubCategoryRow = ({ subCategory, onEdit, onDelete }) => (
       <div className="text-sm text-gray-900">{subCategory.category?.name || "-"}</div>
     </td>
     <td className="px-6 py-4 whitespace-nowrap">
-      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
-        {subCategory.type}
+      <span className="inline-flex items-center    text-xs font-medium ">
+        {subCategory.section?.title || "Spare Parts"}
       </span>
     </td>
     <td className="px-6 py-4 whitespace-nowrap">

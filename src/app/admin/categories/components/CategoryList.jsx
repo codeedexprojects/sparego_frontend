@@ -58,7 +58,7 @@ const CategoryList = ({ categories, loading, error, onEdit, onDelete, onAddCateg
           <thead className="bg-gray-50">
             <tr>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Main Category</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Section</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
               <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
@@ -105,7 +105,7 @@ const CategoryRow = ({ category, onEdit, onDelete }) => (
       </div>
     </td>
     <td className="px-6 py-4 whitespace-nowrap">
-      <div className="text-sm text-gray-900">{category.mainCategory?.name || "-"}</div>
+      <div className="text-sm text-gray-900">{category.section?.title || "Spare Parts"}</div>
     </td>
     <td className="px-6 py-4 whitespace-nowrap">
       <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">

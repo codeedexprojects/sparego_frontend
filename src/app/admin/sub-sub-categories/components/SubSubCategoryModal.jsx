@@ -25,7 +25,7 @@ const SubSubCategoryModal = ({
     } else if (formData.section) {
       // When a specific section is selected, show sub-categories for that section
       const filtered = subCategories.filter(
-        subCat => subCat.section === formData.section
+        subCat => subCat.section?._id === formData.section || subCat.section === formData.section
       );
       setFilteredSubCategories(filtered);
     } else {

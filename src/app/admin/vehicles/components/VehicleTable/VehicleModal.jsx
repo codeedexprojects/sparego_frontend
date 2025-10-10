@@ -59,6 +59,7 @@ const VehicleModal = ({
     if (!formData.year || formData.year < 1900 || formData.year > new Date().getFullYear()) {
       newErrors.year = "Valid year is required";
     }
+    if (!formData.modification.trim()) newErrors.modification = "Model is required";
     
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -173,7 +174,7 @@ const VehicleModal = ({
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-2 text-gray-700">Modification (Optional)</label>
+            <label className="block text-sm font-medium mb-2 text-gray-700">Modification</label>
             <input
               type="text"
               name="modification"
@@ -181,6 +182,7 @@ const VehicleModal = ({
               onChange={handleChange}
               placeholder="Enter modification details (e.g., ABS, Disc Brake)"
               className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
+              required
             />
           </div>
 

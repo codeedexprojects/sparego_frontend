@@ -42,13 +42,18 @@ const OrdersPage = () => {
       result = result.filter((o) => o.status === statusFilter);
     }
     if (searchTerm) {
-      const term = searchTerm.toLowerCase();
-      result = result.filter((o) =>
-        (o.user?.name || "").toLowerCase().includes(term) ||
-        String(o._id || o.id).toLowerCase().includes(term) ||
-        (o.address?.name || "").toLowerCase().includes(term)
-      );
-    }
+  const term = searchTerm.toLowerCase().trim();
+  
+  result = result.filter((order) => {
+    const userName = (order.user?.name || "").toLowerCase();
+    const finalAmount = String(order.finalAmount || "").toLowerCase();
+
+    return (
+      userName.includes(term) ||
+      finalAmount.includes(term)
+    );
+  });
+}
     console.log("Filtered orders result:", result);
     return result;
   }, [orders, statusFilter, searchTerm]);

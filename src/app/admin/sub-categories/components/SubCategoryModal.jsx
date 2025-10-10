@@ -8,31 +8,29 @@ const SubCategoryModal = ({
   onChange,
   preview,
   onRemoveImage,
-  mainCategories,
+  categories,
   editingCategory,
   sections, // Add sections prop to get available sections
 }) => {
-  const [filteredCategories, setFilteredCategories] = useState(mainCategories);
+  const [filteredCategories, setFilteredCategories] = useState(categories);
 
   // Filter categories when section changes
   useEffect(() => {
     if (formData.section === "") {
-      // When "Spare Parts" is selected (empty value), show categories with no section
-      const filtered = mainCategories.filter(
+      const filtered = categories.filter(
         category => !category.section || category.section === ""
       );
       setFilteredCategories(filtered);
     } else if (formData.section) {
-      // When a specific section is selected, show categories for that section
-      const filtered = mainCategories.filter(
-        category => category.section === formData.section
+      const filtered = categories.filter(
+        category => category.section?._id === formData.section || category.section === formData.section
       );
       setFilteredCategories(filtered);
     } else {
       // When no section is selected yet, show all categories
-      setFilteredCategories(mainCategories);
+      setFilteredCategories(categories);
     }
-  }, [formData.section, mainCategories]);
+  }, [formData.section, categories]);
 
   if (!isOpen) return null;
 

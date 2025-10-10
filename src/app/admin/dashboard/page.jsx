@@ -5,7 +5,7 @@ import DashboardHeader from "./components/DashboardHeader";
 import StatsGrid from "./components/StatsGrid";
 import RecentOrders from "./components/RecentOrders";
 import { getOrders } from "../../../redux/slices/adminOrderSlice";
-import { CheckCircle, Clock, XCircle, AlertCircle } from "lucide-react";
+import { CheckCircle, Clock, XCircle, AlertCircle, DollarSign, Package, Calendar } from "lucide-react";
 import ProtectedRoute from "../../../components/admin/ProtectedRoute";
 
 export default function DashboardPage() {
@@ -19,28 +19,112 @@ export default function DashboardPage() {
     dispatch(getOrders(timeFilter));
   }, [dispatch, timeFilter]);
 
-  // 🔹 Stats data could also come from API
-  const statsData = [
-    {
-      title: "Total Orders",
-      value: orders.length.toString(),
-      change: "+12.5%", // Ideally API should calculate this
-      trend: "up",
-      icon: CheckCircle,
-      lightBg: "bg-blue-50",
-      textColor: "text-blue-600",
-    },
-    {
-      title: "Revenue",
-      value: "₹" + orders.reduce((sum, o) => sum + o.finalAmount, 0).toLocaleString(),
-      change: "-2.3%",
-      trend: "down",
-      icon: AlertCircle,
-      lightBg: "bg-orange-50",
-      textColor: "text-orange-600",
-    },
-  ];
+  // 🔹 Calculate today's orders
+  const getTodayOrders = () => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    return orders.filter(order => {
+      const orderDate = new Date(order.createdAt);
+      orderDate.setHours(0, 0, 0, 0);
+      return orderDate.getTime() === today.getTime();
+    });
+  };
 
+  // 🔹 Calculate stats from actual orders data
+  const calculateStats = () => {
+    const totalOrders = orders.length;
+    const todayOrders = getTodayOrders();
+    
+    // Calculate revenue from delivered orders only
+    const deliveredOrders = orders.filter(order => order.status?.toLowerCase() === 'delivered');
+    const deliveredRevenue = deliveredOrders.reduce((sum, order) => sum + (order.finalAmount || 0), 0);
+    
+    
+    // Calculate all orders by status
+    const statusCounts = orders.reduce((acc, order) => {
+      const status = order.status?.toLowerCase() || 'pending';
+      acc[status] = (acc[status] || 0) + 1;
+      return acc;
+    }, {});
+
+    const pendingOrders = statusCounts.pending || 0;
+    const deliveredOrdersCount = statusCounts.delivered || 0;
+    const cancelledOrders = statusCounts.cancelled || 0;
+    const confirmedOrders = statusCounts.confirmed || 0;
+    const shippedOrders = statusCounts.shipped || 0;
+
+    return [
+      {
+        title: "Total Orders",
+        value: totalOrders.toString(),
+        icon: Package,
+        lightBg: "bg-blue-50",
+        textColor: "text-blue-600",
+        borderColor: "border-blue-200"
+      },
+      {
+        title: "Today's Orders",
+        value: todayOrders.length.toString(),
+        icon: Calendar,
+        lightBg: "bg-indigo-50",
+        textColor: "text-indigo-600",
+        borderColor: "border-indigo-200",
+        description: "Orders placed today"
+      },
+      {
+        title: "Revenue",
+        value: "₹" + deliveredRevenue.toLocaleString(),
+        icon: DollarSign,
+        lightBg: "bg-green-50",
+        textColor: "text-green-600",
+        borderColor: "border-green-200",
+        description: `From ${deliveredOrdersCount} delivered orders`
+      },
+      {
+        title: "Delivered",
+        value: deliveredOrdersCount.toString(),
+        icon: CheckCircle,
+        lightBg: "bg-green-50",
+        textColor: "text-green-600",
+        borderColor: "border-green-200"
+      },
+      {
+        title: "Pending",
+        value: pendingOrders.toString(),
+        icon: Clock,
+        lightBg: "bg-yellow-50",
+        textColor: "text-yellow-600",
+        borderColor: "border-yellow-200"
+      },
+      {
+        title: "Confirmed",
+        value: confirmedOrders.toString(),
+        icon: AlertCircle,
+        lightBg: "bg-blue-50",
+        textColor: "text-blue-600",
+        borderColor: "border-blue-200"
+      },
+      {
+        title: "Shipped",
+        value: shippedOrders.toString(),
+        icon: Package,
+        lightBg: "bg-purple-50",
+        textColor: "text-purple-600",
+        borderColor: "border-purple-200"
+      },
+      {
+        title: "Cancelled",
+        value: cancelledOrders.toString(),
+        icon: XCircle,
+        lightBg: "bg-red-50",
+        textColor: "text-red-600",
+        borderColor: "border-red-200"
+      }
+    ];
+  };
+
+  const statsData = calculateStats();
 
   const getStatusConfig = (status) => {
     const configs = {
@@ -68,28 +152,39 @@ export default function DashboardPage() {
         icon: AlertCircle,
         border: "border-blue-200",
       },
+      shipped: {
+        bg: "bg-purple-100",
+        text: "text-purple-700",
+        icon: Package,
+        border: "border-purple-200",
+      },
     };
     return configs[status] || configs.pending;
   };
 
   return (
     <ProtectedRoute>
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 p-4 lg:p-8">
-      <div className="max-w-7xl mx-auto space-y-8">
-        <DashboardHeader timeFilter={timeFilter} setTimeFilter={setTimeFilter} />
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 p-4 lg:p-8">
+        <div className="max-w-7xl mx-auto space-y-8">
+          <DashboardHeader timeFilter={timeFilter} setTimeFilter={setTimeFilter} />
 
-        {loading ? (
-          <p className="text-gray-600">Loading orders...</p>
-        ) : error ? (
-          <p className="text-red-500">⚠️ {error}</p>
-        ) : (
-          <>
-            <StatsGrid statsData={statsData} />
-            <RecentOrders orders={orders} getStatusConfig={getStatusConfig} />
-          </>
-        )}
+          {loading ? (
+            <div className="flex items-center justify-center py-8">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+              <span className="ml-2 text-gray-600">Loading orders...</span>
+            </div>
+          ) : error ? (
+            <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+              <p className="text-red-700">⚠️ {error}</p>
+            </div>
+          ) : (
+            <>
+              <StatsGrid statsData={statsData} />
+              <RecentOrders orders={orders} getStatusConfig={getStatusConfig} />
+            </>
+          )}
+        </div>
       </div>
-    </div>
     </ProtectedRoute>
   );
 }
