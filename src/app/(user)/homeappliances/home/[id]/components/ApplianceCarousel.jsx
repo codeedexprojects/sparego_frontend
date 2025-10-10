@@ -52,7 +52,6 @@ export default function SparePartsCarousel() {
     );
   }
 
-  // Show empty state if no carousel items
   if (!bottomCarousel || bottomCarousel.length === 0) {
     return (
       <section className="relative w-full overflow-hidden h-96 bg-gray-200 rounded-lg flex items-center justify-center">

@@ -56,7 +56,7 @@ export default function PopularItems() {
         } else {
           toast.success("Added to wishlist");
         }
-        dispatch(getWishlist()); 
+        dispatch(getWishlist());
       } else {
         toast.error("Failed to update wishlist");
       }
@@ -66,6 +66,8 @@ export default function PopularItems() {
       setProcessingItems((prev) => ({ ...prev, [productId]: false }));
     }
   };
+
+  
 
   if (loading) {
     return (
@@ -92,7 +94,9 @@ export default function PopularItems() {
     return (
       <div className="bg-white py-12 px-6">
         <div className="max-w-6xl mx-auto text-center">
-          <p className="text-red-600">Error loading products: {error}</p>
+          <p className="text-red-600">
+            Error loading products: {error?.message || String(error)}
+          </p>
         </div>
       </div>
     );
@@ -110,6 +114,7 @@ export default function PopularItems() {
         {products?.map((product) => (
           <div
             key={product._id}
+            onClick={()=> router.push(`/spare/product-details/${product._id}`)}
             className="bg-white border rounded-lg overflow-hidden shadow-sm hover:shadow-lg transition relative flex-none sm:flex-auto w-64 sm:w-auto"
           >
             <div className="relative w-full h-64">
@@ -143,7 +148,7 @@ export default function PopularItems() {
                 />
               </button>
             </div>
-<hr className="border" />
+            <hr className="border" />
             <div className="p-4">
               <h3 className="text-lg font-medium text-gray-900">
                 {product.name}

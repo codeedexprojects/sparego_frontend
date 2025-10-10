@@ -148,7 +148,7 @@ export default function NewArrivalsSection() {
             {productsData[activeTab].length > 0 ? (
               productsData[activeTab].map((product) => (
                 <div key={product.id} className="flex-shrink-0 w-[160px]">
-                  <Link href={product.link}>
+<Link href={`/spare/product-details/${product._id}`}>
                     <div className="relative bg-white border border-gray-200 rounded-lg p-3 hover:shadow-lg transition-all duration-300 cursor-pointer h-full flex flex-col">
                       {product.discount && (
                         <div className="absolute top-2 right-2 bg-red-600 text-white text-xs font-bold px-1.5 py-0.5 rounded-md z-10">

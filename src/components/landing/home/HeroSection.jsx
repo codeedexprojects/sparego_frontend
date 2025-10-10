@@ -116,13 +116,13 @@ export default function HeroSection() {
             href={
               item._id === "static-1"
                 ? "/spare/home" 
-                : `/homeappliances/home/${item.section?._id}` 
+                : `/homeappliances/home/${item?._id}` 
             }
             onClick={() => {
               if (item._id === "static-1") {
                 localStorage.setItem("sectionId", "spare");
-              } else if (item.section?._id) {
-                localStorage.setItem("sectionId", item.section._id);
+              } else if (item?._id) {
+                localStorage.setItem("sectionId", item._id);
               }
             }}
             className="w-full inline-flex items-center justify-center gap-2 px-5 py-3 bg-red-600 hover:bg-red-700 text-white rounded-xl font-semibold text-sm transition-all duration-300 transform hover:scale-105 shadow-lg hover:shadow-red-500/25"

@@ -3,11 +3,13 @@ import React, { useState, useEffect } from 'react';
 import { CheckCircle, ArrowRight, Home, Package } from 'lucide-react';
 import Header from '@/components/user/spare/Header';
 import Footer from '@/components/landing/Footer';
+import { useRouter } from 'next/navigation';
 
 const OrderConfirmedPage = () => {
   const [animateCheck, setAnimateCheck] = useState(false);
   const [showContent, setShowContent] = useState(false);
-
+  const router = useRouter();
+  
   useEffect(() => {
     const timer1 = setTimeout(() => setAnimateCheck(true), 300);
     const timer2 = setTimeout(() => setShowContent(true), 800);
@@ -43,7 +45,9 @@ const OrderConfirmedPage = () => {
             <div className={`space-y-4 transition-all duration-800 delay-500 ${showContent ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
              
               
-              <button className="w-full bg-white border-2 border-gray-200 text-gray-700 py-4 px-6 rounded-2xl font-semibold hover:bg-gray-50 hover:border-gray-300 transition-all duration-200 flex items-center justify-center group">
+              <button 
+              onClick={()=>router.push("/spare/orders")}
+              className="w-full bg-white border-2 border-gray-200 text-gray-700 py-4 px-6 rounded-2xl font-semibold hover:bg-gray-50 hover:border-gray-300 transition-all duration-200 flex items-center justify-center group">
                 <Home className="w-5 h-5 mr-3" />
                 Continue Shopping
                 <ArrowRight className="w-5 h-5 ml-3 group-hover:translate-x-1 transition-transform" />

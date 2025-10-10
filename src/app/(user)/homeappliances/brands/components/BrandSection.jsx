@@ -57,14 +57,14 @@ const BrandSelectionSection = () => {
                 key={`${brand._id}-${index}`}
                 className="bg-white border border-gray-600 rounded-lg p-6 hover:shadow-md transition-shadow cursor-pointer"
               >
-                <div className="w-26 h-22 rounded mb-4 flex items-center justify-center mx-auto">
+                <div className="w-30 h-30 rounded mb-4 flex items-center justify-center mx-auto">
                   {brand.logo ? (
                     <Image
                       src={`${IMG_URL}/${brand.logo}`}
                       alt={`${brand.name} logo`}
                       width={80}
                       height={60}
-                      className="object-contain"
+                      className=" w-30 h-30 object-contain"
                     />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center">
@@ -74,9 +74,7 @@ const BrandSelectionSection = () => {
                 </div>
                 <div className="text-center mb-3">
                   <h3 className="font-semibold text-gray-900 text-sm">{brand.name}</h3>
-                  {brand.description && (
-                    <p className="text-sm text-gray-900">{brand.description}</p>
-                  )}
+                 
                 </div>
               </div>
             ))}
