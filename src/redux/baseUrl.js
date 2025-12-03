@@ -1,4 +1,4 @@
-export const BASE_URL = "https://sparego-backend.onrender.com/api";
+export const BASE_URL = "https://sparego.codeedextechnologies.com/api";
 
 // export const BASE_URL = "http://localhost:9000/api";
 
