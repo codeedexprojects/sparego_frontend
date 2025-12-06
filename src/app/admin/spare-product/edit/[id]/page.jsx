@@ -50,7 +50,8 @@ const EditProductForm = () => {
     category: '',
     subCategory: '',
     subSubCategory: '',
-    productBrand: ''
+    productBrand: '',
+    compatibleVehicles: []
   });
 
   const [images, setImages] = useState([]);
@@ -148,7 +149,8 @@ const EditProductForm = () => {
         category: currentProduct.category?._id || currentProduct.category || '',
         subCategory: currentProduct.subCategory?._id || currentProduct.subCategory || '',
         subSubCategory: currentProduct.subSubCategory?._id || currentProduct.subSubCategory || '',
-        productBrand: currentProduct.productBrand?._id || currentProduct.productBrand || ''
+        productBrand: currentProduct.productBrand?._id || currentProduct.productBrand || '',
+        compatibleVehicles: currentProduct.compatibleVehicles?.map(v => v._id || v) || []
       });
 
       // Set existing images for preview
@@ -277,10 +279,17 @@ const EditProductForm = () => {
       }));
     }
     else {
-      setFormData(prev => ({
-        ...prev,
-        [name]: type === 'checkbox' ? checked : value
-      }));
+      setFormData(prev => {
+        const newData = {
+          ...prev,
+          [name]: type === 'checkbox' ? checked : value
+        };
+        // Clear compatibleVehicles when vehicleType is set to Universal
+        if (name === 'vehicleType' && value === 'Universal') {
+          newData.compatibleVehicles = [];
+        }
+        return newData;
+      });
     }
   };
 
@@ -373,6 +382,13 @@ const EditProductForm = () => {
       if (formData.subCategory) submitData.append("subCategory", formData.subCategory);
       if (formData.subSubCategory) submitData.append("subSubCategory", formData.subSubCategory);
       if (formData.productBrand) submitData.append("productBrand", formData.productBrand);
+      
+      // Append compatible vehicles
+      if (formData.compatibleVehicles && formData.compatibleVehicles.length > 0) {
+        formData.compatibleVehicles.forEach((vehicleId, index) => {
+          submitData.append(`compatibleVehicles[${index}]`, vehicleId);
+        });
+      }
 
       // Handle arrays properly
       const cleanSpecifications = formData.specifications.filter(item => item.trim() !== "");
@@ -500,13 +516,13 @@ const EditProductForm = () => {
             onInputChange={handleInputChange}
             sections={sections}
             sectionsLoading={sectionsLoading}
-            brands={filteredBrands}
+            brands={productBrands}
             brandsLoading={brandsLoading}
-            categories={filteredCategories}
+            categories={categories}
             categoriesLoading={categoriesLoading}
-            subCategories={filteredSubCategories}
+            subCategories={subCategories}
             subCategoriesLoading={subCategoriesLoading}
-            subSubCategories={filteredSubSubCategories}
+            subSubCategories={subSubCategories}
             subSubCategoriesLoading={subSubCategoriesLoading}
           />
 

@@ -7,7 +7,8 @@ const BottomCarouselList = ({
   error, 
   onEdit, 
   onDelete, 
-  onAddCarousel 
+  onAddCarousel,
+  onToggleStatus
 }) => {
   
   if (loading) {
@@ -69,6 +70,7 @@ const BottomCarouselList = ({
             carousel={carousel} 
             onEdit={onEdit} 
             onDelete={onDelete}
+            onToggleStatus={onToggleStatus}
           />
         ))}
       </div>
@@ -77,7 +79,7 @@ const BottomCarouselList = ({
 };
 
 // Individual Carousel Card Component
-const BottomCarouselCard = ({ carousel, onEdit, onDelete }) => (
+const BottomCarouselCard = ({ carousel, onEdit, onDelete, onToggleStatus }) => (
   <div className="bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200 overflow-hidden">
     {/* Carousel Image */}
     <div className="h-48 bg-gray-200 overflow-hidden">
@@ -128,6 +130,18 @@ const BottomCarouselCard = ({ carousel, onEdit, onDelete }) => (
         >
           Edit
         </button>
+        {onToggleStatus && (
+          <button
+            onClick={() => onToggleStatus(carousel)}
+            className={`px-3 py-1 rounded-md text-sm transition-colors duration-200 font-medium ${
+              carousel.isActive
+                ? 'bg-yellow-100 text-yellow-700 hover:bg-yellow-200'
+                : 'bg-green-100 text-green-700 hover:bg-green-200'
+            }`}
+          >
+            {carousel.isActive ? 'Deactivate' : 'Activate'}
+          </button>
+        )}
         <button
           onClick={() => onDelete(carousel)}
           className="text-red-600 hover:text-red-800 font-medium py-1 px-3 rounded-md transition-colors duration-200 text-sm"

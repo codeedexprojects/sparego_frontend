@@ -7,7 +7,8 @@ const MainCarouselList = ({
   error, 
   onEdit, 
   onDelete, 
-  onAddCarousel 
+  onAddCarousel,
+  onToggleStatus
 }) => {
   
   if (loading) {
@@ -69,6 +70,7 @@ const MainCarouselList = ({
             carousel={carousel} 
             onEdit={onEdit} 
             onDelete={onDelete}
+            onToggleStatus={onToggleStatus}
           />
         ))}
       </div>
@@ -77,7 +79,7 @@ const MainCarouselList = ({
 };
 
 // Individual Carousel Card Component
-const MainCarouselCard = ({ carousel, onEdit, onDelete }) => {
+const MainCarouselCard = ({ carousel, onEdit, onDelete, onToggleStatus }) => {
   // Create a unique key for each product with multiple fallbacks
   const getProductKey = (product, index) => {
     return product._id || product.id || `product-${index}-${product.name}`;
@@ -158,6 +160,18 @@ const MainCarouselCard = ({ carousel, onEdit, onDelete }) => {
           >
             Edit
           </button>
+          {onToggleStatus && (
+            <button
+              onClick={() => onToggleStatus(carousel)}
+              className={`px-3 py-1 rounded-md text-sm transition-colors duration-200 font-medium ${
+                carousel.isActive
+                  ? 'bg-yellow-100 text-yellow-700 hover:bg-yellow-200'
+                  : 'bg-green-100 text-green-700 hover:bg-green-200'
+              }`}
+            >
+              {carousel.isActive ? 'Deactivate' : 'Activate'}
+            </button>
+          )}
           <button
             onClick={() => onDelete(carousel)}
             className="text-red-600 hover:text-red-800 disabled:text-red-400 font-medium py-1 px-3 rounded-md transition-colors duration-200 text-sm"

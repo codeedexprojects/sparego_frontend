@@ -8,7 +8,8 @@ import {
   fetchHomeCarousels, 
   addHomeCarousel, 
   editHomeCarousel, 
-  deleteHomeCarousel 
+  deleteHomeCarousel,
+  toggleHomeCarouselStatus
 } from "../../../redux/slices/adminHomeCarouselSlice";
 import DeleteConfirmationModal from "../main-categories/components/DeleteModal";
 import HomeCarouselHeader from "./components/HomeCarouselHeader";
@@ -134,6 +135,20 @@ const HomeCarouselManager = () => {
     }
   };
 
+  const handleToggleStatus = async (carousel) => {
+    try {
+      const newStatus = !carousel.isActive;
+      await dispatch(toggleHomeCarouselStatus({ 
+        id: carousel._id, 
+        currentStatus: carousel.isActive 
+      })).unwrap();
+      toast.success(newStatus ? 'Home carousel activated successfully' : 'Home carousel deactivated successfully');
+      dispatch(fetchHomeCarousels());
+    } catch (error) {
+      toast.error(error?.message || 'Failed to update home carousel status');
+    }
+  };
+
   const getSelectedProducts = () => {
     return products.filter(product => formData.products.includes(product._id));
   };
@@ -159,6 +174,7 @@ const HomeCarouselManager = () => {
             onEdit={openEditModal}
             onDelete={setDeleteConfirm}
             onAddCarousel={openAddModal}
+            onToggleStatus={handleToggleStatus}
           />
 
           {/* Pagination */}

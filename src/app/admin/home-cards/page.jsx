@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import ProtectedRoute from '../../../components/admin/ProtectedRoute';
 import HomeCardTable from "./components/HomeCardTable/HomeCardTable";
 import { 
-  getHomeCards, 
+  getHomeCardsForAdmin, 
   createHomeCard, 
   updateHomeCard, 
   deleteHomeCard, 
@@ -21,7 +21,7 @@ const HomeCardsPage = () => {
 
   // Fetch home cards on mount
   useEffect(() => {
-    dispatch(getHomeCards());
+    dispatch(getHomeCardsForAdmin());
   }, [dispatch]);
 
 
@@ -48,6 +48,8 @@ const HomeCardsPage = () => {
   const handleAddHomeCard = async (homeCardData) => {
     try {
       await dispatch(createHomeCard(homeCardData)).unwrap();
+      // Refetch home cards to ensure UI is in sync
+      await dispatch(getHomeCardsForAdmin());
     } catch (error) {
       console.error("Failed to add home card:", error?.message || error);
     }
@@ -57,6 +59,8 @@ const HomeCardsPage = () => {
     try {
       const homeCardId = oldHomeCard._id || oldHomeCard.id;
       await dispatch(updateHomeCard({ id: homeCardId, homeCardData: newData })).unwrap();
+      // Refetch home cards to ensure UI is in sync
+      await dispatch(getHomeCardsForAdmin());
     } catch (error) {
       console.error("Failed to update home card:", error?.message || error);
     }
@@ -66,6 +70,8 @@ const HomeCardsPage = () => {
     try {
       const homeCardId = homeCardToDelete._id || homeCardToDelete.id;
       await dispatch(deleteHomeCard(homeCardId)).unwrap();
+      // Refetch home cards to ensure UI is in sync
+      await dispatch(getHomeCardsForAdmin());
     } catch (error) {
       console.error("Failed to delete home card:", error?.message || error);
     }
@@ -78,6 +84,8 @@ const HomeCardsPage = () => {
         id: homeCardId, 
         currentStatus: homeCardToToggle.isActive 
       })).unwrap();
+      // Refetch home cards to ensure UI is in sync
+      await dispatch(getHomeCardsForAdmin());
     } catch (error) {
       console.error("Failed to toggle home card status:", error?.message || error);
     }

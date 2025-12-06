@@ -79,6 +79,23 @@ export const deleteBottomCarousel = createAsyncThunk(
   }
 );
 
+// Toggle bottom carousel status
+export const toggleBottomCarouselStatus = createAsyncThunk(
+  "adminBottomCarousel/toggleBottomCarouselStatus",
+  async ({ id, currentStatus }, { rejectWithValue }) => {
+    try {
+      const res = await axios.patch(
+        `${BASE_URL}/bottom-carousel/${id}`,
+        { isActive: !currentStatus },
+        { headers: { Authorization: `Bearer ${getToken()}` } }
+      );
+      return res.data;
+    } catch (err) {
+      return rejectWithValue(err.response?.data?.message || err.message);
+    }
+  }
+);
+
 const adminBottomCarouselSlice = createSlice({
   name: "adminBottomCarousel",
   initialState: {
@@ -151,6 +168,24 @@ const adminBottomCarouselSlice = createSlice({
         );
       })
       .addCase(deleteBottomCarousel.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      // Toggle Status
+      .addCase(toggleBottomCarouselStatus.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(toggleBottomCarouselStatus.fulfilled, (state, action) => {
+        state.loading = false;
+        const index = state.bottomCarousels.findIndex(
+          (c) => c._id === action.payload._id
+        );
+        if (index !== -1) {
+          state.bottomCarousels[index] = action.payload;
+        }
+      })
+      .addCase(toggleBottomCarouselStatus.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       });

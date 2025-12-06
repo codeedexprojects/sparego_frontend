@@ -77,6 +77,23 @@ export const deleteDealBanner = createAsyncThunk(
   }
 );
 
+// Toggle banner status
+export const toggleDealBannerStatus = createAsyncThunk(
+  "adminDealBanner/toggleDealBannerStatus",
+  async ({ id, currentStatus }, { rejectWithValue }) => {
+    try {
+      const res = await axios.patch(
+        `${BASE_URL}/deal-banner/${id}`,
+        { isActive: !currentStatus },
+        { headers: getAuthHeaders() }
+      );
+      return res.data;
+    } catch (err) {
+      return rejectWithValue(err.response?.data?.message || err.message);
+    }
+  }
+);
+
 const adminDealBannerSlice = createSlice({
   name: "adminDealBanner",
   initialState: {
@@ -122,6 +139,22 @@ const adminDealBannerSlice = createSlice({
       .addCase(deleteDealBanner.fulfilled, (state, action) => {
         state.banners = state.banners.filter((b) => b._id !== action.payload);
         state.total -= 1;
+      })
+      // Toggle banner status
+      .addCase(toggleDealBannerStatus.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(toggleDealBannerStatus.fulfilled, (state, action) => {
+        state.loading = false;
+        const index = state.banners.findIndex((b) => b._id === action.payload._id);
+        if (index !== -1) {
+          state.banners[index] = action.payload;
+        }
+      })
+      .addCase(toggleDealBannerStatus.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
       });
   },
 });

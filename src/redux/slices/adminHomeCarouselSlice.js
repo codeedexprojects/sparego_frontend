@@ -82,6 +82,23 @@ export const deleteHomeCarousel = createAsyncThunk(
   }
 );
 
+// Toggle home carousel status
+export const toggleHomeCarouselStatus = createAsyncThunk(
+  "adminHomeCarousel/toggleHomeCarouselStatus",
+  async ({ id, currentStatus }, { rejectWithValue }) => {
+    try {
+      const res = await axios.patch(
+        `${BASE_URL}/home-carousel/${id}`,
+        { isActive: !currentStatus },
+        { headers: { Authorization: `Bearer ${getToken()}` } }
+      );
+      return res.data;
+    } catch (err) {
+      return rejectWithValue(err.response?.data?.message || err.message);
+    }
+  }
+);
+
 const adminHomeCarouselSlice = createSlice({
   name: "adminHomeCarousel",
   initialState: {
@@ -126,6 +143,24 @@ const adminHomeCarouselSlice = createSlice({
         state.homeCarouselList = state.homeCarouselList.filter(
           (c) => c._id !== action.payload
         );
+      })
+      // Toggle Status
+      .addCase(toggleHomeCarouselStatus.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(toggleHomeCarouselStatus.fulfilled, (state, action) => {
+        state.loading = false;
+        const index = state.homeCarouselList.findIndex(
+          (c) => c._id === action.payload._id
+        );
+        if (index !== -1) {
+          state.homeCarouselList[index] = action.payload;
+        }
+      })
+      .addCase(toggleHomeCarouselStatus.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
       });
   },
 });

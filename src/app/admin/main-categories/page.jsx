@@ -8,6 +8,7 @@ import {
   addMainCategory,
   editMainCategory,
   deleteMainCategory,
+  toggleMainCategoryStatus,
 } from "../../../redux/slices/adminMainCategorySlice";
 import MainCategoryHeader from "./components/MainCategoryHeader";
 import MainCategoryList from "./components/MainCategoryList";
@@ -122,6 +123,20 @@ const MainCategoryManager = () => {
     }
   };
 
+  const handleToggleStatus = async (category) => {
+    try {
+      const newStatus = !category.isActive;
+      await dispatch(toggleMainCategoryStatus({ 
+        id: category._id, 
+        currentStatus: category.isActive 
+      })).unwrap();
+      toast.success(newStatus ? 'Main category activated successfully' : 'Main category deactivated successfully');
+      dispatch(fetchMainCategories());
+    } catch (error) {
+      toast.error(error?.message || 'Failed to update main category status');
+    }
+  };
+
   return (
     <ProtectedRoute>
       <div className="min-h-screen">
@@ -140,6 +155,7 @@ const MainCategoryManager = () => {
             onEdit={openEditModal}
             onDelete={setDeleteConfirm}
             onAddCategory={openAddModal}
+            onToggleStatus={handleToggleStatus}
           />
 
           {/* Pagination */}

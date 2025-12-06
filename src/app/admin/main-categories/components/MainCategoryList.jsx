@@ -1,7 +1,7 @@
 // components/MainCategoryList.jsx
 import React from 'react';
 
-const MainCategoryList = ({ categories, loading, error, onEdit, onDelete, onAddCategory }) => {
+const MainCategoryList = ({ categories, loading, error, onEdit, onDelete, onAddCategory, onToggleStatus }) => {
   if (loading) {
     return (
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
@@ -71,7 +71,8 @@ const MainCategoryList = ({ categories, loading, error, onEdit, onDelete, onAddC
                 key={cat._id} 
                 category={cat} 
                 onEdit={onEdit} 
-                onDelete={onDelete} 
+                onDelete={onDelete}
+                onToggleStatus={onToggleStatus}
               />
             ))}
           </tbody>
@@ -82,7 +83,7 @@ const MainCategoryList = ({ categories, loading, error, onEdit, onDelete, onAddC
 };
 
 // Individual Category Row Component
-const CategoryRow = ({ category, onEdit, onDelete }) => (
+const CategoryRow = ({ category, onEdit, onDelete, onToggleStatus }) => (
   <tr className="hover:bg-gray-50 transition-colors duration-150">
     <td className="px-6 py-4 whitespace-nowrap">
       <div className="flex items-center">
@@ -130,6 +131,18 @@ const CategoryRow = ({ category, onEdit, onDelete }) => (
         >
           Edit
         </button>
+        {onToggleStatus && (
+          <button
+            onClick={() => onToggleStatus(category)}
+            className={`px-3 py-1 rounded-md text-sm transition-colors duration-200 ${
+              category.isActive
+                ? 'bg-yellow-100 text-yellow-700 hover:bg-yellow-200'
+                : 'bg-green-100 text-green-700 hover:bg-green-200'
+            }`}
+          >
+            {category.isActive ? 'Deactivate' : 'Activate'}
+          </button>
+        )}
         <button
           onClick={() => onDelete(category)}
           className="text-red-600 hover:text-red-900 bg-red-50 hover:bg-red-100 px-3 py-1 rounded-md text-sm transition-colors duration-200"

@@ -1,6 +1,6 @@
 import { IMG_URL } from '../../../../../redux/baseUrl';
 
-const BrandTableRow = ({ brand, onEdit, onDelete, brandType, sections = [] }) => {
+const BrandTableRow = ({ brand, onEdit, onDelete, onToggleStatus, brandType, sections = [] }) => {
   if (!brand || typeof brand !== 'object') {
     return (
       <div className="bg-white rounded-lg shadow-md border border-gray-200 overflow-hidden">
@@ -83,6 +83,18 @@ const BrandTableRow = ({ brand, onEdit, onDelete, brandType, sections = [] }) =>
           >
             Edit
           </button>
+          {onToggleStatus && (
+            <button
+              onClick={() => onToggleStatus(brand)}
+              className={`px-3 py-2 text-sm rounded-md transition-colors ${
+                brand.isActive
+                  ? 'bg-yellow-100 text-yellow-700 hover:bg-yellow-200'
+                  : 'bg-green-100 text-green-700 hover:bg-green-200'
+              }`}
+            >
+              {brand.isActive ? 'Deactivate' : 'Activate'}
+            </button>
+          )}
           <button
             onClick={() => onDelete(brand)}
             className="px-3 py-2 bg-red-600 text-white text-sm rounded-md hover:bg-red-700 transition-colors"

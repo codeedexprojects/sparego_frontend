@@ -7,6 +7,7 @@ import {
   addSubCategory,
   editSubCategory,
   deleteSubCategory,
+  toggleSubCategoryStatus,
 } from "../../../redux/slices/adminSubCategorySlice";
 import { fetchCategories } from "../../../redux/slices/adminCategorySlice";
 import { getHomeCards } from "../../../redux/slices/adminHomeCardSlice";
@@ -117,8 +118,8 @@ const SubCategoryManager = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     // Validate form
-    if (!formData.section || !formData.category) {
-      toast.error("Please select both section and category");
+    if ( !formData.category) {
+      toast.error("Please select category");
       return;
     }
     
@@ -159,6 +160,20 @@ const SubCategoryManager = () => {
     }
   };
 
+  const handleToggleStatus = async (subCategory) => {
+    try {
+      const newStatus = !subCategory.isActive;
+      await dispatch(toggleSubCategoryStatus({ 
+        id: subCategory._id, 
+        currentStatus: subCategory.isActive 
+      })).unwrap();
+      toast.success(newStatus ? 'Sub-category activated successfully' : 'Sub-category deactivated successfully');
+      dispatch(fetchSubCategories());
+    } catch (error) {
+      toast.error(error?.message || 'Failed to update sub-category status');
+    }
+  };
+
   return (
     <ProtectedRoute>
       <div className="min-h-screen">
@@ -177,6 +192,7 @@ const SubCategoryManager = () => {
             onEdit={openEditModal}
             onDelete={setDeleteConfirm}
             onAddCategory={openAddModal}
+            onToggleStatus={handleToggleStatus}
           />
 
           {/* Pagination */}

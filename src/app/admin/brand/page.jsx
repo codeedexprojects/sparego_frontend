@@ -9,9 +9,11 @@ import {
   createBrand,
   updateBrand,
   deleteBrand,
+  toggleBrandStatus,
   clearError,
   clearSuccess,
 } from "../../../redux/slices/adminBrandSlice";
+import { toast } from 'sonner';
 import { getHomeCards } from "../../../redux/slices/adminHomeCardSlice"; 
 
 const BrandPage = ({ 
@@ -99,6 +101,23 @@ const BrandPage = ({
     }
   };
 
+  const handleToggleStatus = async (brand) => {
+    try {
+      const brandId = brand.id || brand._id;
+      const newStatus = !brand.isActive;
+      await dispatch(toggleBrandStatus({ 
+        id: brandId, 
+        brandType: activeTab,
+        currentStatus: brand.isActive 
+      })).unwrap();
+      toast.success(newStatus ? 'Brand activated successfully' : 'Brand deactivated successfully');
+      // Refetch brands to update the list
+      dispatch(getBrands(activeTab));
+    } catch (error) {
+      toast.error(error?.message || 'Failed to update brand status');
+    }
+  };
+
   return (
     <ProtectedRoute>
       <div className="min-h-screen bg-gray-50 py-6">
@@ -139,6 +158,7 @@ const BrandPage = ({
               onAddBrand={handleAddBrand}
               onEditBrand={handleEditBrand}
               onDeleteBrand={handleDeleteBrand}
+              onToggleStatus={handleToggleStatus}
               brandType={activeTab}
             />
           </div>

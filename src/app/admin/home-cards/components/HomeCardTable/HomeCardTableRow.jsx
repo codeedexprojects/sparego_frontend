@@ -20,18 +20,23 @@ const HomeCardTableRow = ({ homeCard, onEdit, onDelete, onToggleStatus }) => {
 
       {/* Home Card Details */}
       <div className="flex-1 mb-4">
-        <h3 className="text-lg font-semibold text-gray-800 mb-2">{homeCard.title}</h3>
+        <div className="flex items-center justify-between mb-2">
+          <h3 className="text-lg font-semibold text-gray-800">{homeCard.title}</h3>
+          <span className={`px-2.5 py-0.5 text-xs font-medium rounded-full ${
+            homeCard.isActive 
+              ? 'bg-green-100 text-green-800' 
+              : 'bg-gray-100 text-gray-600'
+          }`}>
+            {homeCard.isActive ? 'Active' : 'Inactive'}
+          </span>
+        </div>
         <p className="text-sm text-gray-600 mb-3 line-clamp-2">{homeCard.description}</p>
         
         <div className="flex items-center gap-2 mb-3">
-          
-          
           <span className="px-2.5 py-0.5 bg-blue-100 text-blue-800 text-xs rounded-full">
             {homeCard.buttonText || "Shop Now"}
           </span>
         </div>
-        
-        
       </div>
 
       {/* Actions */}
@@ -47,7 +52,7 @@ const HomeCardTableRow = ({ homeCard, onEdit, onDelete, onToggleStatus }) => {
             Edit
           </button>
         )}
-        {/* {onToggleStatus && (
+        {onToggleStatus && (
           <button 
             onClick={() => onToggleStatus(homeCard)}
             className={`px-3 py-2 text-sm rounded-lg transition-colors flex items-center gap-1 ${
@@ -65,7 +70,7 @@ const HomeCardTableRow = ({ homeCard, onEdit, onDelete, onToggleStatus }) => {
             </svg>
             {homeCard.isActive ? 'Deactivate' : 'Activate'}
           </button>
-        )} */}
+        )}
         {onDelete && (
           <button 
             onClick={() => onDelete(homeCard)}

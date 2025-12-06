@@ -8,6 +8,7 @@ import {
   addDealBanner,
   editDealBanner,
   deleteDealBanner,
+  toggleDealBannerStatus,
 } from "../../../redux/slices/adminDealBannerSlice";
 import { getAllProducts } from "../../../redux/slices/adminProductSlice";
 import DeleteConfirmationModal from "../main-categories/components/DeleteModal";
@@ -225,6 +226,20 @@ const DealBannerManager = () => {
     }
   };
 
+  const handleToggleStatus = async (banner) => {
+    try {
+      const newStatus = !banner.isActive;
+      await dispatch(toggleDealBannerStatus({ 
+        id: banner._id, 
+        currentStatus: banner.isActive 
+      })).unwrap();
+      toast.success(newStatus ? 'Deal banner activated successfully' : 'Deal banner deactivated successfully');
+      dispatch(fetchDealBanners(filters));
+    } catch (error) {
+      toast.error(error?.message || 'Failed to update deal banner status');
+    }
+  };
+
   return (
     <ProtectedRoute>
       <div className="min-h-screen">
@@ -246,6 +261,7 @@ const DealBannerManager = () => {
             onEdit={openEditModal}
             onDelete={setDeleteConfirm}
             onAddBanner={openAddModal}
+            onToggleStatus={handleToggleStatus}
             pageOptions={pageOptions}
           />
 

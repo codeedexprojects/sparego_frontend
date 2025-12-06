@@ -1,6 +1,7 @@
 import React from 'react';
+import { IMG_URL } from '../../../../redux/baseUrl';
 
-const CategoryList = ({ categories, loading, error, onEdit, onDelete, onAddCategory }) => {
+const CategoryList = ({ categories, loading, error, onEdit, onDelete, onAddCategory, onToggleStatus }) => {
   if (loading) {
     return (
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
@@ -70,7 +71,8 @@ const CategoryList = ({ categories, loading, error, onEdit, onDelete, onAddCateg
                 key={cat._id} 
                 category={cat} 
                 onEdit={onEdit} 
-                onDelete={onDelete} 
+                onDelete={onDelete}
+                onToggleStatus={onToggleStatus}
               />
             ))}
           </tbody>
@@ -81,13 +83,17 @@ const CategoryList = ({ categories, loading, error, onEdit, onDelete, onAddCateg
 };
 
 // Individual Category Row Component
-const CategoryRow = ({ category, onEdit, onDelete }) => (
+const CategoryRow = ({ category, onEdit, onDelete, onToggleStatus }) => (
   <tr className="hover:bg-gray-50 transition-colors duration-150">
     <td className="px-6 py-4 whitespace-nowrap">
       <div className="flex items-center">
         <div className="flex-shrink-0 h-10 w-10">
           {category.image ? (
-            <img className="h-10 w-10 rounded-lg object-cover" src={category.image} alt={category.name} />
+            <img 
+              className="h-10 w-10 rounded-lg object-cover" 
+              src={category.image.startsWith('http') ? category.image : `${IMG_URL}/${category.image}`} 
+              alt={category.name} 
+            />
           ) : (
             <div className="h-10 w-10 rounded-lg bg-gray-100 flex items-center justify-center">
               <svg className="h-6 w-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -129,6 +135,18 @@ const CategoryRow = ({ category, onEdit, onDelete }) => (
         >
           Edit
         </button>
+        {onToggleStatus && (
+          <button
+            onClick={() => onToggleStatus(category)}
+            className={`px-3 py-1 rounded-md text-sm transition-colors duration-200 ${
+              category.isActive
+                ? 'bg-yellow-100 text-yellow-700 hover:bg-yellow-200'
+                : 'bg-green-100 text-green-700 hover:bg-green-200'
+            }`}
+          >
+            {category.isActive ? 'Deactivate' : 'Activate'}
+          </button>
+        )}
         <button
           onClick={() => onDelete(category)}
           className="text-red-600 hover:text-red-900 bg-red-50 hover:bg-red-100 px-3 py-1 rounded-md text-sm transition-colors duration-200"

@@ -8,7 +8,8 @@ import {
   fetchBottomCarousels,
   addBottomCarousel,
   editBottomCarousel,
-  deleteBottomCarousel
+  deleteBottomCarousel,
+  toggleBottomCarouselStatus
 } from "../../../redux/slices/adminBottomCarouselSlice";
 import DeleteConfirmationModal from "../main-categories/components/DeleteModal";
 import BottomCarouselHeader from "./components/BottomCarouselHeader";
@@ -125,6 +126,20 @@ const BottomCarouselManager = () => {
     }
   };
 
+  const handleToggleStatus = async (carousel) => {
+    try {
+      const newStatus = !carousel.isActive;
+      await dispatch(toggleBottomCarouselStatus({ 
+        id: carousel._id, 
+        currentStatus: carousel.isActive 
+      })).unwrap();
+      toast.success(newStatus ? 'Bottom carousel activated successfully' : 'Bottom carousel deactivated successfully');
+      dispatch(fetchBottomCarousels());
+    } catch (error) {
+      toast.error(error?.message || 'Failed to update bottom carousel status');
+    }
+  };
+
   // Pagination calculations
   const totalPages = Math.ceil(bottomCarousels.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
@@ -146,6 +161,7 @@ const BottomCarouselManager = () => {
             onEdit={openEditModal}
             onDelete={setDeleteConfirm}
             onAddCarousel={openAddModal}
+            onToggleStatus={handleToggleStatus}
           />
 
           {/* Pagination */}

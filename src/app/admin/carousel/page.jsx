@@ -88,12 +88,18 @@ const CarouselsPage = () => {
 
   const handleToggleStatus = async (carouselType, carouselToToggle) => {
     try {
+      const newStatus = !carouselToToggle.isActive;
       await dispatch(toggleCarouselStatus({
         carouselType,
         carouselId: (carouselToToggle._id || carouselToToggle.id),
         currentStatus: carouselToToggle.isActive
       })).unwrap();
-      toast.success(`Carousel ${carouselToToggle.isActive ? 'disabled' : 'enabled'}`);
+      const carouselTypeName = carouselType === 'main' ? 'Main Carousel' : carouselType === 'bottom' ? 'Bottom Carousel' : 'Home Carousel';
+      toast.success(`${carouselTypeName} ${newStatus ? 'activated' : 'deactivated'} successfully`);
+      // Refetch carousels to update the list
+      dispatch(getCarousels("main"));
+      dispatch(getCarousels("bottom"));
+      dispatch(getCarousels("home"));
     } catch (error) {
       const message = error?.message || "Failed to toggle carousel status";
       console.error("Failed to toggle carousel status:", message);

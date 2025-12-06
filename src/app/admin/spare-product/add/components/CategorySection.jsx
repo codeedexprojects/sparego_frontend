@@ -48,7 +48,7 @@ const CategorySection = ({
       <h3 className="text-lg font-semibold text-gray-900 mb-4">Categorization</h3>
       <div className="space-y-4">
         {/* Section */}
-        <div>
+        {/* <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Section <span className="text-red-500">*</span>
           </label>
@@ -68,7 +68,7 @@ const CategorySection = ({
               </option>
             ))}
           </select>
-        </div>
+        </div> */}
 
         {/* Brand - Available regardless of section selection */}
         <div>
@@ -85,11 +85,13 @@ const CategorySection = ({
             <option value="">
               {brandsLoading ? 'Loading brands...' : 'Select Brand'}
             </option>
-            {brands.map((brand) => (
-              <option key={brand._id} value={brand._id}>
-                {brand.name}
-              </option>
-            ))}
+            {brands
+              .filter(brand => !brand.section || (typeof brand.section === 'object' && !brand.section._id))
+              .map((brand) => (
+                <option key={brand._id} value={brand._id}>
+                  {brand.name}
+                </option>
+              ))}
           </select>
         </div>
 
@@ -110,11 +112,13 @@ const CategorySection = ({
               <option value="">
                 {categoriesLoading ? 'Loading...' : 'Select Category'}
               </option>
-              {categories.map((category) => (
-                <option key={category._id} value={category._id}>
-                  {category.name}
-                </option>
-              ))}
+              {categories
+                .filter(category => !category.section || (typeof category.section === 'object' && !category.section._id))
+                .map((category) => (
+                  <option key={category._id} value={category._id}>
+                    {category.name}
+                  </option>
+                ))}
             </select>
           </div>
 

@@ -7,7 +7,8 @@ const HomeCarouselList = ({
   error, 
   onEdit, 
   onDelete, 
-  onAddCarousel 
+  onAddCarousel,
+  onToggleStatus
 }) => {
   
   console.log("HomeCarouselList received:", { carousels, loading, error });
@@ -77,6 +78,7 @@ const HomeCarouselList = ({
             carousel={carousel} 
             onEdit={onEdit} 
             onDelete={onDelete}
+            onToggleStatus={onToggleStatus}
           />
         ))}
       </div>
@@ -85,7 +87,7 @@ const HomeCarouselList = ({
 };
 
 // Individual Carousel Card Component
-const HomeCarouselCard = ({ carousel, onEdit, onDelete }) => {
+const HomeCarouselCard = ({ carousel, onEdit, onDelete, onToggleStatus }) => {
   console.log("Rendering carousel card:", carousel);
   
   return (
@@ -160,6 +162,18 @@ const HomeCarouselCard = ({ carousel, onEdit, onDelete }) => {
           >
             Edit
           </button>
+          {onToggleStatus && (
+            <button
+              onClick={() => onToggleStatus(carousel)}
+              className={`px-3 py-1 rounded-md text-sm transition-colors duration-200 font-medium ${
+                carousel.isActive
+                  ? 'bg-yellow-100 text-yellow-700 hover:bg-yellow-200'
+                  : 'bg-green-100 text-green-700 hover:bg-green-200'
+              }`}
+            >
+              {carousel.isActive ? 'Deactivate' : 'Activate'}
+            </button>
+          )}
           <button
             onClick={() => onDelete(carousel)}
             className="text-red-600 hover:text-red-800 disabled:text-red-400 font-medium py-1 px-3 rounded-md transition-colors duration-200 text-sm"

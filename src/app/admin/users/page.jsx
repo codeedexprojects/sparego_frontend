@@ -11,6 +11,7 @@ import {
   clearError,
   clearOperationSuccess 
 } from "../../../redux/slices/adminUserManagementSlice";
+import { toast } from 'sonner';
 
 const UsersPage = () => {
   const router = useRouter();
@@ -29,9 +30,33 @@ const UsersPage = () => {
   useEffect(() => { if (error) { const t = setTimeout(() => dispatch(clearError()), 4000); return () => clearTimeout(t); } }, [error, dispatch]);
   useEffect(() => { if (operationSuccess) { const t = setTimeout(() => dispatch(clearOperationSuccess()), 3000); return () => clearTimeout(t); } }, [operationSuccess, dispatch]);
 
-  const handleViewUser = (user) => { const userId = user._id || user.id; router.push(`/admin/users/${userId}`); };
-  const handleToggleUserStatus = async (user) => { await dispatch(toggleUserStatus({ id: user._id || user.id, currentStatus: user.isActive })).unwrap(); };
-  const handleBulkToggleStatus = async (userIds, status) => { await dispatch(bulkToggleUserStatus({ userIds, status })).unwrap(); };
+  const handleViewUser = (user) => { 
+    const userId = user._id || user.id; 
+    router.push(`/admin/users/${userId}`); 
+  };
+  
+  const handleToggleUserStatus = async (user) => {
+    try {
+      const newStatus = !user.isActive;
+      await dispatch(toggleUserStatus({ id: user._id || user.id, currentStatus: user.isActive })).unwrap();
+      toast.success(newStatus ? 'User activated successfully' : 'User deactivated successfully');
+      // Refetch users to update the list
+      dispatch(getAllUsers({ page: currentPage || page, limit: 10 }));
+    } catch (error) {
+      toast.error(error?.message || 'Failed to update user status');
+    }
+  };
+  
+  const handleBulkToggleStatus = async (userIds, status) => {
+    try {
+      await dispatch(bulkToggleUserStatus({ userIds, status })).unwrap();
+      toast.success(`${userIds.length} user(s) ${status ? 'activated' : 'deactivated'} successfully`);
+      // Refetch users to update the list
+      dispatch(getAllUsers({ page: currentPage || page, limit: 10 }));
+    } catch (error) {
+      toast.error(error?.message || 'Failed to update user status');
+    }
+  };
 
   return (
     <ProtectedRoute>

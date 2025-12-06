@@ -78,8 +78,11 @@ export default function Sidebar() {
 
   useEffect(() => {
     if (homeCards && homeCards.length > 0) {
-      // Create dynamic product items from home cards
-      const dynamicProductItems = homeCards.map(card => {
+      // Filter to only show active home cards
+      const activeHomeCards = homeCards.filter(card => card.isActive === true);
+      
+      // Create dynamic product items from active home cards
+      const dynamicProductItems = activeHomeCards.map(card => {
         const cardId = card._id || card.id;
         const path = cardId ? `/admin/product/${cardId}` : "/admin/home-cards";
         
@@ -286,7 +289,7 @@ return {
             <div className="text-red-400">Failed to load products</div>
           ) : (
             <div>
-              {homeCards?.length || 0} dynamic products
+              {homeCards?.filter(card => card.isActive === true).length || 0} active products
             </div>
           )}
         </div>

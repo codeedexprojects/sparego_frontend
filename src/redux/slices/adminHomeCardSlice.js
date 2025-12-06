@@ -59,6 +59,41 @@ export const getHomeCardById = createAsyncThunk(
   }
 );
 
+export const getHomeCardsForAdmin = createAsyncThunk(
+  "adminHomeCard/getHomeCardsForAdmin",
+  async (_, { rejectWithValue }) => {
+    try {
+      const token = localStorage.getItem("adminToken");
+      const response = await axios.get(`${BASE_URL}/home-card/admin`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+      console.log("Home cards for admin response:", response.data);
+      
+      // Handle response structure: { success: true, count: cards.length, cards }
+      if (response.data?.success && response.data?.cards) {
+        return {
+          cards: response.data.cards,
+          count: response.data.count || response.data.cards.length
+        };
+      }
+      
+      // Fallback if response structure is different
+      return {
+        cards: Array.isArray(response.data) ? response.data : response.data?.cards || [],
+        count: response.data?.count || 0
+      };
+    } catch (error) {
+      console.error("Error fetching home cards for admin:", error);
+      return rejectWithValue({
+        message: error?.response?.data?.message || error.message || "Failed to fetch home cards for admin",
+        status: error?.response?.status
+      });
+    }
+  }
+);
+
 // POST Operations
 export const createHomeCard = createAsyncThunk(
   "adminHomeCard/createHomeCard",
@@ -227,6 +262,7 @@ const initialState = {
   error: null,
   operationSuccess: null,
   selectedHomeCards: [],
+  cardsCount: 0,
 };
 
 // Slice
@@ -275,6 +311,22 @@ const adminHomeCardSlice = createSlice({
         state.error = null;
       })
       .addCase(getHomeCardById.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      
+      // Get Home Cards For Admin
+      .addCase(getHomeCardsForAdmin.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(getHomeCardsForAdmin.fulfilled, (state, action) => {
+        state.loading = false;
+        state.homeCards = action.payload.cards || [];
+        state.cardsCount = action.payload.count || 0;
+        state.error = null;
+      })
+      .addCase(getHomeCardsForAdmin.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       })

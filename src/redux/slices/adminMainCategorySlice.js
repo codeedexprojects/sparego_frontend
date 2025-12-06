@@ -72,6 +72,24 @@ export const deleteMainCategory = createAsyncThunk(
   }
 );
 
+// PATCH - toggle main category status
+export const toggleMainCategoryStatus = createAsyncThunk(
+  "mainCategories/toggleStatus",
+  async ({ id, currentStatus }, { rejectWithValue }) => {
+    try {
+      const token = localStorage.getItem("adminToken");
+      const res = await axios.patch(
+        `${BASE_URL}/main-categories/${id}`,
+        { isActive: !currentStatus },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      return res.data;
+    } catch (err) {
+      return rejectWithValue(err.response?.data?.message || "Failed to toggle main category status");
+    }
+  }
+);
+
 const mainCategorySlice = createSlice({
   name: "mainCategories",
   initialState: {
@@ -121,6 +139,24 @@ const mainCategorySlice = createSlice({
         state.mainCategories = state.mainCategories.filter((c) => c._id !== action.payload);
       })
       .addCase(deleteMainCategory.rejected, (state, action) => {
+        state.error = action.payload;
+      });
+
+    // Toggle Status
+    builder
+      .addCase(toggleMainCategoryStatus.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(toggleMainCategoryStatus.fulfilled, (state, action) => {
+        state.loading = false;
+        const index = state.mainCategories.findIndex((c) => c._id === action.payload._id);
+        if (index !== -1) {
+          state.mainCategories[index] = action.payload;
+        }
+      })
+      .addCase(toggleMainCategoryStatus.rejected, (state, action) => {
+        state.loading = false;
         state.error = action.payload;
       });
   },

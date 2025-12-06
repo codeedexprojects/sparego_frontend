@@ -10,7 +10,8 @@ import {
   toggleUserStatus,
   clearError,
   clearOperationSuccess 
-} from "../../../../redux/slices/adminUserManagementSlice"; 
+} from "../../../../redux/slices/adminUserManagementSlice";
+import { toast } from 'sonner'; 
 
 const UserDetailPage = ({ params }) => {
   const router = useRouter();
@@ -69,7 +70,7 @@ const UserDetailPage = ({ params }) => {
   }, [operationSuccess, dispatch]);
 
   const handleBack = () => {
-    router.push("/users");
+    router.push("/admin/users");
   };
 
   const handleEdit = (user) => {
@@ -79,41 +80,34 @@ const UserDetailPage = ({ params }) => {
 
   const handleToggleStatus = async (user) => {
     try {
-      console.log("Toggle status called for user:", user);
-      console.log("User type:", typeof user);
-      console.log("User keys:", user ? Object.keys(user) : "user is null/undefined");
-      console.log("Current user from Redux:", currentUser);
-      
       // Early return if user object is empty or invalid
       if (!user || typeof user !== 'object' || Object.keys(user).length === 0) {
-        console.error("Invalid user object provided to toggle status:", user);
-        console.error("Please ensure the user data is properly loaded before attempting to toggle status");
+        toast.error('Invalid user data. Please refresh the page.');
         return;
       }
       
       const userId = user?._id || user?.id;
-      console.log("User ID:", userId, "Current status:", user?.isActive);
       
       // Validate that we have a valid user ID
       if (!userId) {
-        console.error("No valid user ID found:", user);
-        console.error("Available user properties:", user ? Object.keys(user) : "No user object");
-        console.error("This might indicate the user doesn't exist or the API returned empty data");
-        
+        toast.error('User ID not found. Please refresh the page.');
         // Try to refetch the user data
-        console.log("Attempting to refetch user data...");
         dispatch(getUserById(resolvedParams.id));
         return;
       }
       
-      const result = await dispatch(toggleUserStatus({ 
+      const newStatus = !user.isActive;
+      await dispatch(toggleUserStatus({ 
         id: userId, 
         currentStatus: user.isActive 
       })).unwrap();
       
-      console.log("Toggle status result:", result);
+      toast.success(newStatus ? 'User activated successfully' : 'User deactivated successfully');
+      
+      // Refetch user data to update the UI
+      dispatch(getUserById(resolvedParams.id));
     } catch (error) {
-      console.error("Failed to toggle user status:", error?.message || error);
+      toast.error(error?.message || 'Failed to update user status');
     }
   };
 

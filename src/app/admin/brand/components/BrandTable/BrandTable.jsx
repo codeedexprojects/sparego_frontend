@@ -10,6 +10,7 @@ const BrandTable = ({
   onAddBrand,
   onEditBrand,
   onDeleteBrand,
+  onToggleStatus,
   brandType,
   sections = [], 
 }) => {
@@ -116,6 +117,7 @@ const BrandTable = ({
               brand={brand}
               onEdit={openEditModal}
               onDelete={handleDelete}
+              onToggleStatus={onToggleStatus}
               brandType={brandType}
               sections={brandType === "product" ? sections : []}
             />

@@ -8,6 +8,7 @@ const DealBannerList = ({
   onEdit, 
   onDelete, 
   onAddBanner,
+  onToggleStatus,
   pageOptions 
 }) => {
   
@@ -75,6 +76,7 @@ const DealBannerList = ({
             banner={banner} 
             onEdit={onEdit} 
             onDelete={onDelete}
+            onToggleStatus={onToggleStatus}
             getPageLabel={getPageLabel}
           />
         ))}
@@ -84,7 +86,7 @@ const DealBannerList = ({
 };
 
 // Individual Banner Card Component
-const DealBannerCard = ({ banner, onEdit, onDelete, getPageLabel }) => (
+const DealBannerCard = ({ banner, onEdit, onDelete, onToggleStatus, getPageLabel }) => (
   <div className="bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-shadow duration-200 overflow-hidden">
     {/* Banner Image */}
     <div className="aspect-w-16 aspect-h-9 bg-gray-200 overflow-hidden">
@@ -184,6 +186,18 @@ const DealBannerCard = ({ banner, onEdit, onDelete, getPageLabel }) => (
           </svg>
           Edit
         </button>
+        {onToggleStatus && (
+          <button
+            onClick={() => onToggleStatus(banner)}
+            className={`inline-flex items-center font-medium py-1 px-3 rounded-md transition-colors duration-200 text-sm ${
+              banner.isActive
+                ? 'bg-yellow-100 text-yellow-700 hover:bg-yellow-200'
+                : 'bg-green-100 text-green-700 hover:bg-green-200'
+            }`}
+          >
+            {banner.isActive ? 'Deactivate' : 'Activate'}
+          </button>
+        )}
         <button
           onClick={() => onDelete(banner)}
           className="inline-flex items-center text-red-600 hover:text-red-800 font-medium py-1 px-3 rounded-md transition-colors duration-200 text-sm"

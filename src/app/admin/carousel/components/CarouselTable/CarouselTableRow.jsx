@@ -73,7 +73,7 @@ const CarouselTableRow = ({ carousel, carouselType, onEdit, onDelete, onToggleSt
             onClick={() => onToggleStatus(carousel)}
             className={`px-3 py-2 text-sm rounded-lg transition-colors flex items-center gap-1 ${
               carousel.isActive
-                ? 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                ? 'bg-yellow-100 text-yellow-700 hover:bg-yellow-200'
                 : 'bg-green-100 text-green-700 hover:bg-green-200'
             }`}
           >

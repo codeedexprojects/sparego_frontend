@@ -15,6 +15,7 @@ import {
   clearError,
   clearOperationSuccess 
 } from "../../../redux/slices/adminReviewSlice";
+import { toast } from 'sonner';
 
 const ReviewsPage = () => {
   const dispatch = useDispatch();
@@ -79,14 +80,16 @@ const ReviewsPage = () => {
   const handleToggleStatus = async (reviewToToggle) => {
     try {
       const reviewId = reviewToToggle._id || reviewToToggle.id;
+      const newStatus = !reviewToToggle.isActive;
       await dispatch(toggleReviewStatus({ 
         id: reviewId, 
         currentStatus: reviewToToggle.isActive 
       })).unwrap();
+      toast.success(newStatus ? 'Review activated successfully' : 'Review deactivated successfully');
       // Refresh reviews after successful status toggle
       dispatch(getAllReviews());
     } catch (error) {
-      console.error("Failed to toggle review status:", error?.message || error);
+      toast.error(error?.message || 'Failed to update review status');
     }
   };
 
@@ -106,10 +109,11 @@ const ReviewsPage = () => {
         reviewIds, 
         status 
       })).unwrap();
+      toast.success(`${reviewIds.length} review(s) ${status ? 'activated' : 'deactivated'} successfully`);
       // Refresh reviews after successful bulk status toggle
       dispatch(getAllReviews());
     } catch (error) {
-      console.error("Failed to bulk toggle review status:", error?.message || error);
+      toast.error(error?.message || 'Failed to update review status');
     }
   };
 

@@ -6,6 +6,7 @@ import { getAllProducts, toggleProductStatus } from '../../../../redux/slices/ad
 import { IMG_URL } from '../../../../redux/baseUrl';
 import Link from 'next/link';
 import Pagination from '../../../../components/shared/Pagination';
+import { toast } from 'sonner';
 
 const ProductList = () => {
   const dispatch = useDispatch();
@@ -20,10 +21,15 @@ const ProductList = () => {
     dispatch(getAllProducts({ page: currentPage, limit }));
   }, [dispatch, currentPage, limit]);
 
-  const handleToggleStatus = (id, currentStatus) => {
-    dispatch(toggleProductStatus({ id, isActive: !currentStatus })).then(() => {
+  const handleToggleStatus = async (id, currentStatus) => {
+    const newStatus = !currentStatus;
+    try {
+      await dispatch(toggleProductStatus({ id, isActive: newStatus })).unwrap();
+      toast.success(newStatus ? 'Product activated successfully' : 'Product deactivated successfully');
       dispatch(getAllProducts({ page: currentPage, limit }));
-    });
+    } catch (error) {
+      toast.error(error?.message || 'Failed to update product status');
+    }
   };
 
   const handlePageChange = (newPage) => {

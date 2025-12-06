@@ -9,7 +9,8 @@ import {
   fetchMainCarousels,
   addMainCarousel,
   editMainCarousel,
-  deleteMainCarousel
+  deleteMainCarousel,
+  toggleMainCarouselStatus
 } from "../../../redux/slices/adminMainCarouselSlice";
 import MainCarouselHeader from "./components/MainCarouselHeader";
 import MainCarouselList from "./components/MainCarouselList";
@@ -160,6 +161,20 @@ const MainCarouselManager = () => {
     }
   };
 
+  const handleToggleStatus = async (carousel) => {
+    try {
+      const newStatus = !carousel.isActive;
+      await dispatch(toggleMainCarouselStatus({ 
+        id: carousel._id, 
+        currentStatus: carousel.isActive 
+      })).unwrap();
+      toast.success(newStatus ? 'Main carousel activated successfully' : 'Main carousel deactivated successfully');
+      dispatch(fetchMainCarousels());
+    } catch (error) {
+      toast.error(error?.message || 'Failed to update main carousel status');
+    }
+  };
+
   const getSelectedProducts = () =>
     products.filter(product => 
       formData.products.includes(product._id) || 
@@ -193,6 +208,7 @@ const MainCarouselManager = () => {
             onEdit={openEditModal}
             onDelete={setDeleteConfirm}
             onAddCarousel={openAddModal}
+            onToggleStatus={handleToggleStatus}
           />
 
           {/* Pagination */}

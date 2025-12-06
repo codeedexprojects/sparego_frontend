@@ -85,9 +85,9 @@ const UserTable = ({
               </thead>
               <tbody>
                 {paginatedUsers.length > 0 ? (
-                  paginatedUsers.map(user => (
+                  paginatedUsers.map((user, index) => (
                     <UserTableRow
-                      key={user._id || user.id}
+                      key={user._id || user.id || `user-${index}`}
                       user={user}
                       onView={onViewUser}
                       onToggleStatus={onToggleUserStatus}

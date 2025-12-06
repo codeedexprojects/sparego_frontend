@@ -125,6 +125,27 @@ export const deleteBrand = createAsyncThunk(
   }
 );
 
+// TOGGLE BRAND STATUS
+export const toggleBrandStatus = createAsyncThunk(
+  'brand/toggleBrandStatus',
+  async ({ id, brandType, currentStatus }, { rejectWithValue }) => {
+    try {
+      const token = localStorage.getItem('adminToken');
+      if (!token) return rejectWithValue({ message: 'No admin token found', status: 401 });
+
+      const endpoint = brandType === 'product' ? `/brands/product/${id}/` : `/brands/vehicle/${id}/`;
+      const response = await axios.patch(
+        `${BASE_URL}${endpoint}`,
+        { isActive: !currentStatus },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || 'Failed to toggle brand status');
+    }
+  }
+);
+
 // SLICE
 const brandSlice = createSlice({
   name: 'brand',
@@ -190,7 +211,20 @@ const brandSlice = createSlice({
         state.success = true;
         state.successMessage = 'Brand deleted successfully';
       })
-      .addCase(deleteBrand.rejected, (state, action) => { state.loading = false; state.error = action.payload; });
+      .addCase(deleteBrand.rejected, (state, action) => { state.loading = false; state.error = action.payload; })
+
+      // TOGGLE BRAND STATUS
+      .addCase(toggleBrandStatus.pending, (state) => { state.loading = true; state.error = null; })
+      .addCase(toggleBrandStatus.fulfilled, (state, action) => {
+        state.loading = false;
+        const index = state.brands.findIndex(b => b._id === action.payload._id);
+        if (index !== -1) {
+          state.brands[index] = action.payload;
+        }
+        state.success = true;
+        state.successMessage = `Brand ${action.payload.isActive ? 'activated' : 'deactivated'} successfully`;
+      })
+      .addCase(toggleBrandStatus.rejected, (state, action) => { state.loading = false; state.error = action.payload; });
   }
 });
 

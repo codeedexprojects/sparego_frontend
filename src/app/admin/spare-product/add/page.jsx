@@ -48,7 +48,8 @@ const ProductForm = ({ productId, onSuccess, onCancel }) => {
     category: '',
     subCategory: '',
     subSubCategory: '',
-    productBrand: ''
+    productBrand: '',
+    compatibleVehicles: []
   });
 
   const [images, setImages] = useState([]);
@@ -137,7 +138,8 @@ const ProductForm = ({ productId, onSuccess, onCancel }) => {
         category: currentProduct.category?._id || currentProduct.category || '',
         subCategory: currentProduct.subCategory?._id || currentProduct.subCategory || '',
         subSubCategory: currentProduct.subSubCategory?._id || currentProduct.subSubCategory || '',
-        productBrand: currentProduct.productBrand?._id || currentProduct.productBrand || ''
+        productBrand: currentProduct.productBrand?._id || currentProduct.productBrand || '',
+        compatibleVehicles: currentProduct.compatibleVehicles?.map(v => v._id || v) || []
       });
       setImagePreviews(currentProduct.images || []);
     }
@@ -145,10 +147,17 @@ const ProductForm = ({ productId, onSuccess, onCancel }) => {
 
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: type === 'checkbox' ? checked : value
-    }));
+    setFormData(prev => {
+      const newData = {
+        ...prev,
+        [name]: type === 'checkbox' ? checked : value
+      };
+      // Clear compatibleVehicles when vehicleType is set to Universal
+      if (name === 'vehicleType' && value === 'Universal') {
+        newData.compatibleVehicles = [];
+      }
+      return newData;
+    });
   };
 
   const handleArrayFieldChange = (field, index, value) => {
@@ -233,6 +242,13 @@ const ProductForm = ({ productId, onSuccess, onCancel }) => {
     if (formData.subSubCategory) submitData.append("subSubCategory", formData.subSubCategory);
     if (formData.productBrand) submitData.append("productBrand", formData.productBrand);
     if (formData.section) submitData.append("section", formData.section);
+    
+    // Append compatible vehicles
+    if (formData.compatibleVehicles && formData.compatibleVehicles.length > 0) {
+      formData.compatibleVehicles.forEach((vehicleId, index) => {
+        submitData.append(`compatibleVehicles[${index}]`, vehicleId);
+      });
+    }
 
     // FIXED: Append arrays directly without JSON.stringify
     formData.specifications
@@ -350,7 +366,7 @@ const ProductForm = ({ productId, onSuccess, onCancel }) => {
           <div className="flex justify-end space-x-4 pt-6">
             <button
               type="button"
-              onClick={onCancel || (() => router.push('/admin/ssproduct'))}
+              onClick={onCancel || (() => router.push('/admin/spare-product'))}
               disabled={submitting}
               className="px-8 py-3 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors disabled:opacity-50"
             >

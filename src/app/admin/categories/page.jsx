@@ -7,6 +7,7 @@ import {
   addCategory,
   editCategory,
   deleteCategory,
+  toggleCategoryStatus,
 } from "../../../redux/slices/adminCategorySlice";
 import { getHomeCards } from "../../../redux/slices/adminHomeCardSlice";
 import DeleteConfirmationModal from "../main-categories/components/DeleteModal";
@@ -133,6 +134,20 @@ const CategoryManager = () => {
     }
   };
 
+  const handleToggleStatus = async (category) => {
+    try {
+      const newStatus = !category.isActive;
+      await dispatch(toggleCategoryStatus({ 
+        id: category._id, 
+        currentStatus: category.isActive 
+      })).unwrap();
+      toast.success(newStatus ? 'Category activated successfully' : 'Category deactivated successfully');
+      dispatch(fetchCategories());
+    } catch (error) {
+      toast.error(error?.message || 'Failed to update category status');
+    }
+  };
+
   return (
     <ProtectedRoute>
       <div className="min-h-screen">
@@ -151,6 +166,7 @@ const CategoryManager = () => {
             onEdit={openEditModal}
             onDelete={setDeleteConfirm}
             onAddCategory={openAddModal}
+            onToggleStatus={handleToggleStatus}
           />
 
           {/* Pagination */}

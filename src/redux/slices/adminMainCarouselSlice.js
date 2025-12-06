@@ -68,6 +68,23 @@ export const deleteMainCarousel = createAsyncThunk(
   }
 );
 
+// Toggle main carousel status
+export const toggleMainCarouselStatus = createAsyncThunk(
+  "adminMainCarousel/toggleMainCarouselStatus",
+  async ({ id, currentStatus }, { rejectWithValue }) => {
+    try {
+      const res = await axios.patch(
+        `${BASE_URL}/main-carousel/${id}`,
+        { isActive: !currentStatus },
+        { headers: { Authorization: `Bearer ${getToken()}` } }
+      );
+      return res.data;
+    } catch (err) {
+      return rejectWithValue(err.response?.data?.message || err.message);
+    }
+  }
+);
+
 const adminMainCarouselSlice = createSlice({
   name: "adminMainCarousel",
   initialState: {
@@ -109,6 +126,24 @@ const adminMainCarouselSlice = createSlice({
         state.mainCarousels = state.mainCarousels.filter(
           (c) => c._id !== action.payload
         );
+      })
+      // Toggle Status
+      .addCase(toggleMainCarouselStatus.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(toggleMainCarouselStatus.fulfilled, (state, action) => {
+        state.loading = false;
+        const index = state.mainCarousels.findIndex(
+          (c) => c._id === action.payload._id
+        );
+        if (index !== -1) {
+          state.mainCarousels[index] = action.payload;
+        }
+      })
+      .addCase(toggleMainCarouselStatus.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
       });
   },
 });

@@ -69,6 +69,24 @@ export const deleteSubSubCategory = createAsyncThunk(
   }
 );
 
+// PATCH - toggle sub-sub-category status
+export const toggleSubSubCategoryStatus = createAsyncThunk(
+  "adminSubSubCategory/toggleStatus",
+  async ({ id, currentStatus }, { rejectWithValue }) => {
+    try {
+      const token = localStorage.getItem("adminToken");
+      const res = await axios.patch(
+        `${BASE_URL}/sub-sub-categories/${id}`,
+        { isActive: !currentStatus },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      return res.data;
+    } catch (err) {
+      return rejectWithValue(err.response?.data?.message || "Failed to toggle sub-sub-category status");
+    }
+  }
+);
+
 const adminSubSubCategorySlice = createSlice({
   name: "adminSubSubCategory",
   initialState: {
@@ -118,6 +136,24 @@ const adminSubSubCategorySlice = createSlice({
         state.subSubCategories = state.subSubCategories.filter((c) => c._id !== action.payload);
       })
       .addCase(deleteSubSubCategory.rejected, (state, action) => {
+        state.error = action.payload;
+      });
+
+    // Toggle Status
+    builder
+      .addCase(toggleSubSubCategoryStatus.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(toggleSubSubCategoryStatus.fulfilled, (state, action) => {
+        state.loading = false;
+        const index = state.subSubCategories.findIndex((c) => c._id === action.payload._id);
+        if (index !== -1) {
+          state.subSubCategories[index] = action.payload;
+        }
+      })
+      .addCase(toggleSubSubCategoryStatus.rejected, (state, action) => {
+        state.loading = false;
         state.error = action.payload;
       });
   },
