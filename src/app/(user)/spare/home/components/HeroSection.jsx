@@ -71,10 +71,11 @@ export default function SpareHeroSection() {
         <div className="relative h-[500px] sm:h-[550px] md:h-[600px] lg:h-[500px] flex items-center">
           <div className="w-full h-full">
             {carousel.map((slide, index) => {
-              const productId = slide.products && slide.products.length > 0 
-                ? slide.products[0]._id 
-                : null;
-              
+              const productId =
+                slide.products && slide.products.length > 0
+                  ? slide.products[0]._id
+                  : null;
+
               return (
                 <div
                   key={slide._id}
@@ -82,12 +83,12 @@ export default function SpareHeroSection() {
                     index === currentSlide ? "opacity-100" : "opacity-0"
                   }`}
                 >
-                  <div className="flex flex-col lg:flex-row items-center h-full px-4 sm:px-6 lg:px-12 py-8 lg:py-0">
-                    {/* Text Content */}
-                    <div className="w-full lg:flex-1 text-center lg:text-left mb-8 lg:mb-0 lg:pr-8">
-                      {/* <h1 className="text-4xl sm:text-4xl md:text-5xl lg:text-6xl font-light text-gray-800 leading-tight mb-4 md:mb-6">
+                  <div className="flex flex-col-reverse lg:flex-row items-center h-full px-4 sm:px-6 lg:px-12 py-8 lg:py-0">
+                    {}
+                    <div className="w-full lg:flex-1 text-center lg:text-left mb-6 lg:mb-0 lg:pr-8 flex flex-col items-center lg:items-start justify-center">
+                      <h1 className="text-4xl sm:text-4xl md:text-5xl lg:text-6xl font-light text-gray-800 leading-tight mb-4 md:mb-6">
                         {slide.title}
-                      </h1> */}
+                      </h1>
 
                       {productId ? (
                         <Link
@@ -106,11 +107,11 @@ export default function SpareHeroSection() {
                       )}
                     </div>
 
-                    {/* Image */}
+                    {}
                     <div className="w-full lg:flex-1 flex justify-center items-center">
                       <div className="w-60 h-60 sm:w-72 sm:h-72 md:w-80 md:h-80 lg:w-96 lg:h-96 relative">
                         <Image
-                          src={`${IMG_URL}/${slide.image}`} 
+                          src={`${IMG_URL}/${slide.image}`}
                           alt={slide.title}
                           fill
                           className="object-contain drop-shadow-2xl"
@@ -125,7 +126,7 @@ export default function SpareHeroSection() {
           </div>
         </div>
 
-        {/* Dot Navigation */}
+        {}
         <div className="absolute bottom-4 md:bottom-8 left-1/2 transform -translate-x-1/2 flex space-x-3">
           {carousel.map((_, index) => (
             <button

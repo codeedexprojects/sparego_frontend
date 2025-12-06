@@ -4,15 +4,27 @@ import { useDispatch, useSelector } from "react-redux";
 import { loginUser } from "@/redux/slices/authSlice";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { Watch, Wrench, Microwave, Car, Smartphone, Tv, Cog, Refrigerator, Monitor, Laptop } from "lucide-react";
+import {
+  Watch,
+  Wrench,
+  Microwave,
+  Car,
+  Smartphone,
+  Tv,
+  Cog,
+  Refrigerator,
+  Monitor,
+  Laptop,
+} from "lucide-react";
 
 export default function LoginPage() {
   const [number, setNumber] = useState("");
   const dispatch = useDispatch();
   const router = useRouter();
   const { loading, error } = useSelector((state) => state.auth);
+  const [inputError, setInputError] = useState("");
 
- const handleLogin = (e) => {
+  const handleLogin = (e) => {
     e.preventDefault();
     if (!number) return;
 
@@ -22,60 +34,133 @@ export default function LoginPage() {
         if (res?.success) {
           if (res.sessionId && res.userId) {
             toast.success(res.message || "OTP sent successfully");
-            
+
             // Encode the parameters to handle special characters
             const params = new URLSearchParams({
               sessionId: res.sessionId,
               userId: res.userId,
-              number: number
+              number: number,
             });
-            
+
             router.push(`/spare/verify-otp?${params.toString()}`);
           } else {
             toast.error("Session information missing. Please try again.");
           }
         } else {
-          toast.error(res?.message || "User already exists, please login instead");
+          toast.error(
+            res?.message || "User already exists, please login instead"
+          );
           router.push("/spare/register");
         }
       })
       .catch((error) => {
         console.error("Login failed:", error);
-        toast.error(error?.message || "User already exists, please login instead");
+        toast.error(
+          error?.message || "User already exists, please login instead"
+        );
         router.push("/spare/register");
-
       });
   };
 
-
   const handleKeyPress = (e) => {
-    if (e.key === 'Enter' && !loading) {
+    if (e.key === "Enter" && !loading) {
       handleLogin();
     }
   };
 
   const floatingItems = [
     { Icon: Watch, delay: 0, duration: 25, top: "8%", left: "12%", size: "lg" },
-    { Icon: Wrench, delay: 3, duration: 28, top: "18%", left: "82%", size: "md", rotate: true },
-    { Icon: Microwave, delay: 6, duration: 22, top: "65%", left: "8%", size: "xl" },
+    {
+      Icon: Wrench,
+      delay: 3,
+      duration: 28,
+      top: "18%",
+      left: "82%",
+      size: "md",
+      rotate: true,
+    },
+    {
+      Icon: Microwave,
+      delay: 6,
+      duration: 22,
+      top: "65%",
+      left: "8%",
+      size: "xl",
+    },
     { Icon: Car, delay: 2, duration: 30, top: "75%", left: "88%", size: "lg" },
-    { Icon: Smartphone, delay: 4, duration: 26, top: "35%", left: "5%", size: "md" },
+    {
+      Icon: Smartphone,
+      delay: 4,
+      duration: 26,
+      top: "35%",
+      left: "5%",
+      size: "md",
+    },
     { Icon: Tv, delay: 8, duration: 24, top: "82%", left: "72%", size: "lg" },
-    { Icon: Watch, delay: 10, duration: 27, top: "12%", left: "92%", size: "sm" },
-    { Icon: Cog, delay: 5, duration: 20, top: "88%", left: "18%", size: "md", rotate: true },
-    { Icon: Refrigerator, delay: 7, duration: 29, top: "45%", left: "90%", size: "xl" },
-    { Icon: Laptop, delay: 1, duration: 23, top: "25%", left: "15%", size: "lg" },
-    { Icon: Monitor, delay: 9, duration: 31, top: "55%", left: "85%", size: "md" },
-    { Icon: Wrench, delay: 11, duration: 21, top: "92%", left: "45%", size: "sm", rotate: true },
+    {
+      Icon: Watch,
+      delay: 10,
+      duration: 27,
+      top: "12%",
+      left: "92%",
+      size: "sm",
+    },
+    {
+      Icon: Cog,
+      delay: 5,
+      duration: 20,
+      top: "88%",
+      left: "18%",
+      size: "md",
+      rotate: true,
+    },
+    {
+      Icon: Refrigerator,
+      delay: 7,
+      duration: 29,
+      top: "45%",
+      left: "90%",
+      size: "xl",
+    },
+    {
+      Icon: Laptop,
+      delay: 1,
+      duration: 23,
+      top: "25%",
+      left: "15%",
+      size: "lg",
+    },
+    {
+      Icon: Monitor,
+      delay: 9,
+      duration: 31,
+      top: "55%",
+      left: "85%",
+      size: "md",
+    },
+    {
+      Icon: Wrench,
+      delay: 11,
+      duration: 21,
+      top: "92%",
+      left: "45%",
+      size: "sm",
+      rotate: true,
+    },
   ];
 
   const getSizeClass = (size) => {
-    switch(size) {
-      case "sm": return "w-8 h-8 md:w-10 md:h-10";
-      case "md": return "w-10 h-10 md:w-14 md:h-14";
-      case "lg": return "w-12 h-12 md:w-16 md:h-16";
-      case "xl": return "w-14 h-14 md:w-20 md:h-20";
-      default: return "w-12 h-12 md:w-16 md:h-16";
+    switch (size) {
+      case "sm":
+        return "w-8 h-8 md:w-10 md:h-10";
+      case "md":
+        return "w-10 h-10 md:w-14 md:h-14";
+      case "lg":
+        return "w-12 h-12 md:w-16 md:h-16";
+      case "xl":
+        return "w-14 h-14 md:w-20 md:h-20";
+      default:
+        return "w-12 h-12 md:w-16 md:h-16";
     }
   };
 
@@ -85,7 +170,9 @@ export default function LoginPage() {
         {floatingItems.map((item, index) => (
           <div
             key={index}
-            className={`absolute ${item.rotate ? 'animate-float-rotate' : 'animate-float'}`}
+            className={`absolute ${
+              item.rotate ? "animate-float-rotate" : "animate-float"
+            }`}
             style={{
               top: item.top,
               left: item.left,
@@ -93,15 +180,17 @@ export default function LoginPage() {
               animationDuration: `${item.duration}s`,
             }}
           >
-            <item.Icon 
-              className={`${getSizeClass(item.size)} text-red-600 opacity-0 animate-fade-in`}
+            <item.Icon
+              className={`${getSizeClass(
+                item.size
+              )} text-red-600 opacity-0 animate-fade-in`}
               style={{
                 animationDelay: `${item.delay + 0.5}s`,
               }}
             />
           </div>
         ))}
-        
+
         {/* Additional gradient orbs for depth */}
         <div className="absolute top-20 left-20 w-64 h-64 bg-red-200 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob"></div>
         <div className="absolute top-40 right-20 w-72 h-72 bg-orange-200 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000"></div>
@@ -109,9 +198,7 @@ export default function LoginPage() {
       </div>
       <div className="relative min-h-[calc(100vh-200px)] flex items-center justify-center px-4 py-8 md:py-12">
         <div className="w-full max-w-md">
-          {/* Card with Glass Effect */}
           <div className="bg-white/95 backdrop-blur-xl p-6 md:p-10 rounded-2xl shadow-2xl border border-white/30 transform transition-all duration-300 hover:shadow-3xl animate-slide-up">
-            {/* Header Section */}
             <div className="text-center mb-8">
               <div className="inline-flex items-center justify-center w-16 h-16 md:w-20 md:h-20 bg-gradient-to-br from-red-500 to-red-700 rounded-full mb-4 shadow-lg animate-bounce-slow">
                 <Car className="w-8 h-8 md:w-10 md:h-10 text-white" />
@@ -134,13 +221,26 @@ export default function LoginPage() {
                   <input
                     type="tel"
                     value={number}
-                    onChange={(e) => setNumber(e.target.value)}
+                    onChange={(e) => {
+                      const value = e.target.value;
+
+                      if (/^\d*$/.test(value)) {
+                        setNumber(value);
+                        setInputError("");
+                      } else {
+                        setInputError("Only numbers are allowed");
+                      }
+                    }}
                     onKeyPress={handleKeyPress}
                     placeholder="Enter your mobile number"
                     className="w-full text-gray-800 bg-gray-50 border border-gray-300 rounded-xl px-4 py-3 md:py-4 pl-12 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition-all duration-200 placeholder:text-gray-400 group-hover:border-gray-400"
                   />
                   <Smartphone className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 transition-colors group-focus-within:text-red-500" />
                 </div>
+
+                {inputError && (
+                  <p className="text-red-600 text-sm mt-1">{inputError}</p>
+                )}
               </div>
 
               {error && (
@@ -158,8 +258,20 @@ export default function LoginPage() {
                 {loading ? (
                   <span className="flex items-center justify-center gap-2">
                     <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                        fill="none"
+                      />
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                      />
                     </svg>
                     Sending OTP...
                   </span>
@@ -192,16 +304,12 @@ export default function LoginPage() {
               </a>
             </div>
           </div>
-
-          {/* Security Note */}
-          <p className="text-center text-xs md:text-sm text-gray-600 mt-6 px-4">
-            By continuing, you agree to our Terms of Service and Privacy Policy
-          </p>
         </div>
       </div>
       <style jsx>{`
         @keyframes float {
-          0%, 100% {
+          0%,
+          100% {
             transform: translateY(0px) translateX(0px) scale(1);
             opacity: 0.12;
           }
@@ -220,20 +328,24 @@ export default function LoginPage() {
         }
 
         @keyframes float-rotate {
-          0%, 100% {
+          0%,
+          100% {
             transform: translateY(0px) translateX(0px) rotate(0deg) scale(1);
             opacity: 0.12;
           }
           25% {
-            transform: translateY(-15px) translateX(10px) rotate(90deg) scale(1.05);
+            transform: translateY(-15px) translateX(10px) rotate(90deg)
+              scale(1.05);
             opacity: 0.18;
           }
           50% {
-            transform: translateY(-25px) translateX(-5px) rotate(180deg) scale(1.1);
+            transform: translateY(-25px) translateX(-5px) rotate(180deg)
+              scale(1.1);
             opacity: 0.1;
           }
           75% {
-            transform: translateY(-10px) translateX(15px) rotate(270deg) scale(1.05);
+            transform: translateY(-10px) translateX(15px) rotate(270deg)
+              scale(1.05);
             opacity: 0.15;
           }
         }
@@ -250,7 +362,8 @@ export default function LoginPage() {
         }
 
         @keyframes blob {
-          0%, 100% {
+          0%,
+          100% {
             transform: translate(0px, 0px) scale(1);
           }
           33% {
@@ -273,7 +386,8 @@ export default function LoginPage() {
         }
 
         @keyframes bounce-slow {
-          0%, 100% {
+          0%,
+          100% {
             transform: translateY(0);
           }
           50% {
@@ -282,9 +396,16 @@ export default function LoginPage() {
         }
 
         @keyframes shake {
-          0%, 100% { transform: translateX(0); }
-          25% { transform: translateX(-5px); }
-          75% { transform: translateX(5px); }
+          0%,
+          100% {
+            transform: translateX(0);
+          }
+          25% {
+            transform: translateX(-5px);
+          }
+          75% {
+            transform: translateX(5px);
+          }
         }
 
         .animate-float {
@@ -325,7 +446,8 @@ export default function LoginPage() {
 
         @media (max-width: 640px) {
           @keyframes float {
-            0%, 100% {
+            0%,
+            100% {
               transform: translateY(0px) translateX(0px) scale(1);
               opacity: 0.08;
             }
@@ -336,12 +458,14 @@ export default function LoginPage() {
           }
 
           @keyframes float-rotate {
-            0%, 100% {
+            0%,
+            100% {
               transform: translateY(0px) translateX(0px) rotate(0deg) scale(1);
               opacity: 0.08;
             }
             50% {
-              transform: translateY(-15px) translateX(-5px) rotate(180deg) scale(1.05);
+              transform: translateY(-15px) translateX(-5px) rotate(180deg)
+                scale(1.05);
               opacity: 0.06;
             }
           }

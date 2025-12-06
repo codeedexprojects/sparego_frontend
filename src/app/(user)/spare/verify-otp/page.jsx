@@ -134,11 +134,11 @@ export default function VerifyOtpPage({ searchParams }) {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
-      {process.env.NODE_ENV === "development" && (
+      {/* {process.env.NODE_ENV === "development" && (
         <div className="fixed top-0 left-0 bg-yellow-100 text-yellow-800 text-xs p-2">
           Debug: Number: {number}, SessionId: {sessionId}
         </div>
-      )}
+      )} */}
       <div className="min-h-[calc(100vh-80px)] flex items-center justify-center px-4 py-8">
         <div className="max-w-md w-full">
           <div className="bg-white rounded-2xl shadow-lg p-6 sm:p-8 mx-auto">

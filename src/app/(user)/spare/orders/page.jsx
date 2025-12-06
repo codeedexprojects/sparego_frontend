@@ -3,7 +3,13 @@ import Footer from "@/components/landing/Footer";
 import Header from "@/components/user/spare/Header";
 import { IMG_URL } from "@/redux/baseUrl";
 import { getOrders } from "@/redux/slices/orderSlice";
-import { List, ListCheck, ListCheckIcon, ListChecks, TrendingUp } from "lucide-react";
+import {
+  List,
+  ListCheck,
+  ListCheckIcon,
+  ListChecks,
+  TrendingUp,
+} from "lucide-react";
 import { useRouter } from "next/navigation";
 import React, { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
@@ -12,7 +18,7 @@ const OrdersPage = () => {
   const dispatch = useDispatch();
   const router = useRouter();
   const { order: orders, loading, error } = useSelector((state) => state.order);
-   const { user } = useSelector((state) => state.auth);
+  const user = localStorage.getItem("user")
 
   useEffect(() => {
     dispatch(getOrders());
@@ -164,55 +170,54 @@ const OrdersPage = () => {
     );
   }
 
-if (!user) {
-  return (
-    <>
-    <Header/>
-   <div className=" flex items-center justify-center p-6 bg-gradient-to-br from-red-50 to-white">
+  if (!user) {
+    return (
+      <>
+        <Header />
+        <div className=" flex items-center justify-center p-6 bg-gradient-to-br from-red-50 to-white">
+          <div className="max-w-md w-full">
+            <div className="bg-white rounded-2xl shadow-xl p-8 border border-red-100">
+              {/* Icon */}
+              <div className="flex justify-center mb-6">
+                <div className="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center">
+                  <TrendingUp className="w-16 h-16 text-red-600" />
+                </div>
+              </div>
 
-  <div className="max-w-md w-full">
-    <div className="bg-white rounded-2xl shadow-xl p-8 border border-red-100">
-      {/* Icon */}
-      <div className="flex justify-center mb-6">
-        <div className="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center">
-         <TrendingUp className="w-16 h-16 text-red-600"/>
+              {/* Content */}
+              <h2 className="text-2xl font-bold text-gray-900 mb-3 text-center">
+                Your Orders Awaits
+              </h2>
+              <p className="text-gray-600 text-center mb-8 leading-relaxed">
+                Sign in to access your saved items, manage your profile, and
+                track your orders all in one place.
+              </p>
+
+              {/* Button */}
+              <button
+                className="w-full bg-red-600 text-white px-6 py-3 rounded-lg hover:bg-red-700 transition-all duration-200 font-semibold shadow-lg shadow-red-600/30 hover:shadow-xl hover:shadow-red-600/40 hover:scale-105 transform"
+                onClick={() => router.push("/spare/login")}
+              >
+                Login to Continue
+              </button>
+
+              {/* Footer text */}
+              <p className="text-sm text-gray-500 text-center mt-6">
+                Don't have an account?{" "}
+                <button
+                  className="text-red-600 hover:text-red-700 font-medium hover:underline"
+                  onClick={() => router.push("/spare/register")}
+                >
+                  Sign up
+                </button>
+              </p>
+            </div>
+          </div>
         </div>
-      </div>
-
-      {/* Content */}
-      <h2 className="text-2xl font-bold text-gray-900 mb-3 text-center">
-        Your Orders Awaits
-      </h2>
-      <p className="text-gray-600 text-center mb-8 leading-relaxed">
-        Sign in to access your saved items, manage your profile, and track your orders all in one place.
-      </p>
-
-      {/* Button */}
-      <button
-        className="w-full bg-red-600 text-white px-6 py-3 rounded-lg hover:bg-red-700 transition-all duration-200 font-semibold shadow-lg shadow-red-600/30 hover:shadow-xl hover:shadow-red-600/40 hover:scale-105 transform"
-        onClick={() => router.push("/spare/login")}
-      >
-        Login to Continue
-      </button>
-
-      {/* Footer text */}
-      <p className="text-sm text-gray-500 text-center mt-6">
-        Don't have an account?{' '}
-        <button 
-          className="text-red-600 hover:text-red-700 font-medium hover:underline"
-          onClick={() => router.push("/spare/register")}
-        >
-          Sign up
-        </button>
-      </p>
-    </div>
-  </div>
-</div>
-<Footer/>
-</>
-  );
-} 
-
+        <Footer />
+      </>
+    );
+  }
 
   return (
     <div>

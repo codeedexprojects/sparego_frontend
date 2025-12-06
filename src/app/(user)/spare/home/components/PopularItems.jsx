@@ -113,7 +113,7 @@ export default function PopularItemsSection() {
                   <div
                     key={item._id}
                     className="flex-shrink-0 snap-start"
-                    onClick={() => handleCardClick(item)} // 👈 added click handler
+                    onClick={() => handleCardClick(item)} 
                   >
                     {index === 6 ? (
                       <div
