@@ -11,17 +11,24 @@ import {
   TrendingUp,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 
 const OrdersPage = () => {
   const dispatch = useDispatch();
   const router = useRouter();
   const { order: orders, loading, error } = useSelector((state) => state.order);
-  const user = localStorage.getItem("user")
+  const [user, setUser] = useState(null);
 
   useEffect(() => {
-    dispatch(getOrders());
+    // Only access localStorage on the client side
+    if (typeof window !== "undefined") {
+      const userData = localStorage.getItem("user");
+      setUser(userData);
+      if (userData) {
+        dispatch(getOrders());
+      }
+    }
   }, [dispatch]);
 
   // Function to format date
